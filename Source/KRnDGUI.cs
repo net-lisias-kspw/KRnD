@@ -16,7 +16,7 @@ namespace KRnD
     {
         // TODO: The Application-Button shows up during the flight scene ...
         private static ApplicationLauncherButton button = null;
-        public static Rect windowPosition = new Rect(300, 60, 450, 400);
+        public static Rect windowPosition = new Rect(300, 60, 450, 400+40);
         private static GUIStyle windowStyle = new GUIStyle(HighLogic.Skin.window) { fixedWidth = 500f, fixedHeight = 300f };
         private static GUIStyle labelStyle = new GUIStyle(HighLogic.Skin.label);
         private static GUIStyle labelStyleSmall = new GUIStyle(HighLogic.Skin.label) { fontSize = 10 };
