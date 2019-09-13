@@ -15,8 +15,8 @@ namespace KRnD
 	{
 		// TODO: The Application-Button shows up during the flight scene ...
 		private static ApplicationLauncherButton button;
-		public static Rect windowPosition = new Rect(300, 60, 450, 400 + 40);
-		private static readonly GUIStyle windowStyle = new GUIStyle(HighLogic.Skin.window) {fixedWidth = 500f, fixedHeight = 300f};
+		public static Rect windowPosition = new Rect(300, 60, 450, 400 + 80);
+		private static readonly GUIStyle windowStyle = new GUIStyle(HighLogic.Skin.window) {fixedWidth = 500f, fixedHeight = 300f + 80};
 		private static readonly GUIStyle labelStyle = new GUIStyle(HighLogic.Skin.label);
 		private static readonly GUIStyle labelStyleSmall = new GUIStyle(HighLogic.Skin.label) {fontSize = 10};
 		private static readonly GUIStyle buttonStyle = new GUIStyle(HighLogic.Skin.button);
@@ -507,6 +507,9 @@ namespace KRnD
 				var optionsHeight = windowStyle.fixedHeight - 30 - 30 - 20;
 				GUILayout.BeginArea(new Rect(10, 30 + 20, optionsWidth, optionsHeight));
 
+
+				GUILayout.BeginVertical();
+
 				var options = new List<string>();
 				options.Add("Dry Mass");
 				options.Add("Max Temp");
@@ -526,6 +529,9 @@ namespace KRnD
 				if (parachuteModule) options.Add("Parachute");
 				if (this.selectedUpgradeOption >= options.Count) this.selectedUpgradeOption = 0;
 				this.selectedUpgradeOption = GUILayout.SelectionGrid(this.selectedUpgradeOption, options.ToArray(), 1, buttonStyle);
+
+				GUILayout.EndVertical();
+
 				GUILayout.EndArea();
 
 				var selectedUpgradeOption = options.ToArray()[this.selectedUpgradeOption];
