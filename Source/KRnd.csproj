@@ -66,9 +66,11 @@
     <Compile Include="KRnD.cs" />
     <Compile Include="KRnDModule.cs" />
     <Compile Include="KRnDGUI.cs" />
+    <Compile Include="KRnDSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GameData\KRnD\blacklist.cfg" />
+    <None Include="GameData\KRnD\Configuration.cfg" />
     <None Include="GameData\KRnD\parts.cfg" />
   </ItemGroup>
   <ItemGroup>
@@ -78,8 +80,8 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "$(SolutionDir)GameData\KRnD" 
-copy /Y  "$(SolutionDir)GameData\KRnD" "D:\Games\Steam\SteamApps\common\Kerbal Space Program\GameData\KRnD"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "$(SolutionDir)Source/GameData\KRnD" 
+copy /Y  "$(SolutionDir)Source/GameData\KRnD" "D:\Games\Steam\SteamApps\common\Kerbal Space Program\GameData\KRnD"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
