@@ -1034,6 +1034,8 @@ namespace KRnD
 		public override void OnSave(ConfigNode node)
 		{
 			try {
+				if (KRnDSettings.Instance != null) KRnDSettings.Instance.OnSave(node);
+
 				double time = DateTime.Now.Ticks;
 				var upgradeNodes = new ConfigNode("upgrades");
 				foreach (var upgradeName in KRnD.upgrades.Keys) {
@@ -1060,6 +1062,8 @@ namespace KRnD
 		public override void OnLoad(ConfigNode node)
 		{
 			try {
+				if (KRnDSettings.Instance != null) KRnDSettings.Instance.OnLoad(node);
+
 				double time = DateTime.Now.Ticks;
 				var upgradesApplied = 0;
 

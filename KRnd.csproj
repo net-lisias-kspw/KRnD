@@ -40,6 +40,12 @@
     <Reference Include="Assembly-UnityScript-firstpass">
       <HintPath>D:\Games\Steam\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-UnityScript-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="ClickThroughBlocker">
+      <HintPath>D:\Games\Steam\steamapps\common\Kerbal Space Program\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
+    </Reference>
+    <Reference Include="ContractConfigurator">
+      <HintPath>D:\Games\Steam\steamapps\common\Kerbal Space Program\GameData\ContractConfigurator\ContractConfigurator.dll</HintPath>
+    </Reference>
     <Reference Include="KSPAssets, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\Games\Steam\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\KSPAssets.dll</HintPath>
@@ -53,6 +59,9 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="ToolbarControl">
+      <HintPath>D:\Games\Steam\steamapps\common\Kerbal Space Program\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\Games\Steam\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
@@ -63,12 +72,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="KRnD.cs" />
-    <Compile Include="KRnDModule.cs" />
-    <Compile Include="KRnDGUI.cs" />
-    <Compile Include="KRnDSettings.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="GameData\KRnD\blacklist.cfg" />
     <None Include="GameData\KRnD\Configuration.cfg" />
     <None Include="GameData\KRnD\parts.cfg" />
@@ -77,11 +80,19 @@
     <Content Include="GameData\KRnD\KRnD.dll" />
     <Content Include="GameData\KRnD\R&amp;D_icon.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="KRnD.cs" />
+    <Compile Include="KRnDGUI.cs" />
+    <Compile Include="KRnDModule.cs" />
+    <Compile Include="KRnDSettings.cs" />
+    <Compile Include="UpgradeData.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "$(SolutionDir)Source/GameData\KRnD" 
-copy /Y  "$(SolutionDir)Source/GameData\KRnD" "D:\Games\Steam\SteamApps\common\Kerbal Space Program\GameData\KRnD"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "$(SolutionDir)GameData\KRnD" 
+copy /Y  "$(SolutionDir)GameData\KRnD" "D:\Games\Steam\SteamApps\common\Kerbal Space Program\GameData\KRnD"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
