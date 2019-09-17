@@ -34,7 +34,7 @@ namespace KRnD.Source
 		{
 			if (texture == null) {
 				texture = new Texture2D(36, 36, TextureFormat.RGBA32, false);
-				var textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "R&D_icon.png");
+				var textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Constants.APP_ICON);
 				texture.LoadImage(File.ReadAllBytes(textureFile));
 			}
 

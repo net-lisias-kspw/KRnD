@@ -26,9 +26,9 @@ namespace KRnD.Source
 
 
 
-		public float calculateImprovementFactor(int upgrades)
+		public float CalculateImprovementFactor(int upgrades)
 		{
-			float factor = 0;
+			float factor = 1;
 			if (upgrades < 0) upgrades = 0;
 			for (var i = 0; i < upgrades; i++) {
 				factor += improvementValue * (float)Math.Pow(KRnDSettings.improvementRate, i);
@@ -37,11 +37,12 @@ namespace KRnD.Source
 			/*
 			 * Improvement is clamped at a limit of 10% to 400% of original value.
 			 */
-			if (improvementValue < 0 && factor < -0.9) factor = -0.9f;
-			return 1 + (float)Math.Round(factor, 4);
+			if (factor < 0.1) factor = 0.1f;
+			if (factor > 4) factor = 4.0f;
+			return factor;
 		}
 
-		public int calculateScienceCost(float original_stat, int upgrades)
+		public int CalculateScienceCost(float original_stat, int upgrades)
 		{
 			float cost_total = 0;
 			float cost_base = scienceCost * costDivisor > 0 ? (original_stat / costDivisor) : 1;
@@ -51,10 +52,10 @@ namespace KRnD.Source
 			}
 
 			/*
-			 * Cost is clamped between 1 and max signed int.
+			 * Cost is clamped between 1 and max signed int. Science point cost is always a whole number.
 			 */
 			if (cost_total < 1) cost_total = 1;
-			if (cost_total > 2147483647) return 2147483647; // Cap at signed 32 bit int
+			if (cost_total > Int32.MaxValue) return Int32.MaxValue; // Cap at signed 32 bit int
 			return (int)Math.Round(cost_total);
 		}
 

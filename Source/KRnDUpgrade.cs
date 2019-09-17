@@ -35,6 +35,7 @@ namespace KRnD.Source
 		public int parachuteStrength;
 		public int torque;
 
+#if false
 		public override string ToString()
 		{
 			return "KRnDUpgrade(" +
@@ -53,6 +54,7 @@ namespace KRnD.Source
 				   Constants.FUEL_CAPACITY + ":" + fuelCapacity +
 				   ")";
 		}
+#endif
 
 		public ConfigNode CreateConfigNode(string name)
 		{

@@ -31,5 +31,7 @@
 
 
 		public static string CONFIG_FILENAME = "/GameData/KRnD/Config.cfg";
+
+		public static string APP_ICON = "R&D_icon.png";
 	}
 }
