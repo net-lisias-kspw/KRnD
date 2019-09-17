@@ -81,14 +81,17 @@
     <Content Include="GameData\KRnD\R&amp;D_icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="KRnD.cs" />
-    <Compile Include="KRnDGUI.cs" />
-    <Compile Include="KRnDModule.cs" />
-    <Compile Include="KRnDSettings.cs" />
-    <Compile Include="UpgradeData.cs" />
+    <Compile Include="Source\AssemblyInfo.cs" />
+    <Compile Include="Source\Constants.cs" />
+    <Compile Include="Source\KRnD.cs" />
+    <Compile Include="Source\KRnDGUI.cs" />
+    <Compile Include="Source\KRnDModule.cs" />
+    <Compile Include="Source\KRnDSettings.cs" />
+    <Compile Include="Source\KRnDUpgrade.cs" />
+    <Compile Include="Source\PartStats.cs" />
+    <Compile Include="Source\UpgradeData.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetPath)" "$(SolutionDir)GameData\KRnD" 

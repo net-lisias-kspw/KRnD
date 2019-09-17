@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace KRnD
+﻿namespace KRnD.Source
 {
 	public class Constants
 	{
@@ -22,11 +17,17 @@ namespace KRnD
 		public static string TORQUE = "torque";
 
 
-		public static string COST_SCALE = "costScale";
-		public static string COST_SCALE_REFERENCE = "costScaleReference";
+		//public static string COST_SCALE = "costScale";
+		public static string COST_DIVISOR = "costDivisor";
 		public static string IMPROVEMENT = "improvement";
-		public static string IMPROVEMENT_SCALE = "improvementScale";
+		//public static string IMPROVEMENT_SCALE = "improvementScale";
 		public static string SCIENCE_COST = "scienceCost";
+
+		public static string COST_RATE = "costRate";
+		public static string IMPROVEMENT_RATE = "improvementRate";
+
+		//public static float IMPROVEMENT_SCALE_FACTOR = 1.0f;
+		//public static float COST_SCALE_FACTOR = 2.0f;
 
 
 		public static string CONFIG_FILENAME = "/GameData/KRnD/Config.cfg";

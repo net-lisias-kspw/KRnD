@@ -5,223 +5,8 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace KRnD
+namespace KRnD.Source
 {
-	// This class stores all types of upgrades a part can have.
-	public class KRnDUpgrade
-	{
-		public const string ISP_VAC = "ispVac";
-		public const string ISP_ATM = "ispAtm";
-		public const string DRY_MASS = "dryMass";
-		public const string FUEL_FLOW = "fuelFlow";
-		public const string TORQUE = "torque";
-		public const string CHARGE_RATE = "chargeRate";
-		public const string CRASH_TOLERANCE = "crashTolerance";
-		public const string BATTERY_CHARGE = "batteryCharge";
-		public const string GENERATOR_EFFICIENCY = "generatorEfficiency";
-		public const string CONVERTER_EFFICIENCY = "converterEfficiency";
-		public const string PARACHUTE_STRENGTH = "parachuteStrength";
-		public const string MAX_TEMPERATURE = "maxTemperature";
-		public const string FUEL_CAPACITY = "fuelCapacity";
-		public int batteryCharge;
-		public int chargeRate;
-		public int converterEfficiency;
-		public int crashTolerance;
-		public int dryMass;
-		public int fuelCapacity;
-		public int fuelFlow;
-		public int generatorEfficiency;
-		public int ispAtm;
-		public int ispVac;
-		public int maxTemperature;
-		public int parachuteStrength;
-		public int torque;
-
-		public override string ToString()
-		{
-			return "KRnDUpgrade(" +
-			       ISP_VAC + ":" + ispVac + "," +
-			       ISP_ATM + ":" + ispAtm + "," +
-			       DRY_MASS + ":" + dryMass + "," +
-			       FUEL_FLOW + ":" + fuelFlow + "," +
-			       TORQUE + ":" + torque + "," +
-			       CHARGE_RATE + ":" + chargeRate + "," +
-			       CRASH_TOLERANCE + ":" + crashTolerance + "," +
-			       BATTERY_CHARGE + ":" + batteryCharge + "," +
-			       GENERATOR_EFFICIENCY + ":" + generatorEfficiency + "," +
-			       CONVERTER_EFFICIENCY + ":" + converterEfficiency + "," +
-			       PARACHUTE_STRENGTH + ":" + parachuteStrength + "," +
-			       MAX_TEMPERATURE + ":" + maxTemperature + "," +
-			       FUEL_CAPACITY + ":" + fuelCapacity +
-			       ")";
-		}
-
-		public ConfigNode createConfigNode(string name)
-		{
-			var node = new ConfigNode(name);
-			if (ispVac > 0) node.AddValue(ISP_VAC, ispVac.ToString());
-			if (ispAtm > 0) node.AddValue(ISP_ATM, ispAtm.ToString());
-			if (dryMass > 0) node.AddValue(DRY_MASS, dryMass.ToString());
-			if (fuelFlow > 0) node.AddValue(FUEL_FLOW, fuelFlow.ToString());
-			if (torque > 0) node.AddValue(TORQUE, torque.ToString());
-			if (chargeRate > 0) node.AddValue(CHARGE_RATE, chargeRate.ToString());
-			if (crashTolerance > 0) node.AddValue(CRASH_TOLERANCE, crashTolerance.ToString());
-			if (batteryCharge > 0) node.AddValue(BATTERY_CHARGE, batteryCharge.ToString());
-			if (generatorEfficiency > 0) node.AddValue(GENERATOR_EFFICIENCY, generatorEfficiency.ToString());
-			if (converterEfficiency > 0) node.AddValue(CONVERTER_EFFICIENCY, converterEfficiency.ToString());
-			if (parachuteStrength > 0) node.AddValue(PARACHUTE_STRENGTH, parachuteStrength.ToString());
-			if (maxTemperature > 0) node.AddValue(MAX_TEMPERATURE, maxTemperature.ToString());
-			if (fuelCapacity > 0) node.AddValue(FUEL_CAPACITY, fuelCapacity.ToString());
-			return node;
-		}
-
-		public static KRnDUpgrade createFromConfigNode(ConfigNode node)
-		{
-			var upgrade = new KRnDUpgrade();
-			if (node.HasValue(ISP_VAC)) upgrade.ispVac = int.Parse(node.GetValue(ISP_VAC));
-			if (node.HasValue(ISP_ATM)) upgrade.ispAtm = int.Parse(node.GetValue(ISP_ATM));
-			if (node.HasValue(DRY_MASS)) upgrade.dryMass = int.Parse(node.GetValue(DRY_MASS));
-			if (node.HasValue(FUEL_FLOW)) upgrade.fuelFlow = int.Parse(node.GetValue(FUEL_FLOW));
-			if (node.HasValue(TORQUE)) upgrade.torque = int.Parse(node.GetValue(TORQUE));
-			if (node.HasValue(CHARGE_RATE)) upgrade.chargeRate = int.Parse(node.GetValue(CHARGE_RATE));
-			if (node.HasValue(CRASH_TOLERANCE)) upgrade.crashTolerance = int.Parse(node.GetValue(CRASH_TOLERANCE));
-			if (node.HasValue(BATTERY_CHARGE)) upgrade.batteryCharge = int.Parse(node.GetValue(BATTERY_CHARGE));
-			if (node.HasValue(GENERATOR_EFFICIENCY)) upgrade.generatorEfficiency = int.Parse(node.GetValue(GENERATOR_EFFICIENCY));
-			if (node.HasValue(CONVERTER_EFFICIENCY)) upgrade.converterEfficiency = int.Parse(node.GetValue(CONVERTER_EFFICIENCY));
-			if (node.HasValue(PARACHUTE_STRENGTH)) upgrade.parachuteStrength = int.Parse(node.GetValue(PARACHUTE_STRENGTH));
-			if (node.HasValue(MAX_TEMPERATURE)) upgrade.maxTemperature = int.Parse(node.GetValue(MAX_TEMPERATURE));
-			if (node.HasValue(FUEL_CAPACITY)) upgrade.fuelCapacity = int.Parse(node.GetValue(FUEL_CAPACITY));
-			return upgrade;
-		}
-
-		public KRnDUpgrade clone()
-		{
-			var copy = new KRnDUpgrade();
-			copy.ispVac = ispVac;
-			copy.ispAtm = ispAtm;
-			copy.dryMass = dryMass;
-			copy.fuelFlow = fuelFlow;
-			copy.torque = torque;
-			copy.chargeRate = chargeRate;
-			copy.crashTolerance = crashTolerance;
-			copy.batteryCharge = batteryCharge;
-			copy.generatorEfficiency = generatorEfficiency;
-			copy.converterEfficiency = converterEfficiency;
-			copy.parachuteStrength = parachuteStrength;
-			copy.maxTemperature = maxTemperature;
-			copy.fuelCapacity = fuelCapacity;
-			return copy;
-		}
-	}
-
-	// This class is used to store all relevant base-stats of a part used to calculate all other stats with
-	// incremental upgrades as well as a backup for restoring the original stats (eg after loading a savegame).
-	public class PartStats
-	{
-		public List<FloatCurve> atmosphereCurves;
-		public double batteryCharge;
-		public float chargeRate;
-		public double chuteMaxTemp;
-		public Dictionary<string, Dictionary<string, double>> converterEfficiency; // Converter Name, (Resource-Name, Ratio)
-		public float crashTolerance;
-		public float fairingAreaMass;
-		public double fissionPowerGeneration; // From FissionGenerator
-		public Dictionary<string, double> fuelCapacities; // Resource-Name, capacity
-		public double fuelCapacitiesSum; // Sum of all fuel capacities
-		public Dictionary<string, double> generatorEfficiency; // Resource-Name, Rate
-		public double intMaxTemp;
-		public float mass;
-		public List<float> maxFuelFlows;
-		public double skinMaxTemp;
-		public float torque;
-
-		public PartStats(Part part)
-		{
-			mass = part.mass;
-			skinMaxTemp = part.skinMaxTemp;
-			intMaxTemp = part.maxTemp;
-
-			// There should only be one or the other, engines or RCS:
-			var engineModules = KRnD.getEngineModules(part);
-			var rcsModule = KRnD.getRcsModule(part);
-			if (engineModules != null) {
-				maxFuelFlows = new List<float>();
-				atmosphereCurves = new List<FloatCurve>();
-
-				foreach (var engineModule in engineModules) {
-					maxFuelFlows.Add(engineModule.maxFuelFlow);
-
-					var atmosphereCurve = new FloatCurve();
-					for (var i = 0; i < engineModule.atmosphereCurve.Curve.length; i++) {
-						var frame = engineModule.atmosphereCurve.Curve[i];
-						atmosphereCurve.Add(frame.time, frame.value);
-					}
-
-					atmosphereCurves.Add(atmosphereCurve);
-				}
-			} else if (rcsModule) {
-				maxFuelFlows = new List<float>();
-				atmosphereCurves = new List<FloatCurve>();
-
-				maxFuelFlows.Add(rcsModule.thrusterPower);
-				var atmosphereCurve = new FloatCurve();
-				for (var i = 0; i < rcsModule.atmosphereCurve.Curve.length; i++) {
-					var frame = rcsModule.atmosphereCurve.Curve[i];
-					atmosphereCurve.Add(frame.time, frame.value);
-				}
-
-				atmosphereCurves.Add(atmosphereCurve);
-			}
-
-			var reactionWheel = KRnD.getReactionWheelModule(part);
-			if (reactionWheel) torque = reactionWheel.RollTorque; // There is also pitch- and yaw-torque, but they should all be the same
-
-			var solarPanel = KRnD.getSolarPanelModule(part);
-			if (solarPanel) chargeRate = solarPanel.chargeRate;
-
-			var landingLeg = KRnD.getLandingLegModule(part);
-			if (landingLeg) crashTolerance = part.crashTolerance; // Every part has a crash tolerance, but we only want to improve landing legs.
-
-			var electricCharge = KRnD.getChargeResource(part);
-			if (electricCharge != null) batteryCharge = electricCharge.maxAmount;
-
-			var generator = KRnD.getGeneratorModule(part);
-			if (generator != null) {
-				generatorEfficiency = new Dictionary<string, double>();
-				foreach (var outputResource in generator.resHandler.outputResources) generatorEfficiency.Add(outputResource.name, outputResource.rate);
-			}
-
-			var fissionGenerator = KRnD.getFissionGeneratorModule(part);
-			if (fissionGenerator != null) fissionPowerGeneration = KRnD.getGenericModuleValue(fissionGenerator, "PowerGeneration");
-
-			// There might be different converter-modules in the same part with different names (eg for Fuel, Monopropellant, etc):
-			var converterList = KRnD.getConverterModules(part);
-			if (converterList != null) {
-				converterEfficiency = new Dictionary<string, Dictionary<string, double>>();
-				foreach (var converter in converterList) {
-					var thisConverterEfficiency = new Dictionary<string, double>();
-					foreach (var resourceRatio in converter.outputList) thisConverterEfficiency.Add(resourceRatio.ResourceName, resourceRatio.Ratio);
-					converterEfficiency.Add(converter.ConverterName, thisConverterEfficiency);
-				}
-			}
-
-			var parachute = KRnD.getParachuteModule(part);
-			if (parachute) chuteMaxTemp = parachute.chuteMaxTemp;
-
-			var fairing = KRnD.getFairingModule(part);
-			if (fairing) fairingAreaMass = fairing.UnitAreaMass;
-
-			var fuelResources = KRnD.getFuelResources(part);
-			if (fuelResources != null) {
-				fuelCapacities = new Dictionary<string, double>();
-				fuelCapacitiesSum = 0;
-				foreach (var fuelResource in fuelResources) {
-					fuelCapacities.Add(fuelResource.resourceName, fuelResource.maxAmount);
-					fuelCapacitiesSum += fuelResource.maxAmount;
-				}
-			}
-		}
-	}
 
 	[KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
 	public class KRnD : MonoBehaviour
@@ -233,7 +18,7 @@ namespace KRnD
 		public static List<string> blacklistedParts;
 
 		// Helper for accessing values in third party modules:
-		public static double getGenericModuleValue(PartModule module, string fieldName)
+		public static double GetGenericModuleValue(PartModule module, string fieldName)
 		{
 			var type = module.GetType();
 			foreach (var info in type.GetFields()) {
@@ -246,7 +31,7 @@ namespace KRnD
 		}
 
 		// Helper for setting values in third party modules:
-		public static void setGenericModuleValue(PartModule module, string fieldName, double value)
+		public static void SetGenericModuleValue(PartModule module, string fieldName, double value)
 		{
 			var type = module.GetType();
 			foreach (var info in type.GetFields()) {
@@ -260,7 +45,7 @@ namespace KRnD
 		}
 
 		// Checks if the given, generic part-module has a field with the given name:
-		public static bool hasGenericModuleField(PartModule module, string fieldName)
+		public static bool HasGenericModuleField(PartModule module, string fieldName)
 		{
 			var type = module.GetType();
 			foreach (var info in type.GetFields()) {
@@ -272,7 +57,7 @@ namespace KRnD
 			return false;
 		}
 
-		public static KRnDModule getKRnDModule(Part part)
+		public static KRnDModule GetKRnDModule(Part part)
 		{
 			// If this is a blacklisted part, don't touch it, even if it should have an RnD-Module. We do it like
 			// this because using module-manager-magic to prevent RnD from getting installed with other, incompatible
@@ -394,7 +179,7 @@ namespace KRnD
 			foreach (var partModule in part.Modules)
 				// We are only interested in "FissionGenerator" with the tunable attribute "PowerGeneration":
 			{
-				if (partModule.moduleName == "FissionGenerator" && hasGenericModuleField(partModule, "PowerGeneration")) {
+				if (partModule.moduleName == "FissionGenerator" && HasGenericModuleField(partModule, "PowerGeneration")) {
 					return partModule;
 				}
 			}
@@ -543,9 +328,8 @@ namespace KRnD
 
 						var fuelResources = getFuelResources(part.partPrefab);
 						var electricCharge = getChargeResource(part.partPrefab);
-						foreach (var info in part.resourceInfos)
-							// The Resource-Names are not always formated the same way, eg "Electric Charge" vs "ElectricCharge", so we do some reformating.
-						{
+						// The Resource-Names are not always formated the same way, eg "Electric Charge" vs "ElectricCharge", so we do some reformating.
+						foreach (var info in part.resourceInfos) {
 							if (electricCharge != null && info.resourceName.Replace(" ", "").ToLower() == electricCharge.resourceName.Replace(" ", "").ToLower()) {
 								info.info = electricCharge.GetInfo();
 								info.primaryInfo = "<b>" + info.resourceName + ":</b> " + electricCharge.maxAmount;
@@ -598,8 +382,8 @@ namespace KRnD
 					updatePart(part, upgradesToApply);
 				}
 			} else {
-				// Extract current upgrades of the part and set thoes stats:
-				var rndModule = getKRnDModule(part);
+				// Extract current upgrades of the part and set those stats:
+				var rndModule = GetKRnDModule(part);
 				if (rndModule != null && (upgradesToApply = rndModule.getCurrentUpgrades()) != null) {
 					// Apply upgrades from the RnD-Module:
 					updatePart(part, upgradesToApply);
@@ -623,7 +407,7 @@ namespace KRnD
 		{
 			try {
 				// Find all relevant modules of this part:
-				var rndModule = getKRnDModule(part);
+				var rndModule = GetKRnDModule(part);
 				if (rndModule == null) return;
 				if (upgrades == null) throw new Exception("upgrades-dictionary missing");
 				if (KRnD.originalStats == null) throw new Exception("original-stats-dictionary missing");
@@ -777,7 +561,7 @@ namespace KRnD
 
 					if (fissionGenerator) {
 						var powerGeneration = originalStats.fissionPowerGeneration * (1 + calculateImprovementFactor(rndModule.generatorEfficiency_improvement, rndModule.generatorEfficiency_improvementScale, upgradesToApply.generatorEfficiency));
-						setGenericModuleValue(fissionGenerator, "PowerGeneration", powerGeneration);
+						SetGenericModuleValue(fissionGenerator, "PowerGeneration", powerGeneration);
 					}
 				} else {
 					rndModule.generatorEfficiency_upgrades = 0;
@@ -853,7 +637,7 @@ namespace KRnD
 				// Iterate through all parts:
 				foreach (var part in vessel.parts) {
 					// We only have to update parts which have the RnD-Module:
-					var rndModule = getKRnDModule(part);
+					var rndModule = GetKRnDModule(part);
 					if (rndModule == null) continue;
 
 					if (vessel.situation == Vessel.Situations.PRELAUNCH) {
@@ -1001,7 +785,7 @@ namespace KRnD
 						var part = aPart.partPrefab;
 
 						// Backup this part, if it has the RnD-Module:
-						if (getKRnDModule(part) != null) {
+						if (GetKRnDModule(part) != null) {
 							PartStats duplicate;
 							if (originalStats.TryGetValue(part.name, out duplicate)) {
 								//Debug.LogError("[KRnD] Awake(): duplicate part-name: " + part.name.ToString());
@@ -1041,7 +825,7 @@ namespace KRnD
 				foreach (var upgradeName in KRnD.upgrades.Keys) {
 					KRnDUpgrade upgrade;
 					if (!KRnD.upgrades.TryGetValue(upgradeName, out upgrade)) continue;
-					upgradeNodes.AddNode(upgrade.createConfigNode(upgradeName));
+					upgradeNodes.AddNode(upgrade.CreateConfigNode(upgradeName));
 					//Debug.Log("[KRnD] saved: " + upgradeName + " " + upgrade.ToString());
 				}
 
@@ -1072,7 +856,7 @@ namespace KRnD
 				var upgradeNodes = node.GetNode("upgrades");
 				if (upgradeNodes != null) {
 					foreach (var upgradeNode in upgradeNodes.GetNodes()) {
-						var upgrade = KRnDUpgrade.createFromConfigNode(upgradeNode);
+						var upgrade = KRnDUpgrade.CreateFromConfigNode(upgradeNode);
 						KRnD.upgrades.Add(upgradeNode.name, upgrade);
 					}
 

@@ -8,7 +8,7 @@ using UnityEngine;
 
 // For "ApplicationLauncherButton"
 
-namespace KRnD
+namespace KRnD.Source
 {
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
 	public class KRnDGUI : MonoBehaviour
@@ -332,7 +332,7 @@ namespace KRnD
 			var info = "";
 			KRnDUpgrade originalUpgrades = null;
 			try {
-				var rndModule = KRnD.getKRnDModule(part);
+				var rndModule = KRnD.GetKRnDModule(part);
 				if (rndModule == null || (originalUpgrades = rndModule.getCurrentUpgrades()) == null) return info;
 
 				// Upgrade the part to get the correct info, we revert it back to its previous values in the finally block below:
@@ -452,7 +452,7 @@ namespace KRnD
 						}
 
 					if (part) {
-						rndModule = KRnD.getKRnDModule(part);
+						rndModule = KRnD.GetKRnDModule(part);
 						engineModules = KRnD.getEngineModules(part);
 						rcsModule = KRnD.getRcsModule(part);
 						reactionWheelModule = KRnD.getReactionWheelModule(part);
@@ -493,7 +493,7 @@ namespace KRnD
 				var currentInfo = getPartInfo(part, currentUpgrade);
 
 				// Create a copy of the part-stats which we can use to mock an upgrade further below:
-				var nextUpgrade = currentUpgrade.clone();
+				var nextUpgrade = currentUpgrade.Clone();
 
 				// Title:
 				GUILayout.BeginArea(new Rect(10, 5, windowStyle.fixedWidth, 20));

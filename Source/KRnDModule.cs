@@ -1,4 +1,4 @@
-﻿namespace KRnD
+﻿namespace KRnD.Source
 {
 	[KSPModule("R&D")]
 	public class KRnDModule : PartModule
