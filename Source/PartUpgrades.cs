@@ -6,7 +6,7 @@ using System.Text;
 namespace KRnD.Source
 {
 	// This class stores all types of upgrades a part can have.
-	public class KRnDUpgrade
+	public class PartUpgrades
 	{
 		//public const string ISP_VAC = "ispVac";
 		//public const string ISP_ATM = "ispAtm";
@@ -75,9 +75,9 @@ namespace KRnD.Source
 			return node;
 		}
 
-		public static KRnDUpgrade CreateFromConfigNode(ConfigNode node)
+		public static PartUpgrades CreateFromConfigNode(ConfigNode node)
 		{
-			var upgrade = new KRnDUpgrade();
+			var upgrade = new PartUpgrades();
 			if (node.HasValue(Constants.ISP_VAC)) upgrade.ispVac = int.Parse(node.GetValue(Constants.ISP_VAC));
 			if (node.HasValue(Constants.ISP_ATM)) upgrade.ispAtm = int.Parse(node.GetValue(Constants.ISP_ATM));
 			if (node.HasValue(Constants.DRY_MASS)) upgrade.dryMass = int.Parse(node.GetValue(Constants.DRY_MASS));
@@ -94,9 +94,9 @@ namespace KRnD.Source
 			return upgrade;
 		}
 
-		public KRnDUpgrade Clone()
+		public PartUpgrades Clone()
 		{
-			var copy = new KRnDUpgrade();
+			var copy = new PartUpgrades();
 			copy.ispVac = ispVac;
 			copy.ispAtm = ispAtm;
 			copy.dryMass = dryMass;

@@ -11,7 +11,7 @@ using UnityEngine;
 namespace KRnD.Source
 {
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
-	public class KRnDGUI : MonoBehaviour
+	public class UpgradeUI : MonoBehaviour
 	{
 		// TODO: The Application-Button shows up during the flight scene ...
 		private static ApplicationLauncherButton button;
@@ -34,7 +34,7 @@ namespace KRnD.Source
 		{
 			if (texture == null) {
 				texture = new Texture2D(36, 36, TextureFormat.RGBA32, false);
-				var textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Constants.APP_ICON);
+				var textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), Constants.APP_ICON);
 				texture.LoadImage(File.ReadAllBytes(textureFile));
 			}
 
@@ -82,15 +82,15 @@ namespace KRnD.Source
 		public static int UpgradeIspVac(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.ispVac++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeIspVac(): " + e);
 			}
@@ -101,15 +101,15 @@ namespace KRnD.Source
 		public static int UpgradeIspAtm(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.ispAtm++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeIspAtm(): " + e);
 			}
@@ -120,15 +120,15 @@ namespace KRnD.Source
 		public static int UpgradeDryMass(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.dryMass++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeDryMass(): " + e);
 			}
@@ -139,15 +139,15 @@ namespace KRnD.Source
 		public static int UpgradeFuelFlow(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.fuelFlow++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeFuelFlow(): " + e);
 			}
@@ -158,15 +158,15 @@ namespace KRnD.Source
 		public static int UpgradeTorque(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.torque++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeTorque(): " + e);
 			}
@@ -177,15 +177,15 @@ namespace KRnD.Source
 		public static int UpgradeChargeRate(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.chargeRate++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeChargeRate(): " + e);
 			}
@@ -196,15 +196,15 @@ namespace KRnD.Source
 		public static int UpgradeCrashTolerance(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.crashTolerance++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeCrashTolerance(): " + e);
 			}
@@ -215,15 +215,15 @@ namespace KRnD.Source
 		public static int UpgradeBatteryCharge(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.batteryCharge++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeBatteryCharge(): " + e);
 			}
@@ -234,15 +234,15 @@ namespace KRnD.Source
 		public static int UpgradeGeneratorEfficiency(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.generatorEfficiency++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeGeneratorEfficiency(): " + e);
 			}
@@ -253,15 +253,15 @@ namespace KRnD.Source
 		public static int UpgradeConverterEfficiency(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.converterEfficiency++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeConverterEfficiency(): " + e);
 			}
@@ -272,15 +272,15 @@ namespace KRnD.Source
 		public static int UpgradeParachuteStrength(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.parachuteStrength++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeParachuteStrength(): " + e);
 			}
@@ -291,15 +291,15 @@ namespace KRnD.Source
 		public static int UpgradeMaxTemperature(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.maxTemperature++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeMaxTemperature(): " + e);
 			}
@@ -310,15 +310,15 @@ namespace KRnD.Source
 		public static int UpgradeFuelCapacity(Part part)
 		{
 			try {
-				KRnDUpgrade store = null;
+				PartUpgrades store = null;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
-					store = new KRnDUpgrade();
+					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
 				}
 
 				store.fuelCapacity++;
-				KRnD.updateGlobalParts();
-				KRnD.updateEditorVessel();
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] UpgradeFuelCapacity(): " + e);
 			}
@@ -327,33 +327,36 @@ namespace KRnD.Source
 		}
 
 		// Returns the info-text of the given part with the given upgrades to be displayed in the GUI-comparison.
-		private string getPartInfo(Part part, KRnDUpgrade upgradesToApply = null)
+		private string getPartInfo(Part part, PartUpgrades upgradesToApply = null)
 		{
 			var info = "";
-			KRnDUpgrade originalUpgrades = null;
+			PartUpgrades originalUpgrades = null;
 			try {
 				var rndModule = KRnD.GetKRnDModule(part);
-				if (rndModule == null || (originalUpgrades = rndModule.getCurrentUpgrades()) == null) return info;
+				if (rndModule == null || (originalUpgrades = rndModule.GetCurrentUpgrades()) == null) return info;
 
 				// Upgrade the part to get the correct info, we revert it back to its previous values in the finally block below:
-				KRnD.updatePart(part, upgradesToApply);
-				var engineModules = KRnD.getEngineModules(part);
-				var rcsModule = KRnD.getRcsModule(part);
-				var reactionWheelModule = KRnD.getReactionWheelModule(part);
-				var solarPanelModule = KRnD.getSolarPanelModule(part);
-				var landingLegModule = KRnD.getLandingLegModule(part);
-				var electricChargeResource = KRnD.getChargeResource(part);
-				var generatorModule = KRnD.getGeneratorModule(part);
-				var fissionGenerator = KRnD.getFissionGeneratorModule(part);
-				var converterModules = KRnD.getConverterModules(part);
-				var parachuteModule = KRnD.getParachuteModule(part);
-				var fairingModule = KRnD.getFairingModule(part);
-				var fuelResources = KRnD.getFuelResources(part);
+				KRnD.UpdatePart(part, upgradesToApply);
+				var engineModules = KRnD.GetEngineModules(part);
+				var rcsModule = KRnD.GetRcsModule(part);
+				var reactionWheelModule = KRnD.GetReactionWheelModule(part);
+				var solarPanelModule = KRnD.GetSolarPanelModule(part);
+				var landingLegModule = KRnD.GetLandingLegModule(part);
+				var electricChargeResource = KRnD.GetChargeResource(part);
+				var generatorModule = KRnD.GetGeneratorModule(part);
+				var fissionGenerator = KRnD.GetFissionGeneratorModule(part);
+				var converterModules = KRnD.GetConverterModules(part);
+				var parachuteModule = KRnD.GetParachuteModule(part);
+				var fairingModule = KRnD.GetFairingModule(part);
+				var fuelResources = KRnD.GetFuelResources(part);
 
 				// Basic stats:
 				info = "<color=#FFFFFF><b>Dry Mass:</b> " + part.mass.ToString("0.#### t") + "\n";
+
 				info += "<b>Max Temp.:</b> " + part.maxTemp.ToString("0.#") + "/" + part.skinMaxTemp.ToString("0.#") + " °K\n";
+
 				if (landingLegModule != null) info += "<b>Crash Tolerance:</b> " + part.crashTolerance.ToString("0.#### m/s") + "\n";
+
 				if (electricChargeResource != null) info += "<b>Electric Charge:</b> " + electricChargeResource.maxAmount + "\n";
 
 				// Fuels:
@@ -377,7 +380,7 @@ namespace KRnD.Source
 
 				if (rcsModule) info += "<color=#99FF00><b>RCS:</b></color>\n" + rcsModule.GetInfo();
 				if (reactionWheelModule) info += "<color=#99FF00><b>Reaction Wheel:</b></color>\n" + reactionWheelModule.GetInfo();
-				if (solarPanelModule) info += "<color=#99FF00><b>Solar Panel:</b></color>\n" + KRnD.getSolarPanelInfo(solarPanelModule);
+				if (solarPanelModule) info += "<color=#99FF00><b>Solar Panel:</b></color>\n" + KRnD.GetSolarPanelInfo(solarPanelModule);
 				if (generatorModule) info += "<color=#99FF00><b>Generator:</b></color>\n" + generatorModule.GetInfo();
 				if (fissionGenerator) info += "<color=#99FF00><b>Fission-Generator:</b></color>\n" + fissionGenerator.GetInfo();
 				if (converterModules != null)
@@ -390,7 +393,7 @@ namespace KRnD.Source
 				Debug.LogError("[KRnDGUI] getPartInfo(): " + e);
 			} finally {
 				try {
-					if (originalUpgrades != null) KRnD.updatePart(part, originalUpgrades);
+					if (originalUpgrades != null) KRnD.UpdatePart(part, originalUpgrades);
 				} catch (Exception e) {
 					Debug.LogError("[KRnDGUI] getPartInfo() restore of part failed: " + e);
 				}
@@ -453,17 +456,17 @@ namespace KRnD.Source
 
 					if (part) {
 						rndModule = KRnD.GetKRnDModule(part);
-						engineModules = KRnD.getEngineModules(part);
-						rcsModule = KRnD.getRcsModule(part);
-						reactionWheelModule = KRnD.getReactionWheelModule(part);
-						solarPanelModule = KRnD.getSolarPanelModule(part);
-						landingLegModule = KRnD.getLandingLegModule(part);
-						electricChargeResource = KRnD.getChargeResource(part);
-						generatorModule = KRnD.getGeneratorModule(part);
-						fissionGenerator = KRnD.getFissionGeneratorModule(part);
-						converterModules = KRnD.getConverterModules(part);
-						parachuteModule = KRnD.getParachuteModule(part);
-						fuelResources = KRnD.getFuelResources(part);
+						engineModules = KRnD.GetEngineModules(part);
+						rcsModule = KRnD.GetRcsModule(part);
+						reactionWheelModule = KRnD.GetReactionWheelModule(part);
+						solarPanelModule = KRnD.GetSolarPanelModule(part);
+						landingLegModule = KRnD.GetLandingLegModule(part);
+						electricChargeResource = KRnD.GetChargeResource(part);
+						generatorModule = KRnD.GetGeneratorModule(part);
+						fissionGenerator = KRnD.GetFissionGeneratorModule(part);
+						converterModules = KRnD.GetConverterModules(part);
+						parachuteModule = KRnD.GetParachuteModule(part);
+						fuelResources = KRnD.GetFuelResources(part);
 					}
 				}
 
@@ -488,8 +491,8 @@ namespace KRnD.Source
 				}
 
 				// Get stats of the current version of the selected part:
-				KRnDUpgrade currentUpgrade;
-				if (!KRnD.upgrades.TryGetValue(part.name, out currentUpgrade)) currentUpgrade = new KRnDUpgrade();
+				PartUpgrades currentUpgrade;
+				if (!KRnD.upgrades.TryGetValue(part.name, out currentUpgrade)) currentUpgrade = new PartUpgrades();
 				var currentInfo = getPartInfo(part, currentUpgrade);
 
 				// Create a copy of the part-stats which we can use to mock an upgrade further below:
@@ -497,7 +500,7 @@ namespace KRnD.Source
 
 				// Title:
 				GUILayout.BeginArea(new Rect(10, 5, windowStyle.fixedWidth, 20));
-				var version = rndModule.getVersion();
+				var version = rndModule.GetVersion();
 				if (version != "") version = " - " + version;
 				GUILayout.Label("<b>" + partTitle + version + "</b>", labelStyle);
 				GUILayout.EndArea();
@@ -545,65 +548,65 @@ namespace KRnD.Source
 					upgradeFunction = UpgradeIspVac;
 					currentUpgradeCount = currentUpgrade.ispVac;
 					nextUpgradeCount = ++nextUpgrade.ispVac;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.ispVac_improvement, rndModule.ispVac_improvementScale, currentUpgrade.ispVac);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.ispVac_improvement, rndModule.ispVac_improvementScale, nextUpgrade.ispVac);
-					scienceCost = KRnD.calculateScienceCost(rndModule.ispVac_scienceCost, rndModule.ispVac_costScale, nextUpgrade.ispVac);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.ispVac_improvement, rndModule.ispVac_improvementScale, currentUpgrade.ispVac);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.ispVac_improvement, rndModule.ispVac_improvementScale, nextUpgrade.ispVac);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.ispVac_scienceCost, rndModule.ispVac_costScale, nextUpgrade.ispVac);
 				} else if (selectedUpgradeOption == "ISP Atm") {
 					upgradeFunction = UpgradeIspAtm;
 					currentUpgradeCount = currentUpgrade.ispAtm;
 					nextUpgradeCount = ++nextUpgrade.ispAtm;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.ispAtm_improvement, rndModule.ispAtm_improvementScale, currentUpgrade.ispAtm);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.ispAtm_improvement, rndModule.ispAtm_improvementScale, nextUpgrade.ispAtm);
-					scienceCost = KRnD.calculateScienceCost(rndModule.ispAtm_scienceCost, rndModule.ispAtm_costScale, nextUpgrade.ispAtm);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.ispAtm_improvement, rndModule.ispAtm_improvementScale, currentUpgrade.ispAtm);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.ispAtm_improvement, rndModule.ispAtm_improvementScale, nextUpgrade.ispAtm);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.ispAtm_scienceCost, rndModule.ispAtm_costScale, nextUpgrade.ispAtm);
 				} else if (selectedUpgradeOption == "Fuel Flow") {
 					upgradeFunction = UpgradeFuelFlow;
 					currentUpgradeCount = currentUpgrade.fuelFlow;
 					nextUpgradeCount = ++nextUpgrade.fuelFlow;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.fuelFlow_improvement, rndModule.fuelFlow_improvementScale, currentUpgrade.fuelFlow);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.fuelFlow_improvement, rndModule.fuelFlow_improvementScale, nextUpgrade.fuelFlow);
-					scienceCost = KRnD.calculateScienceCost(rndModule.fuelFlow_scienceCost, rndModule.fuelFlow_costScale, nextUpgrade.fuelFlow);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.fuelFlow_improvement, rndModule.fuelFlow_improvementScale, currentUpgrade.fuelFlow);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.fuelFlow_improvement, rndModule.fuelFlow_improvementScale, nextUpgrade.fuelFlow);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.fuelFlow_scienceCost, rndModule.fuelFlow_costScale, nextUpgrade.fuelFlow);
 				} else if (selectedUpgradeOption == "Dry Mass") {
 					upgradeFunction = UpgradeDryMass;
 					currentUpgradeCount = currentUpgrade.dryMass;
 					nextUpgradeCount = ++nextUpgrade.dryMass;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.dryMass_improvement, rndModule.dryMass_improvementScale, currentUpgrade.dryMass);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.dryMass_improvement, rndModule.dryMass_improvementScale, nextUpgrade.dryMass);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.dryMass_improvement, rndModule.dryMass_improvementScale, currentUpgrade.dryMass);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.dryMass_improvement, rndModule.dryMass_improvementScale, nextUpgrade.dryMass);
 
 					// Scale science cost with original mass:
 					PartStats originalStats;
 					if (!KRnD.originalStats.TryGetValue(part.name, out originalStats)) throw new Exception("no original-stats for part '" + part.name + "'");
 					float scaleReferenceFactor = 1;
-					if (rndModule.dryMass_costScaleReference > 0) scaleReferenceFactor = originalStats.mass / rndModule.dryMass_costScaleReference;
+					if (rndModule.dryMass_costScaleReference > 0) scaleReferenceFactor = originalStats.dryMass / rndModule.dryMass_costScaleReference;
 					var scaledCost = (int) Math.Round(rndModule.dryMass_scienceCost * scaleReferenceFactor);
 					if (scaledCost < 1) scaledCost = 1;
-					scienceCost = KRnD.calculateScienceCost(scaledCost, rndModule.dryMass_costScale, nextUpgrade.dryMass);
+					scienceCost = KRnD.CalculateScienceCost(scaledCost, rndModule.dryMass_costScale, nextUpgrade.dryMass);
 				} else if (selectedUpgradeOption == "Torque") {
 					upgradeFunction = UpgradeTorque;
 					currentUpgradeCount = currentUpgrade.torque;
 					nextUpgradeCount = ++nextUpgrade.torque;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.torque_improvement, rndModule.torque_improvementScale, currentUpgrade.torque);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.torque_improvement, rndModule.torque_improvementScale, nextUpgrade.torque);
-					scienceCost = KRnD.calculateScienceCost(rndModule.torque_scienceCost, rndModule.torque_costScale, nextUpgrade.torque);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.torque_improvement, rndModule.torque_improvementScale, currentUpgrade.torque);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.torque_improvement, rndModule.torque_improvementScale, nextUpgrade.torque);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.torque_scienceCost, rndModule.torque_costScale, nextUpgrade.torque);
 				} else if (selectedUpgradeOption == "Charge Rate") {
 					upgradeFunction = UpgradeChargeRate;
 					currentUpgradeCount = currentUpgrade.chargeRate;
 					nextUpgradeCount = ++nextUpgrade.chargeRate;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.chargeRate_improvement, rndModule.chargeRate_improvementScale, currentUpgrade.chargeRate);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.chargeRate_improvement, rndModule.chargeRate_improvementScale, nextUpgrade.chargeRate);
-					scienceCost = KRnD.calculateScienceCost(rndModule.chargeRate_scienceCost, rndModule.chargeRate_costScale, nextUpgrade.chargeRate);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.chargeRate_improvement, rndModule.chargeRate_improvementScale, currentUpgrade.chargeRate);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.chargeRate_improvement, rndModule.chargeRate_improvementScale, nextUpgrade.chargeRate);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.chargeRate_scienceCost, rndModule.chargeRate_costScale, nextUpgrade.chargeRate);
 				} else if (selectedUpgradeOption == "Crash Tolerance") {
 					upgradeFunction = UpgradeCrashTolerance;
 					currentUpgradeCount = currentUpgrade.crashTolerance;
 					nextUpgradeCount = ++nextUpgrade.crashTolerance;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.crashTolerance_improvement, rndModule.crashTolerance_improvementScale, currentUpgrade.crashTolerance);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.crashTolerance_improvement, rndModule.crashTolerance_improvementScale, nextUpgrade.crashTolerance);
-					scienceCost = KRnD.calculateScienceCost(rndModule.crashTolerance_scienceCost, rndModule.crashTolerance_costScale, nextUpgrade.crashTolerance);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.crashTolerance_improvement, rndModule.crashTolerance_improvementScale, currentUpgrade.crashTolerance);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.crashTolerance_improvement, rndModule.crashTolerance_improvementScale, nextUpgrade.crashTolerance);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.crashTolerance_scienceCost, rndModule.crashTolerance_costScale, nextUpgrade.crashTolerance);
 				} else if (selectedUpgradeOption == "Battery") {
 					upgradeFunction = UpgradeBatteryCharge;
 					currentUpgradeCount = currentUpgrade.batteryCharge;
 					nextUpgradeCount = ++nextUpgrade.batteryCharge;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.batteryCharge_improvement, rndModule.batteryCharge_improvementScale, currentUpgrade.batteryCharge);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.batteryCharge_improvement, rndModule.batteryCharge_improvementScale, nextUpgrade.batteryCharge);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.batteryCharge_improvement, rndModule.batteryCharge_improvementScale, currentUpgrade.batteryCharge);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.batteryCharge_improvement, rndModule.batteryCharge_improvementScale, nextUpgrade.batteryCharge);
 
 					// Scale science cost with original battery charge:
 					PartStats originalStats;
@@ -612,13 +615,13 @@ namespace KRnD.Source
 					if (rndModule.batteryCharge_costScaleReference > 0) scaleReferenceFactor = originalStats.batteryCharge / rndModule.batteryCharge_costScaleReference;
 					var scaledCost = (int) Math.Round(rndModule.batteryCharge_scienceCost * scaleReferenceFactor);
 					if (scaledCost < 1) scaledCost = 1;
-					scienceCost = KRnD.calculateScienceCost(scaledCost, rndModule.batteryCharge_costScale, nextUpgrade.batteryCharge);
+					scienceCost = KRnD.CalculateScienceCost(scaledCost, rndModule.batteryCharge_costScale, nextUpgrade.batteryCharge);
 				} else if (selectedUpgradeOption == "Fuel Pressure") {
 					upgradeFunction = UpgradeFuelCapacity;
 					currentUpgradeCount = currentUpgrade.fuelCapacity;
 					nextUpgradeCount = ++nextUpgrade.fuelCapacity;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.fuelCapacity_improvement, rndModule.fuelCapacity_improvementScale, currentUpgrade.fuelCapacity);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.fuelCapacity_improvement, rndModule.fuelCapacity_improvementScale, nextUpgrade.fuelCapacity);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.fuelCapacity_improvement, rndModule.fuelCapacity_improvementScale, currentUpgrade.fuelCapacity);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.fuelCapacity_improvement, rndModule.fuelCapacity_improvementScale, nextUpgrade.fuelCapacity);
 
 					// Scale science cost with original fuel capacity:
 					PartStats originalStats;
@@ -627,35 +630,35 @@ namespace KRnD.Source
 					if (rndModule.fuelCapacity_costScaleReference > 0) scaleReferenceFactor = originalStats.fuelCapacitiesSum / rndModule.fuelCapacity_costScaleReference;
 					var scaledCost = (int) Math.Round(rndModule.fuelCapacity_scienceCost * scaleReferenceFactor);
 					if (scaledCost < 1) scaledCost = 1;
-					scienceCost = KRnD.calculateScienceCost(scaledCost, rndModule.fuelCapacity_costScale, nextUpgrade.fuelCapacity);
+					scienceCost = KRnD.CalculateScienceCost(scaledCost, rndModule.fuelCapacity_costScale, nextUpgrade.fuelCapacity);
 				} else if (selectedUpgradeOption == "Generator") {
 					upgradeFunction = UpgradeGeneratorEfficiency;
 					currentUpgradeCount = currentUpgrade.generatorEfficiency;
 					nextUpgradeCount = ++nextUpgrade.generatorEfficiency;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.generatorEfficiency_improvement, rndModule.generatorEfficiency_improvementScale, currentUpgrade.generatorEfficiency);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.generatorEfficiency_improvement, rndModule.generatorEfficiency_improvementScale, nextUpgrade.generatorEfficiency);
-					scienceCost = KRnD.calculateScienceCost(rndModule.generatorEfficiency_scienceCost, rndModule.generatorEfficiency_costScale, nextUpgrade.generatorEfficiency);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.generatorEfficiency_improvement, rndModule.generatorEfficiency_improvementScale, currentUpgrade.generatorEfficiency);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.generatorEfficiency_improvement, rndModule.generatorEfficiency_improvementScale, nextUpgrade.generatorEfficiency);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.generatorEfficiency_scienceCost, rndModule.generatorEfficiency_costScale, nextUpgrade.generatorEfficiency);
 				} else if (selectedUpgradeOption == "Converter") {
 					upgradeFunction = UpgradeConverterEfficiency;
 					currentUpgradeCount = currentUpgrade.converterEfficiency;
 					nextUpgradeCount = ++nextUpgrade.converterEfficiency;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.converterEfficiency_improvement, rndModule.converterEfficiency_improvementScale, currentUpgrade.converterEfficiency);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.converterEfficiency_improvement, rndModule.converterEfficiency_improvementScale, nextUpgrade.converterEfficiency);
-					scienceCost = KRnD.calculateScienceCost(rndModule.converterEfficiency_scienceCost, rndModule.converterEfficiency_costScale, nextUpgrade.converterEfficiency);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.converterEfficiency_improvement, rndModule.converterEfficiency_improvementScale, currentUpgrade.converterEfficiency);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.converterEfficiency_improvement, rndModule.converterEfficiency_improvementScale, nextUpgrade.converterEfficiency);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.converterEfficiency_scienceCost, rndModule.converterEfficiency_costScale, nextUpgrade.converterEfficiency);
 				} else if (selectedUpgradeOption == "Parachute") {
 					upgradeFunction = UpgradeParachuteStrength;
 					currentUpgradeCount = currentUpgrade.parachuteStrength;
 					nextUpgradeCount = ++nextUpgrade.parachuteStrength;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.parachuteStrength_improvement, rndModule.parachuteStrength_improvementScale, currentUpgrade.parachuteStrength);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.parachuteStrength_improvement, rndModule.parachuteStrength_improvementScale, nextUpgrade.parachuteStrength);
-					scienceCost = KRnD.calculateScienceCost(rndModule.parachuteStrength_scienceCost, rndModule.parachuteStrength_costScale, nextUpgrade.parachuteStrength);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.parachuteStrength_improvement, rndModule.parachuteStrength_improvementScale, currentUpgrade.parachuteStrength);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.parachuteStrength_improvement, rndModule.parachuteStrength_improvementScale, nextUpgrade.parachuteStrength);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.parachuteStrength_scienceCost, rndModule.parachuteStrength_costScale, nextUpgrade.parachuteStrength);
 				} else if (selectedUpgradeOption == "Max Temp") {
 					upgradeFunction = UpgradeMaxTemperature;
 					currentUpgradeCount = currentUpgrade.maxTemperature;
 					nextUpgradeCount = ++nextUpgrade.maxTemperature;
-					currentImprovement = KRnD.calculateImprovementFactor(rndModule.maxTemperature_improvement, rndModule.maxTemperature_improvementScale, currentUpgrade.maxTemperature);
-					nextImprovement = KRnD.calculateImprovementFactor(rndModule.maxTemperature_improvement, rndModule.maxTemperature_improvementScale, nextUpgrade.maxTemperature);
-					scienceCost = KRnD.calculateScienceCost(rndModule.maxTemperature_scienceCost, rndModule.maxTemperature_costScale, nextUpgrade.maxTemperature);
+					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.maxTemperature_improvement, rndModule.maxTemperature_improvementScale, currentUpgrade.maxTemperature);
+					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.maxTemperature_improvement, rndModule.maxTemperature_improvementScale, nextUpgrade.maxTemperature);
+					scienceCost = KRnD.CalculateScienceCost(rndModule.maxTemperature_scienceCost, rndModule.maxTemperature_costScale, nextUpgrade.maxTemperature);
 				} else {
 					throw new Exception("unexpected option '" + selectedUpgradeOption + "'");
 				}

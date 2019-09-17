@@ -21,94 +21,94 @@ namespace KRnD.Source
 		public double fuelCapacitiesSum; // Sum of all fuel capacities
 		public Dictionary<string, double> generatorEfficiency; // Resource-Name, Rate
 		public double intMaxTemp;
-		public float mass;
+		public float dryMass;
 		public List<float> maxFuelFlows;
 		public double skinMaxTemp;
-		public float torque;
+		public float torqueStrength;
 
 		public PartStats(Part part)
 		{
-			mass = part.mass;
+			dryMass = part.mass;
 			skinMaxTemp = part.skinMaxTemp;
 			intMaxTemp = part.maxTemp;
 
 			// There should only be one or the other, engines or RCS:
-			var engineModules = KRnD.getEngineModules(part);
-			var rcsModule = KRnD.getRcsModule(part);
-			if (engineModules != null) {
+			var engine_modules = KRnD.GetEngineModules(part);
+			var rcs_module = KRnD.GetRcsModule(part);
+			if (engine_modules != null) {
 				maxFuelFlows = new List<float>();
 				atmosphereCurves = new List<FloatCurve>();
 
-				foreach (var engineModule in engineModules) {
-					maxFuelFlows.Add(engineModule.maxFuelFlow);
+				foreach (var engine_module in engine_modules) {
+					maxFuelFlows.Add(engine_module.maxFuelFlow);
 
-					var atmosphereCurve = new FloatCurve();
-					for (var i = 0; i < engineModule.atmosphereCurve.Curve.length; i++) {
-						var frame = engineModule.atmosphereCurve.Curve[i];
-						atmosphereCurve.Add(frame.time, frame.value);
+					var atmosphere_curve = new FloatCurve();
+					for (var i = 0; i < engine_module.atmosphereCurve.Curve.length; i++) {
+						var frame = engine_module.atmosphereCurve.Curve[i];
+						atmosphere_curve.Add(frame.time, frame.value);
 					}
 
-					atmosphereCurves.Add(atmosphereCurve);
+					atmosphereCurves.Add(atmosphere_curve);
 				}
-			} else if (rcsModule) {
+			} else if (rcs_module) {
 				maxFuelFlows = new List<float>();
 				atmosphereCurves = new List<FloatCurve>();
 
-				maxFuelFlows.Add(rcsModule.thrusterPower);
-				var atmosphereCurve = new FloatCurve();
-				for (var i = 0; i < rcsModule.atmosphereCurve.Curve.length; i++) {
-					var frame = rcsModule.atmosphereCurve.Curve[i];
-					atmosphereCurve.Add(frame.time, frame.value);
+				maxFuelFlows.Add(rcs_module.thrusterPower);
+				var atmosphere_curve = new FloatCurve();
+				for (var i = 0; i < rcs_module.atmosphereCurve.Curve.length; i++) {
+					var frame = rcs_module.atmosphereCurve.Curve[i];
+					atmosphere_curve.Add(frame.time, frame.value);
 				}
 
-				atmosphereCurves.Add(atmosphereCurve);
+				atmosphereCurves.Add(atmosphere_curve);
 			}
 
-			var reactionWheel = KRnD.getReactionWheelModule(part);
-			if (reactionWheel) torque = reactionWheel.RollTorque; // There is also pitch- and yaw-torque, but they should all be the same
+			var reaction_wheel = KRnD.GetReactionWheelModule(part);
+			if (reaction_wheel) torqueStrength = reaction_wheel.RollTorque; // There is also pitch- and yaw-torque, but they should all be the same
 
-			var solarPanel = KRnD.getSolarPanelModule(part);
-			if (solarPanel) chargeRate = solarPanel.chargeRate;
+			var solar_panel = KRnD.GetSolarPanelModule(part);
+			if (solar_panel) chargeRate = solar_panel.chargeRate;
 
-			var landingLeg = KRnD.getLandingLegModule(part);
-			if (landingLeg) crashTolerance = part.crashTolerance; // Every part has a crash tolerance, but we only want to improve landing legs.
+			var landing_leg = KRnD.GetLandingLegModule(part);
+			if (landing_leg) crashTolerance = part.crashTolerance; // Every part has a crash tolerance, but we only want to improve landing legs.
 
-			var electricCharge = KRnD.getChargeResource(part);
-			if (electricCharge != null) batteryCharge = electricCharge.maxAmount;
+			var electric_charge = KRnD.GetChargeResource(part);
+			if (electric_charge != null) batteryCharge = electric_charge.maxAmount;
 
-			var generator = KRnD.getGeneratorModule(part);
+			var generator = KRnD.GetGeneratorModule(part);
 			if (generator != null) {
 				generatorEfficiency = new Dictionary<string, double>();
-				foreach (var outputResource in generator.resHandler.outputResources) generatorEfficiency.Add(outputResource.name, outputResource.rate);
+				foreach (var output_resource in generator.resHandler.outputResources) generatorEfficiency.Add(output_resource.name, output_resource.rate);
 			}
 
-			var fissionGenerator = KRnD.getFissionGeneratorModule(part);
-			if (fissionGenerator != null) fissionPowerGeneration = KRnD.GetGenericModuleValue(fissionGenerator, "PowerGeneration");
+			var fission_generator = KRnD.GetFissionGeneratorModule(part);
+			if (fission_generator != null) fissionPowerGeneration = KRnD.GetGenericModuleValue(fission_generator, "PowerGeneration");
 
 			// There might be different converter-modules in the same part with different names (eg for Fuel, Monopropellant, etc):
-			var converterList = KRnD.getConverterModules(part);
-			if (converterList != null) {
+			var converter_list = KRnD.GetConverterModules(part);
+			if (converter_list != null) {
 				converterEfficiency = new Dictionary<string, Dictionary<string, double>>();
-				foreach (var converter in converterList) {
-					var thisConverterEfficiency = new Dictionary<string, double>();
-					foreach (var resourceRatio in converter.outputList) thisConverterEfficiency.Add(resourceRatio.ResourceName, resourceRatio.Ratio);
-					converterEfficiency.Add(converter.ConverterName, thisConverterEfficiency);
+				foreach (var converter in converter_list) {
+					var this_converter_efficiency = new Dictionary<string, double>();
+					foreach (var resource_ratio in converter.outputList) this_converter_efficiency.Add(resource_ratio.ResourceName, resource_ratio.Ratio);
+					converterEfficiency.Add(converter.ConverterName, this_converter_efficiency);
 				}
 			}
 
-			var parachute = KRnD.getParachuteModule(part);
+			var parachute = KRnD.GetParachuteModule(part);
 			if (parachute) chuteMaxTemp = parachute.chuteMaxTemp;
 
-			var fairing = KRnD.getFairingModule(part);
+			var fairing = KRnD.GetFairingModule(part);
 			if (fairing) fairingAreaMass = fairing.UnitAreaMass;
 
-			var fuelResources = KRnD.getFuelResources(part);
-			if (fuelResources != null) {
+			var fuel_resources = KRnD.GetFuelResources(part);
+			if (fuel_resources != null) {
 				fuelCapacities = new Dictionary<string, double>();
 				fuelCapacitiesSum = 0;
-				foreach (var fuelResource in fuelResources) {
-					fuelCapacities.Add(fuelResource.resourceName, fuelResource.maxAmount);
-					fuelCapacitiesSum += fuelResource.maxAmount;
+				foreach (var fuel_resource in fuel_resources) {
+					fuelCapacities.Add(fuel_resource.resourceName, fuel_resource.maxAmount);
+					fuelCapacitiesSum += fuel_resource.maxAmount;
 				}
 			}
 		}

@@ -178,7 +178,7 @@
 			return number.ToString();
 		}
 
-		public string getVersion()
+		public string GetVersion()
 		{
 			var upgrades =
 				dryMass_upgrades +
@@ -200,7 +200,7 @@
 
 		public override void OnStart(StartState state)
 		{
-			moduleVersion = getVersion();
+			moduleVersion = GetVersion();
 			if (moduleVersion == "")
 				Fields[0].guiActive = false;
 			else
@@ -208,9 +208,9 @@
 		}
 
 		// Returns the upgrade-stats which this module represents.
-		public KRnDUpgrade getCurrentUpgrades()
+		public PartUpgrades GetCurrentUpgrades()
 		{
-			var upgrades = new KRnDUpgrade();
+			var upgrades = new PartUpgrades();
 			upgrades.dryMass = dryMass_upgrades;
 			upgrades.fuelFlow = fuelFlow_upgrades;
 			upgrades.ispVac = ispVac_upgrades;
