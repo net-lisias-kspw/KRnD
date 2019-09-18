@@ -10,14 +10,8 @@ namespace KRnD.Source
 	// This class handles load- and save-operations.
 	[KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
 	[UsedImplicitly]
-	internal class ScenarioModule : global::ScenarioModule
+	internal class KRnDScenario : ScenarioModule
 	{
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/// <summary> Awakes this object.</summary>
-		[UsedImplicitly]
-		public void Awake()
-		{
-		}
 
 		public override void OnSave(ConfigNode node)
 		{
@@ -30,13 +24,13 @@ namespace KRnD.Source
 					PartUpgrades upgrade;
 					if (!KRnD.upgrades.TryGetValue(upgrade_name, out upgrade)) continue;
 					upgrade_nodes.AddNode(upgrade.CreateConfigNode(upgrade_name));
-					//Debug.Log("[KRnD] saved: " + upgradeName + " " + upgrade.ToString());
+					Debug.Log("[KRnD] saved: " + upgrade_name + " " + upgrade.ToString());
 				}
 
 				node.AddNode(upgrade_nodes);
 
 				time = (DateTime.Now.Ticks - time) / TimeSpan.TicksPerSecond;
-				//Debug.Log("[KRnD] saved " + upgradeNodes.CountNodes.ToString() + " upgrades in " + time.ToString("0.000s"));
+				Debug.Log("[KRnD] saved " + upgrade_nodes.CountNodes.ToString() + " upgrades in " + time.ToString("0.000s"));
 
 				var gui_settings = new ConfigNode("gui");
 				gui_settings.AddValue("left", UpgradeUI.windowPosition.xMin);
@@ -72,7 +66,7 @@ namespace KRnD.Source
 					if (vessel) KRnD.UpdateVessel(vessel);
 
 					time = (DateTime.Now.Ticks - time) / TimeSpan.TicksPerSecond;
-					//Debug.Log("[KRnD] retrieved and applied " + upgradesApplied.ToString() + " upgrades in " + time.ToString("0.000s"));
+					Debug.Log("[KRnD] retrieved and applied " + upgrades_applied.ToString() + " upgrades in " + time.ToString("0.000s"));
 				}
 
 				var gui_settings = node.GetNode("gui");

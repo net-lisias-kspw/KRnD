@@ -31,49 +31,63 @@ namespace KRnD.Source
 
 		public static void Initialize()
 		{
-			// Default upgrade control data used only if no config file found. Every modifiable aspect needs to be listed here since
-			// the dictionary is populated by this step as a side effect.
-			upgradeDatabase = new Dictionary<string, UpgradeData>
-			{
-				[Constants.BATTERY_CHARGE] = new UpgradeData(Constants.BATTERY_CHARGE, "EC storage capacity for batteries", 500, 0.2f, 10),
-				[Constants.CHARGE_RATE] = new UpgradeData(Constants.CHARGE_RATE, "The EC rate generated from solar panels", 0, 0.05f, 10),
-				[Constants.CONVERTER_EFFICIENCY] = new UpgradeData(Constants.CONVERTER_EFFICIENCY, "ISRU and Fuel Cell conversion efficiency", 0, 0.1f, 15),
-				[Constants.CRASH_TOLERANCE] = new UpgradeData(Constants.CRASH_TOLERANCE, "Crash-tolerance for landing legs", 0, 0.15f, 10),
-				[Constants.DRY_MASS] = new UpgradeData(Constants.DRY_MASS, "Dry mass (applies to every kind of part)", 1, -0.1f, 10),
-				[Constants.FUEL_CAPACITY] = new UpgradeData(Constants.FUEL_CAPACITY, "Contained resource capacity", 1000, 0.05f, 5),
-				[Constants.FUEL_FLOW] = new UpgradeData(Constants.FUEL_FLOW, "Rate that fuel is consumed -- increases thrust", 0, 0.1f, 10),
-				[Constants.GENERATOR_EFFICIENCY] = new UpgradeData(Constants.GENERATOR_EFFICIENCY, "Power output efficiency from reactors", 0, 0.1f, 15),
-				[Constants.ISP_ATM] = new UpgradeData(Constants.ISP_ATM, "I.S.P. in atmosphere", 0, 0.05f, 15),
-				[Constants.ISP_VAC] = new UpgradeData(Constants.ISP_VAC, "I.S.P. in vacuum", 0, 0.05f, 15),
-				[Constants.MAX_TEMPERATURE] = new UpgradeData(Constants.MAX_TEMPERATURE, "Maximum part temperature limit", 1200, 0.2f, 5),
-				[Constants.PARACHUTE_STRENGTH] = new UpgradeData(Constants.PARACHUTE_STRENGTH, "Parachute strength -- affects max speed when deploying", 250, 0.3f, 10),
-				[Constants.TORQUE] = new UpgradeData(Constants.TORQUE, "Reaction-wheel torque power", 0, 0.25f, 5)
-			};
+			try {
+				// Default upgrade control data used only if no config file found. Every modifiable aspect needs to be listed here since
+				// the dictionary is populated by this step as a side effect.
+				upgradeDatabase = new Dictionary<string, UpgradeData>
+				{
+					[Constants.BATTERY_CHARGE] = new UpgradeData(Constants.BATTERY_CHARGE, 500, 0.2f, 10),
+					[Constants.CHARGE_RATE] = new UpgradeData(Constants.CHARGE_RATE, 0, 0.05f, 10),
+					[Constants.CONVERTER_EFFICIENCY] = new UpgradeData(Constants.CONVERTER_EFFICIENCY, 0, 0.1f, 15),
+					[Constants.CRASH_TOLERANCE] = new UpgradeData(Constants.CRASH_TOLERANCE, 0, 0.15f, 10),
+					[Constants.DRY_MASS] = new UpgradeData(Constants.DRY_MASS, 1, -0.1f, 10),
+					[Constants.FUEL_CAPACITY] = new UpgradeData(Constants.FUEL_CAPACITY, 1000, 0.05f, 5),
+					[Constants.FUEL_FLOW] = new UpgradeData(Constants.FUEL_FLOW, 0, 0.1f, 10),
+					[Constants.GENERATOR_EFFICIENCY] = new UpgradeData(Constants.GENERATOR_EFFICIENCY, 0, 0.1f, 15),
+					[Constants.ISP_ATM] = new UpgradeData(Constants.ISP_ATM, 0, 0.05f, 15),
+					[Constants.ISP_VAC] = new UpgradeData(Constants.ISP_VAC, 0, 0.05f, 15),
+					[Constants.MAX_TEMPERATURE] = new UpgradeData(Constants.MAX_TEMPERATURE, 1200, 0.2f, 5),
+					[Constants.PARACHUTE_STRENGTH] = new UpgradeData(Constants.PARACHUTE_STRENGTH, 250, 0.3f, 10),
+					[Constants.TORQUE] = new UpgradeData(Constants.TORQUE,  0, 0.25f, 5)
+				};
 
 
-			// Load in the default values from the config file.
+				// Load in the default values from the config file.
 
-			string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), Constants.CONFIG_FILENAME);
-			if (File.Exists(filename)) {
+				string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), Constants.CONFIG_FILENAME);
+				if (File.Exists(filename)) {
 
-				// Read config data from config file.
-				var settings = ConfigNode.Load(filename);
-				LoadFromNode(settings);
+					// Read config data from config file.
+					var settings = ConfigNode.Load(filename);
+					LoadFromNode(settings);
 
-			} else {
+				} else {
 
-				// Create initial config file since it doesn't exist. This shouldn't be needed.
-				var node = new ConfigNode();
-				SaveToNode(node);
-				node.Save(filename);
+					// Create initial config file since it doesn't exist. This shouldn't be needed.
+					var node = new ConfigNode();
+					SaveToNode(node);
+					node.Save(filename);
+				}
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] Initialize(): " + e);
+			}
+		}
+
+		public static UpgradeData GetData(string key)
+		{
+			try { 
+				return upgradeDatabase[key];
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] GetData(): " + e);
+				return null;
 			}
 		}
 
 
 		static void SaveToNode(ConfigNode node)
 		{
-			node.SetValue(Constants.COST_RATE, costRate, "Science cost per level increases at this rate for every upgrade level", true);
-			node.SetValue(Constants.IMPROVEMENT_RATE, improvementRate, "Part stat improvement per level diminishes by this factor for every upgrade level", true);
+			node.SetValue(Constants.COST_RATE, costRate, true);
+			node.SetValue(Constants.IMPROVEMENT_RATE, improvementRate, true);
 			foreach (var data in upgradeDatabase) {
 				data.Value.SaveToNode(node);
 			}

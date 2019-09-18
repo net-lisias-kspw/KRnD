@@ -14,75 +14,94 @@ namespace KRnD.Source
 	public class UpgradeUI : MonoBehaviour
 	{
 		// TODO: The Application-Button shows up during the flight scene ...
-		private static ApplicationLauncherButton button;
+		private static ApplicationLauncherButton _launcherButton;
 		public static Rect windowPosition = new Rect(300, 60, 450, 400 + 80);
-		private static readonly GUIStyle windowStyle = new GUIStyle(HighLogic.Skin.window) {fixedWidth = 500f, fixedHeight = 300f + 80};
-		private static readonly GUIStyle labelStyle = new GUIStyle(HighLogic.Skin.label);
-		private static readonly GUIStyle labelStyleSmall = new GUIStyle(HighLogic.Skin.label) {fontSize = 10};
-		private static readonly GUIStyle buttonStyle = new GUIStyle(HighLogic.Skin.button);
-		private static readonly GUIStyle scrollStyle = new GUIStyle(HighLogic.Skin.scrollView);
-		private static Vector2 scrollPos = Vector2.zero;
-		private static Texture2D texture;
-		private static bool showGui;
+		private static readonly GUIStyle _windowStyle = new GUIStyle(HighLogic.Skin.window) {fixedWidth = 500f, fixedHeight = 300f + 80};
+		private static readonly GUIStyle _labelStyle = new GUIStyle(HighLogic.Skin.label);
+		private static readonly GUIStyle _labelStyleSmall = new GUIStyle(HighLogic.Skin.label) {fontSize = 10};
+		private static readonly GUIStyle _buttonStyle = new GUIStyle(HighLogic.Skin.button);
+		private static readonly GUIStyle _scrollStyle = new GUIStyle(HighLogic.Skin.scrollView);
+		private static Vector2 _scrollPos = Vector2.zero;
+		//private static Texture2D texture;
+		private static bool _showGui;
+
+		private static Texture2D _closeIcon;
 
 		// The part that was last selected in the editor:
 		public static Part selectedPart;
 
-		private int selectedUpgradeOption;
+		private int _selectedUpgradeOption;
 
 		private void Awake()
 		{
-			if (texture == null) {
-				texture = new Texture2D(36, 36, TextureFormat.RGBA32, false);
-				var textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), Constants.APP_ICON);
-				texture.LoadImage(File.ReadAllBytes(textureFile));
-			}
+			//if (texture == null) {
+			//texture = new Texture2D(36, 36, TextureFormat.RGBA32, false);
+			//var textureFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), Constants.APP_ICON);
+			//texture.LoadImage(File.ReadAllBytes(textureFile));
+			//}
+
+			//_closeIcon = GameDatabase.Instance.GetTexture("KRnD/Icons/close", false);
+
+
 
 			// Add event-handlers to create and destroy our button:
-			GameEvents.onGUIApplicationLauncherReady.Remove(ReadyEvent);
+			//GameEvents.onGUIApplicationLauncherReady.Remove(ReadyEvent);
 			GameEvents.onGUIApplicationLauncherReady.Add(ReadyEvent);
-			GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
+			//GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
 			GameEvents.onGUIApplicationLauncherDestroyed.Add(DestroyEvent);
+		}
+
+		private void OnDestroy()
+		{
+			GameEvents.onGUIApplicationLauncherReady.Remove(ReadyEvent);
+			GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
 		}
 
 		// Fires when a scene is ready so we can install our button.
 		public void ReadyEvent()
 		{
-			if (ApplicationLauncher.Ready && button == null) {
-				var visibleScense = ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
-				button = ApplicationLauncher.Instance.AddModApplication(GuiOn, GuiOff, null, null, null, null, visibleScense, texture);
+			if (ApplicationLauncher.Ready && _launcherButton == null) {
+				var visible_in_scenes = ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
+				var texture_file = Constants.MOD_DIRECTORY + Constants.APP_ICON;
+				_launcherButton = ApplicationLauncher.Instance.AddModApplication(GuiToggle, GuiToggle, null, null, null, null, visible_in_scenes, GameDatabase.Instance.GetTexture(texture_file, false));
 			}
 		}
 
 		// Fires when a scene is unloaded and we should destroy our button:
 		public void DestroyEvent()
 		{
-			if (button == null) return;
-			ApplicationLauncher.Instance.RemoveModApplication(button);
-			button = null;
+			if (_launcherButton == null) return;
+			ApplicationLauncher.Instance.RemoveModApplication(_launcherButton);
+			_launcherButton = null;
 			selectedPart = null;
-			showGui = false;
+			_showGui = false;
 		}
 
-		private void GuiOn()
+		private void GuiToggle()
 		{
-			showGui = true;
+			_showGui = !_showGui;
 		}
 
-		private void GuiOff()
-		{
-			showGui = false;
-		}
 
 		public void OnGUI()
 		{
-			if (showGui) windowPosition = GUILayout.Window(100, windowPosition, OnWindow, "", windowStyle);
+			if (_showGui) {
+
+				if (_closeIcon == null) _closeIcon = GameDatabase.Instance.GetTexture(Constants.MOD_DIRECTORY + Constants.CLOSE_ICON, false);
+
+				GUI.depth = 0;
+				windowPosition = GUILayout.Window(100, windowPosition, OnWindow, "", _windowStyle);
+				const int icon_size = 28;
+				if (GUI.Button(new Rect(windowPosition.xMax - (icon_size + 2), windowPosition.yMin + 2, icon_size, icon_size), _closeIcon, GUI.skin.button)) {
+					_showGui = false;
+				}
+			}
 		}
 
 		public static int UpgradeIspVac(Part part)
 		{
 			try {
-				PartUpgrades store = null;
+				PartUpgrades store;
 				if (!KRnD.upgrades.TryGetValue(part.name, out store)) {
 					store = new PartUpgrades();
 					KRnD.upgrades.Add(part.name, store);
@@ -472,8 +491,8 @@ namespace KRnD.Source
 
 				if (!part) {
 					// No part selected:
-					GUILayout.BeginArea(new Rect(10, 5, windowStyle.fixedWidth, 20));
-					GUILayout.Label("<b>Kerbal R&D: Select a part to improve</b>", labelStyle);
+					GUILayout.BeginArea(new Rect(10, 5, _windowStyle.fixedWidth, 20));
+					GUILayout.Label("<b>Kerbal R&D: Select a part to improve</b>", _labelStyle);
 					GUILayout.EndArea();
 					GUILayout.EndVertical();
 					GUI.DragWindow();
@@ -482,8 +501,8 @@ namespace KRnD.Source
 
 				if (!rndModule) {
 					// Invalid part selected:
-					GUILayout.BeginArea(new Rect(10, 5, windowStyle.fixedWidth, 20));
-					GUILayout.Label("<b>Kerbal R&D: Select a different part to improve</b>", labelStyle);
+					GUILayout.BeginArea(new Rect(10, 5, _windowStyle.fixedWidth, 20));
+					GUILayout.Label("<b>Kerbal R&D: Select a different part to improve</b>", _labelStyle);
 					GUILayout.EndArea();
 					GUILayout.EndVertical();
 					GUI.DragWindow();
@@ -499,15 +518,15 @@ namespace KRnD.Source
 				var nextUpgrade = currentUpgrade.Clone();
 
 				// Title:
-				GUILayout.BeginArea(new Rect(10, 5, windowStyle.fixedWidth, 20));
+				GUILayout.BeginArea(new Rect(10, 5, _windowStyle.fixedWidth, 20));
 				var version = rndModule.GetVersion();
 				if (version != "") version = " - " + version;
-				GUILayout.Label("<b>" + partTitle + version + "</b>", labelStyle);
+				GUILayout.Label("<b>" + partTitle + version + "</b>", _labelStyle);
 				GUILayout.EndArea();
 
 				// List with upgrade-options:
 				float optionsWidth = 100;
-				var optionsHeight = windowStyle.fixedHeight - 30 - 30 - 20;
+				var optionsHeight = _windowStyle.fixedHeight - 30 - 30 - 20;
 				GUILayout.BeginArea(new Rect(10, 30 + 20, optionsWidth, optionsHeight));
 
 
@@ -530,14 +549,14 @@ namespace KRnD.Source
 				if (generatorModule || fissionGenerator) options.Add("Generator");
 				if (converterModules != null) options.Add("Converter");
 				if (parachuteModule) options.Add("Parachute");
-				if (this.selectedUpgradeOption >= options.Count) this.selectedUpgradeOption = 0;
-				this.selectedUpgradeOption = GUILayout.SelectionGrid(this.selectedUpgradeOption, options.ToArray(), 1, buttonStyle);
+				if (this._selectedUpgradeOption >= options.Count) this._selectedUpgradeOption = 0;
+				this._selectedUpgradeOption = GUILayout.SelectionGrid(this._selectedUpgradeOption, options.ToArray(), 1, _buttonStyle);
 
 				GUILayout.EndVertical();
 
 				GUILayout.EndArea();
 
-				var selectedUpgradeOption = options.ToArray()[this.selectedUpgradeOption];
+				var selectedUpgradeOption = options.ToArray()[this._selectedUpgradeOption];
 				var currentUpgradeCount = 0;
 				var nextUpgradeCount = 0;
 				var scienceCost = 0;
@@ -625,7 +644,7 @@ namespace KRnD.Source
 
 					// Scale science cost with original fuel capacity:
 					PartStats originalStats;
-					if (!KRnD.originalStats.TryGetValue(part.name, out originalStats)) throw new Exception("no origional-stats for part '" + part.name + "'");
+					if (!KRnD.originalStats.TryGetValue(part.name, out originalStats)) throw new Exception("no original-stats for part '" + part.name + "'");
 					double scaleReferenceFactor = 1;
 					if (rndModule.fuelCapacity_costScaleReference > 0) scaleReferenceFactor = originalStats.fuelCapacitiesSum / rndModule.fuelCapacity_costScaleReference;
 					var scaledCost = (int) Math.Round(rndModule.fuelCapacity_scienceCost * scaleReferenceFactor);
@@ -653,12 +672,27 @@ namespace KRnD.Source
 					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.parachuteStrength_improvement, rndModule.parachuteStrength_improvementScale, nextUpgrade.parachuteStrength);
 					scienceCost = KRnD.CalculateScienceCost(rndModule.parachuteStrength_scienceCost, rndModule.parachuteStrength_costScale, nextUpgrade.parachuteStrength);
 				} else if (selectedUpgradeOption == "Max Temp") {
+
+
 					upgradeFunction = UpgradeMaxTemperature;
 					currentUpgradeCount = currentUpgrade.maxTemperature;
 					nextUpgradeCount = ++nextUpgrade.maxTemperature;
+
+#if true
+					UpgradeData u_data = KRnDSettings.GetData(Constants.MAX_TEMPERATURE);
+					currentImprovement = u_data.CalculateImprovementFactor(currentUpgrade.maxTemperature);
+					nextImprovement = u_data.CalculateImprovementFactor(nextUpgrade.maxTemperature);
+
+
+					if (!KRnD.originalStats.TryGetValue(part.name, out var original_stats)) throw new Exception("no original-stats for part '" + part.name + "'");
+					scienceCost = u_data.CalculateScienceCost((float)original_stats.skinMaxTemp, nextUpgrade.maxTemperature);
+#else
+
 					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.maxTemperature_improvement, rndModule.maxTemperature_improvementScale, currentUpgrade.maxTemperature);
 					nextImprovement = KRnD.CalculateImprovementFactor(rndModule.maxTemperature_improvement, rndModule.maxTemperature_improvementScale, nextUpgrade.maxTemperature);
 					scienceCost = KRnD.CalculateScienceCost(rndModule.maxTemperature_scienceCost, rndModule.maxTemperature_costScale, nextUpgrade.maxTemperature);
+#endif
+
 				} else {
 					throw new Exception("unexpected option '" + selectedUpgradeOption + "'");
 				}
@@ -667,42 +701,42 @@ namespace KRnD.Source
 				newInfo = highlightChanges(currentInfo, newInfo);
 
 				// Current stats:
-				GUILayout.BeginArea(new Rect(10 + optionsWidth + 10, 30, windowStyle.fixedWidth, 20));
-				GUILayout.Label("<color=#FFFFFF><b>Current:</b> " + currentUpgradeCount + " (" + currentImprovement.ToString("+0.##%;-0.##%;-") + ")</color>", labelStyle);
+				GUILayout.BeginArea(new Rect(10 + optionsWidth + 10, 30, _windowStyle.fixedWidth, 20));
+				GUILayout.Label("<color=#FFFFFF><b>Current:</b> " + currentUpgradeCount + " (" + currentImprovement.ToString("+0.##%;-0.##%;-") + ")</color>", _labelStyle);
 				GUILayout.EndArea();
 
-				var areaWidth = (windowStyle.fixedWidth - 20 - optionsWidth) / 2;
+				var areaWidth = (_windowStyle.fixedWidth - 20 - optionsWidth) / 2;
 				var areaHeight = optionsHeight;
 				GUILayout.BeginArea(new Rect(10 + optionsWidth, 30 + 20, areaWidth, areaHeight));
-				scrollPos = GUILayout.BeginScrollView(scrollPos, scrollStyle, GUILayout.Width(areaWidth), GUILayout.Height(areaHeight));
+				_scrollPos = GUILayout.BeginScrollView(_scrollPos, _scrollStyle, GUILayout.Width(areaWidth), GUILayout.Height(areaHeight));
 
-				GUILayout.Label(currentInfo, labelStyleSmall);
+				GUILayout.Label(currentInfo, _labelStyleSmall);
 				GUILayout.EndScrollView();
 				GUILayout.EndArea();
 
 				// Next stats:
-				GUILayout.BeginArea(new Rect(10 + optionsWidth + areaWidth + 10, 30, windowStyle.fixedWidth, 20));
-				GUILayout.Label("<color=#FFFFFF><b>Next upgrade:</b> " + nextUpgradeCount + " (" + nextImprovement.ToString("+0.##%;-0.##%;-") + ")</color>", labelStyle);
+				GUILayout.BeginArea(new Rect(10 + optionsWidth + areaWidth + 10, 30, _windowStyle.fixedWidth, 20));
+				GUILayout.Label("<color=#FFFFFF><b>Next upgrade:</b> " + nextUpgradeCount + " (" + nextImprovement.ToString("+0.##%;-0.##%;-") + ")</color>", _labelStyle);
 				GUILayout.EndArea();
 
 				GUILayout.BeginArea(new Rect(10 + optionsWidth + areaWidth, 30 + 20, areaWidth, areaHeight));
-				scrollPos = GUILayout.BeginScrollView(scrollPos, scrollStyle, GUILayout.Width(areaWidth), GUILayout.Height(areaHeight));
-				GUILayout.Label(newInfo, labelStyleSmall);
+				_scrollPos = GUILayout.BeginScrollView(_scrollPos, _scrollStyle, GUILayout.Width(areaWidth), GUILayout.Height(areaHeight));
+				GUILayout.Label(newInfo, _labelStyleSmall);
 				GUILayout.EndScrollView();
 				GUILayout.EndArea();
 
 				// Bottom-line (display only if the upgrade would have an effect):
 				if (currentImprovement != nextImprovement) {
-					GUILayout.BeginArea(new Rect(10, windowStyle.fixedHeight - 25, windowStyle.fixedWidth, 30));
+					GUILayout.BeginArea(new Rect(10, _windowStyle.fixedHeight - 25, _windowStyle.fixedWidth, 30));
 					float currentScience = 0;
 					if (ResearchAndDevelopment.Instance != null) currentScience = ResearchAndDevelopment.Instance.Science;
 					var color = "FF0000";
 					if (currentScience >= scienceCost) color = "00FF00";
-					GUILayout.Label("<b>Science: <color=#" + color + ">" + scienceCost + " / " + Math.Floor(currentScience) + "</color></b>", labelStyle);
+					GUILayout.Label("<b>Science: <color=#" + color + ">" + scienceCost + " / " + Math.Floor(currentScience) + "</color></b>", _labelStyle);
 					GUILayout.EndArea();
 					if (currentScience >= scienceCost && ResearchAndDevelopment.Instance != null && upgradeFunction != null) {
-						GUILayout.BeginArea(new Rect(windowStyle.fixedWidth - 110, windowStyle.fixedHeight - 30, 100, 30));
-						if (GUILayout.Button("Research", buttonStyle)) {
+						GUILayout.BeginArea(new Rect(_windowStyle.fixedWidth - 110, _windowStyle.fixedHeight - 30, 100, 30));
+						if (GUILayout.Button("Research", _buttonStyle)) {
 							upgradeFunction(part);
 							ResearchAndDevelopment.Instance.AddScience(-scienceCost, TransactionReasons.RnDTechResearch);
 						}
