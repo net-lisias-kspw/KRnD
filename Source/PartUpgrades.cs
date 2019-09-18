@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace KRnD.Source
+﻿namespace KRnD.Source
 {
 	// This class stores all types of upgrades a part can have.
 	public class PartUpgrades
@@ -96,20 +91,22 @@ namespace KRnD.Source
 
 		public PartUpgrades Clone()
 		{
-			var copy = new PartUpgrades();
-			copy.ispVac = ispVac;
-			copy.ispAtm = ispAtm;
-			copy.dryMass = dryMass;
-			copy.fuelFlow = fuelFlow;
-			copy.torque = torque;
-			copy.chargeRate = chargeRate;
-			copy.crashTolerance = crashTolerance;
-			copy.batteryCharge = batteryCharge;
-			copy.generatorEfficiency = generatorEfficiency;
-			copy.converterEfficiency = converterEfficiency;
-			copy.parachuteStrength = parachuteStrength;
-			copy.maxTemperature = maxTemperature;
-			copy.fuelCapacity = fuelCapacity;
+			var copy = new PartUpgrades
+			{
+				ispVac = ispVac,
+				ispAtm = ispAtm,
+				dryMass = dryMass,
+				fuelFlow = fuelFlow,
+				torque = torque,
+				chargeRate = chargeRate,
+				crashTolerance = crashTolerance,
+				batteryCharge = batteryCharge,
+				generatorEfficiency = generatorEfficiency,
+				converterEfficiency = converterEfficiency,
+				parachuteStrength = parachuteStrength,
+				maxTemperature = maxTemperature,
+				fuelCapacity = fuelCapacity
+			};
 			return copy;
 		}
 	}

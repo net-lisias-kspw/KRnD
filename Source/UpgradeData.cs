@@ -56,7 +56,7 @@ namespace KRnD.Source
 			 * Cost is clamped between 1 and max signed int. Science point cost is always a whole number.
 			 */
 			if (cost_total < 1) cost_total = 1;
-			if (cost_total > Int32.MaxValue) return Int32.MaxValue; // Cap at signed 32 bit int
+			if (cost_total > int.MaxValue) return int.MaxValue; // Cap at signed 32 bit int
 			return (int)Math.Round(cost_total);
 		}
 

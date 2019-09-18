@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace KRnD.Source
 {
 	// This class is used to store all relevant base-stats of a part used to calculate all other stats with
-	// incremental upgrades as well as a backup for restoring the original stats (eg after loading a savegame).
+	// incremental upgrades as well as a backup for restoring the original stats (eg after loading a saved-game).
 	public class PartStats
 	{
 		public List<FloatCurve> atmosphereCurves;
@@ -85,7 +82,7 @@ namespace KRnD.Source
 			var fission_generator = KRnD.GetFissionGeneratorModule(part);
 			if (fission_generator != null) fissionPowerGeneration = KRnD.GetGenericModuleValue(fission_generator, "PowerGeneration");
 
-			// There might be different converter-modules in the same part with different names (eg for Fuel, Monopropellant, etc):
+			// There might be different converter-modules in the same part with different names (eg for Fuel, Mono-propellant, etc):
 			var converter_list = KRnD.GetConverterModules(part);
 			if (converter_list != null) {
 				converterEfficiency = new Dictionary<string, Dictionary<string, double>>();

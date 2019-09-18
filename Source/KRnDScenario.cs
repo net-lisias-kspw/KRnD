@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using JetBrains.Annotations;
 using UnityEngine;
 
 namespace KRnD.Source
 {
-	// This class handles load- and save-operations.
+	// This class handles load and save operations.
 	[KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
 	[UsedImplicitly]
 	internal class KRnDScenario : ScenarioModule
@@ -21,10 +18,9 @@ namespace KRnD.Source
 				double time = DateTime.Now.Ticks;
 				var upgrade_nodes = new ConfigNode("upgrades");
 				foreach (var upgrade_name in KRnD.upgrades.Keys) {
-					PartUpgrades upgrade;
-					if (!KRnD.upgrades.TryGetValue(upgrade_name, out upgrade)) continue;
+					if (!KRnD.upgrades.TryGetValue(upgrade_name, out var upgrade)) continue;
 					upgrade_nodes.AddNode(upgrade.CreateConfigNode(upgrade_name));
-					Debug.Log("[KRnD] saved: " + upgrade_name + " " + upgrade.ToString());
+					Debug.Log("[KRnD] saved: " + upgrade_name + " " + upgrade);
 				}
 
 				node.AddNode(upgrade_nodes);
@@ -47,7 +43,6 @@ namespace KRnD.Source
 				KRnDSettings.OnLoad(node);
 
 				double time = DateTime.Now.Ticks;
-				var upgrades_applied = 0;
 
 				KRnD.upgrades.Clear();
 
@@ -59,7 +54,7 @@ namespace KRnD.Source
 					}
 
 					// Update global part-list with new upgrades from the saved-game:
-					upgrades_applied = KRnD.UpdateGlobalParts();
+					var upgrades_applied = KRnD.UpdateGlobalParts();
 
 					// If we started with an active vessel, update that vessel:
 					var vessel = FlightGlobals.ActiveVessel;

@@ -435,20 +435,36 @@ namespace KRnD.Source
 
 				// Max Int/Skin Temp:
 				rnd_module.maxTemperature_upgrades = upgrades_to_apply.maxTemperature;
+
+#if true
+				UpgradeData u_data = KRnDSettings.GetData(Constants.MAX_TEMPERATURE);
+				double upgrade_factor = u_data.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
+				part.skinMaxTemp = original_stats.skinMaxTemp * upgrade_factor;
+				part.maxTemp = original_stats.intMaxTemp * upgrade_factor;
+
+#else
 				double temp_factor = 1 + CalculateImprovementFactor(rnd_module.maxTemperature_improvement, rnd_module.maxTemperature_improvementScale, upgrades_to_apply.maxTemperature);
 				part.skinMaxTemp = original_stats.skinMaxTemp * temp_factor;
 				part.maxTemp = original_stats.intMaxTemp * temp_factor;
+#endif
+
+
 
 				// Fuel Flow:
+				u_data = KRnDSettings.GetData(Constants.FUEL_FLOW);
+				upgrade_factor = u_data.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
 				var engine_modules = GetEngineModules(part);
 				var rcs_module = GetRcsModule(part);
 				if (engine_modules != null || rcs_module) {
 					rnd_module.fuelFlow_upgrades = upgrades_to_apply.fuelFlow;
 					for (var i = 0; i < original_stats.maxFuelFlows.Count; i++) {
-						var max_fuel_flow = original_stats.maxFuelFlows[i] * (1 + CalculateImprovementFactor(rnd_module.fuelFlow_improvement, rnd_module.fuelFlow_improvementScale, upgrades_to_apply.fuelFlow));
+						//var max_fuel_flow = original_stats.maxFuelFlows[i] * (1 + CalculateImprovementFactor(rnd_module.fuelFlow_improvement, rnd_module.fuelFlow_improvementScale, upgrades_to_apply.fuelFlow));
+						var max_fuel_flow = (float)(original_stats.maxFuelFlows[i] * upgrade_factor);
 						if (engine_modules != null) {
 							engine_modules[i].maxFuelFlow = max_fuel_flow;
-						} else if (rcs_module) rcs_module.thrusterPower = max_fuel_flow; // There is only one rcs-module
+						} else if (rcs_module) {
+							rcs_module.thrusterPower = max_fuel_flow; // There is only one rcs-module
+						}
 					}
 				} else {
 					rnd_module.fuelFlow_upgrades = 0;
@@ -522,8 +538,12 @@ namespace KRnD.Source
 				// Crash Tolerance (only for landing legs):
 				var landing_leg = GetLandingLegModule(part);
 				if (landing_leg) {
+
 					rnd_module.crashTolerance_upgrades = upgrades_to_apply.crashTolerance;
-					var crash_tolerance = original_stats.crashTolerance * (1 + CalculateImprovementFactor(rnd_module.crashTolerance_improvement, rnd_module.crashTolerance_improvementScale, upgrades_to_apply.crashTolerance));
+
+					u_data = KRnDSettings.GetData(Constants.CRASH_TOLERANCE);
+					var crash_tolerance = original_stats.crashTolerance * u_data.CalculateImprovementFactor(upgrades_to_apply.crashTolerance);
+					//var crash_tolerance = original_stats.crashTolerance * (1 + CalculateImprovementFactor(rnd_module.crashTolerance_improvement, rnd_module.crashTolerance_improvementScale, upgrades_to_apply.crashTolerance));
 					part.crashTolerance = crash_tolerance;
 				} else {
 					rnd_module.crashTolerance_upgrades = 0;
@@ -536,8 +556,7 @@ namespace KRnD.Source
 					var battery_charge = original_stats.batteryCharge * (1 + CalculateImprovementFactor(rnd_module.batteryCharge_improvement, rnd_module.batteryCharge_improvementScale, upgrades_to_apply.batteryCharge));
 					battery_charge = Math.Round(battery_charge); // We don't want half units of electric charge
 
-					var battery_is_full = false;
-					if (electric_charge.amount == electric_charge.maxAmount) battery_is_full = true;
+					bool battery_is_full = Math.Abs(electric_charge.amount - electric_charge.maxAmount) < float.Epsilon;
 
 					electric_charge.maxAmount = battery_charge;
 					if (battery_is_full) electric_charge.amount = electric_charge.maxAmount;
@@ -607,8 +626,7 @@ namespace KRnD.Source
 						var new_capacity = original_capacity * improvement_factor;
 						new_capacity = Math.Round(new_capacity); // We don't want half units of fuel
 
-						var tank_is_full = false;
-						if (fuel_resource.amount == fuel_resource.maxAmount) tank_is_full = true;
+						bool tank_is_full = Math.Abs(fuel_resource.amount - fuel_resource.maxAmount) < float.Epsilon;
 
 						fuel_resource.maxAmount = new_capacity;
 						if (tank_is_full) fuel_resource.amount = fuel_resource.maxAmount;

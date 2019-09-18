@@ -38,13 +38,13 @@
 		// Converter Efficiency
 		[KSPField(isPersistant = true)] public int converterEfficiency_upgrades = 0;
 
-		[KSPField(isPersistant = false)] public float crashTolerance_costScale = 2f;
+		//[KSPField(isPersistant = false)] public float crashTolerance_costScale = 2f;
 
-		[KSPField(isPersistant = false)] public float crashTolerance_improvement = 0.15f;
+		//[KSPField(isPersistant = false)] public float crashTolerance_improvement = 0.15f;
 
-		[KSPField(isPersistant = false)] public float crashTolerance_improvementScale = 1f;
+		//[KSPField(isPersistant = false)] public float crashTolerance_improvementScale = 1f;
 
-		[KSPField(isPersistant = false)] public int crashTolerance_scienceCost = 10;
+		//[KSPField(isPersistant = false)] public int crashTolerance_scienceCost = 10;
 
 		// Crash Tolerance
 		[KSPField(isPersistant = true)] public int crashTolerance_upgrades = 0;
@@ -75,13 +75,13 @@
 		// Fuel Capacity
 		[KSPField(isPersistant = true)] public int fuelCapacity_upgrades = 0;
 
-		[KSPField(isPersistant = false)] public float fuelFlow_costScale = 2f;
+		//[KSPField(isPersistant = false)] public float fuelFlow_costScale = 2f;
 
-		[KSPField(isPersistant = false)] public float fuelFlow_improvement = 0.1f;
+		//[KSPField(isPersistant = false)] public float fuelFlow_improvement = 0.1f;
 
-		[KSPField(isPersistant = false)] public float fuelFlow_improvementScale = 1f;
+		//[KSPField(isPersistant = false)] public float fuelFlow_improvementScale = 1f;
 
-		[KSPField(isPersistant = false)] public int fuelFlow_scienceCost = 10;
+		//[KSPField(isPersistant = false)] public int fuelFlow_scienceCost = 10;
 
 		// Fuel Flow
 		[KSPField(isPersistant = true)] public int fuelFlow_upgrades = 0;
@@ -119,13 +119,13 @@
 		// ISP Vac
 		[KSPField(isPersistant = true)] public int ispVac_upgrades = 0;
 
-		[KSPField(isPersistant = false)] public float maxTemperature_costScale = 2f;
+		//[KSPField(isPersistant = false)] public float maxTemperature_costScale = 2f;
 
-		[KSPField(isPersistant = false)] public float maxTemperature_improvement = 0.2f;
+		//[KSPField(isPersistant = false)] public float maxTemperature_improvement = 0.2f;
 
-		[KSPField(isPersistant = false)] public float maxTemperature_improvementScale = 1f;
+		//[KSPField(isPersistant = false)] public float maxTemperature_improvementScale = 1f;
 
-		[KSPField(isPersistant = false)] public int maxTemperature_scienceCost = 5;
+		//[KSPField(isPersistant = false)] public int maxTemperature_scienceCost = 5;
 
 		// Max Skin Temp
 		[KSPField(isPersistant = true)] public int maxTemperature_upgrades = 0;

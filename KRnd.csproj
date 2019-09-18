@@ -82,6 +82,7 @@
     <Content Include="GameData\KRnD\Icons\settings.png" />
     <Content Include="GameData\KRnD\KRnD.dll" />
     <Content Include="GameData\KRnD\Icons\R&amp;D_icon.png" />
+    <Content Include="Support\R&amp;D_Art.psd" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Source\AssemblyInfo.cs" />
