@@ -13,7 +13,7 @@ namespace KRnD.Source
 		public override void OnSave(ConfigNode node)
 		{
 			try {
-				KRnDSettings.OnSave(node);
+				InitConstants.OnSave(node);
 
 				double time = DateTime.Now.Ticks;
 				var upgrade_nodes = new ConfigNode("upgrades");
@@ -29,8 +29,8 @@ namespace KRnD.Source
 				Debug.Log("[KRnD] saved " + upgrade_nodes.CountNodes.ToString() + " upgrades in " + time.ToString("0.000s"));
 
 				var gui_settings = new ConfigNode("gui");
-				gui_settings.AddValue("left", UpgradeUI.windowPosition.xMin);
-				gui_settings.AddValue("top", UpgradeUI.windowPosition.yMin);
+				gui_settings.AddValue("left", KRnDUI.windowPosition.xMin);
+				gui_settings.AddValue("top", KRnDUI.windowPosition.yMin);
 				node.AddNode(gui_settings);
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] OnSave(): " + e);
@@ -40,7 +40,7 @@ namespace KRnD.Source
 		public override void OnLoad(ConfigNode node)
 		{
 			try {
-				KRnDSettings.OnLoad(node);
+				InitConstants.OnLoad(node);
 
 				double time = DateTime.Now.Ticks;
 
@@ -66,8 +66,8 @@ namespace KRnD.Source
 
 				var gui_settings = node.GetNode("gui");
 				if (gui_settings != null) {
-					if (gui_settings.HasValue("left")) UpgradeUI.windowPosition.xMin = (float)double.Parse(gui_settings.GetValue("left"));
-					if (gui_settings.HasValue("top")) UpgradeUI.windowPosition.yMin = (float)double.Parse(gui_settings.GetValue("top"));
+					if (gui_settings.HasValue("left")) KRnDUI.windowPosition.xMin = (float)double.Parse(gui_settings.GetValue("left"));
+					if (gui_settings.HasValue("top")) KRnDUI.windowPosition.yMin = (float)double.Parse(gui_settings.GetValue("top"));
 				}
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] OnLoad(): " + e);

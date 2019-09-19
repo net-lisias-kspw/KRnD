@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace KRnD.Source
 {
-	public class UpgradeData
+	public class UpgradeConstants
 	{
 		public string name;
 
@@ -11,7 +11,7 @@ namespace KRnD.Source
 		public float improvementValue;
 		public int scienceCost;
 
-		public UpgradeData(string name_str, float cost_divisor, float improve_value, int science_cost)
+		public UpgradeConstants(string name_str, float cost_divisor, float improve_value, int science_cost)
 		{
 			name = name_str;
 			costDivisor = cost_divisor;
@@ -31,13 +31,13 @@ namespace KRnD.Source
 			float factor = 1;
 			if (upgrades < 0) upgrades = 0;
 			for (var i = 0; i < upgrades; i++) {
-				factor += improvementValue * (float)Math.Pow(KRnDSettings.improvementRate, i);
+				factor += improvementValue * (float)Math.Pow(InitConstants.improvementRate, i);
 			}
 
 			/*
 			 * Improvement is clamped at a limit of 10% to 400% of original value, typically.
 			 */
-			return Mathf.Clamp(factor, KRnDSettings.minFactor, KRnDSettings.maxFactor);
+			return Mathf.Clamp(factor, InitConstants.minFactor, InitConstants.maxFactor);
 		}
 
 		public int CalculateScienceCost(float original_stat, int upgrades)
@@ -46,7 +46,7 @@ namespace KRnD.Source
 			float cost_base = scienceCost * costDivisor > 0 ? (original_stat / costDivisor) : 1;
 			if (upgrades < 0) upgrades = 0;
 			for (var i = 0; i < upgrades; i++) {
-				cost_total += cost_base * (float)Math.Pow(KRnDSettings.costRate, i);
+				cost_total += cost_base * (float)Math.Pow(InitConstants.costRate, i);
 			}
 
 			/*

@@ -63,7 +63,7 @@ namespace KRnD.Source
 		/// 		  main UI becomes hidden.</summary>
 		private void ApplicationButtonClicked()
 		{
-			UpgradeUI.showGui = !UpgradeUI.showGui;
+			KRnDUI.showGui = !KRnDUI.showGui;
 		}
 
 
@@ -75,9 +75,9 @@ namespace KRnD.Source
 		private void OnGameSceneSwitchRequested(GameEvents.FromToAction<GameScenes, GameScenes> data)
 		{
 			if (_toolbarButton == null) return;
-			UpgradeUI.showGui = false;
+			KRnDUI.showGui = false;
 
-			UpgradeUI.selectedPart = null;
+			KRnDUI.selectedPart = null;
 
 
 			// If going to the main menu, then make sure the button has been removed.

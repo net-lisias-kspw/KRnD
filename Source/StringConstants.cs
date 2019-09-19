@@ -1,4 +1,6 @@
-﻿namespace KRnD.Source
+﻿using System.Collections.Generic;
+
+namespace KRnD.Source
 {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// <summary> The constants this mod uses that are tightly coupled to the saved-game file. Changing these will
@@ -123,6 +125,17 @@
 		/// 		  level per upgrade.</summary>
 		public static string IMPROVEMENT_RATE = "improvementRate";
 		#endregion
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> The list of propellants that are not actually fuels and should not be affected by "fuel pressure"
+		/// 		  upgrades.</summary>
+		public static List<string> NON_FUELS = new List<string>
+		{
+			"ElectricCharge",
+			"IntakeAir",
+			"IntakeAtm"
+		};
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////

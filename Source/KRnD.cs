@@ -18,209 +18,57 @@ namespace KRnD.Source
 		public static List<string> fuelResources;
 		public static List<string> blacklistedParts;
 
-		// Helper for accessing values in third party modules:
-		public static double GetGenericModuleValue(PartModule module, string field_name)
-		{
-			var type = module.GetType();
-			foreach (var info in type.GetFields()) {
-				if (info.Name == field_name) {
-					return Convert.ToDouble(info.GetValue(module));
-				}
-			}
 
-			throw new Exception("field " + field_name + " not found in module " + module.moduleName);
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Is called when this Add-on is first loaded to initializes all values (eg registration of event-
+		/// 		  handlers and creation of original-stats library).</summary>
+		[UsedImplicitly]
+		public void Awake()
+		{
+			try {
+
+				// Execute the following code only once:
+				if (_initialized) return;
+				DontDestroyOnLoad(this);
+
+				// Register event-handlers:
+				GameEvents.onVesselChange.Add(OnVesselChange);
+				GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
+
+				InitConstants.Initialize();
+
+				fuelResources = FetchAllFuelResources();
+				blacklistedParts = FetchAllBlacklistedParts();
+				originalStats = FetchAllPartStats();
+
+				_initialized = true;
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] Awake(): " + e);
+			}
 		}
 
-		// Helper for setting values in third party modules:
-		public static void SetGenericModuleValue(PartModule module, string field_name, double value)
-		{
-			var type = module.GetType();
-			foreach (var info in type.GetFields()) {
-				if (info.Name == field_name) {
-					info.SetValue(module, Convert.ChangeType(value, info.FieldType));
-					return;
-				}
-			}
 
-			throw new Exception("field " + field_name + " not found in module " + module.moduleName);
+		// Is called every time the active vessel changes (on entering a scene, switching the vessel or on docking).
+		private void OnVesselChange(Vessel vessel)
+		{
+			try {
+				UpdateVessel(vessel);
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] OnVesselChange(): " + e);
+			}
 		}
 
-		// Checks if the given, generic part-module has a field with the given name:
-		public static bool HasGenericModuleField(PartModule module, string field_name)
+		// Is called when we interact with a part in the editor.
+		private void OnEditorPartEvent(ConstructionEventType ev, Part part)
 		{
-			var type = module.GetType();
-			foreach (var info in type.GetFields()) {
-				if (info.Name == field_name) {
-					return true;
-				}
+			try {
+				if (ev != ConstructionEventType.PartCreated && ev != ConstructionEventType.PartDetached && ev != ConstructionEventType.PartAttached && ev != ConstructionEventType.PartDragging) return;
+				KRnDUI.selectedPart = part;
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] EditorPartEvent(): " + e);
 			}
-
-			return false;
 		}
 
-		public static KRnDModule GetKRnDModule(Part part)
-		{
-			// If this is a blacklisted part, don't touch it, even if it should have an RnD-Module. We do it like
-			// this because using module-manager-magic to prevent RnD from getting installed with other, incompatible
-			// modules from other mods depends on the order in which module-manager applies the patches; this way
-			// we can avoid these problems. It means though that parts might have the RnD-Module, which isn't used though.
-			if (blacklistedParts.Contains(SanatizePartName(part.name))) return null;
-
-			// Check if this part has the RnD-Module and return it:
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "KRnDModule") {
-					return (KRnDModule) part_module;
-				}
-			}
-
-			return null;
-		}
-
-		// Multi-Mode engines have multiple Engine-Modules which we return as a list.
-		public static List<ModuleEngines> GetEngineModules(Part part)
-		{
-			var engines = new List<ModuleEngines>();
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleEngines" || part_module.moduleName == "ModuleEnginesFX") {
-					engines.Add((ModuleEngines) part_module);
-				}
-			}
-
-			if (engines.Count > 0) return engines;
-			return null;
-		}
-
-		public static ModuleRCS GetRcsModule(Part part)
-		{
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleRCS" || part_module.moduleName == "ModuleRCSFX") {
-					return (ModuleRCS) part_module;
-				}
-			}
-
-			return null;
-		}
-
-		public static ModuleReactionWheel GetReactionWheelModule(Part part)
-		{
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleReactionWheel") {
-					return (ModuleReactionWheel) part_module;
-				}
-			}
-
-			return null;
-		}
-
-		public static ModuleDeployableSolarPanel GetSolarPanelModule(Part part)
-		{
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleDeployableSolarPanel") {
-					return (ModuleDeployableSolarPanel) part_module;
-				}
-			}
-
-			return null;
-		}
-
-		public static ModuleWheelBase GetLandingLegModule(Part part)
-		{
-			foreach (var partModule in part.Modules) {
-				if (partModule.moduleName == "ModuleWheelBase") {
-					var wheel_base = (ModuleWheelBase) partModule;
-					if (wheel_base.wheelType == WheelType.LEG) return wheel_base;
-				}
-			}
-
-			return null;
-		}
-
-		public static PartResource GetChargeResource(Part part)
-		{
-			if (part.Resources == null) return null;
-			foreach (var part_resource in part.Resources)
-				// Engines with an alternator might have a max-amount of 0, skip those:
-			{
-				if (part_resource.resourceName == "ElectricCharge" && part_resource.maxAmount > 0) {
-					return part_resource;
-				}
-			}
-
-			return null;
-		}
-
-		public static List<PartResource> GetFuelResources(Part part)
-		{
-			if (part.Resources == null) return null;
-			var part_fuels = new List<PartResource>();
-			foreach (var part_resource in part.Resources) {
-				if (fuelResources != null && fuelResources.Contains(part_resource.resourceName)) {
-					part_fuels.Add(part_resource);
-				}
-			}
-
-			if (part_fuels.Count == 0) return null;
-			return part_fuels;
-		}
-
-		public static ModuleGenerator GetGeneratorModule(Part part)
-		{
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleGenerator") {
-					return (ModuleGenerator) part_module;
-				}
-			}
-
-			return null;
-		}
-
-		public static PartModule GetFissionGeneratorModule(Part part)
-		{
-			foreach (var part_module in part.Modules)
-				// We are only interested in "FissionGenerator" with the tunable attribute "PowerGeneration":
-			{
-				if (part_module.moduleName == "FissionGenerator" && HasGenericModuleField(part_module, "PowerGeneration")) {
-					return part_module;
-				}
-			}
-
-			return null;
-		}
-
-		public static List<ModuleResourceConverter> GetConverterModules(Part part)
-		{
-			var converters = new List<ModuleResourceConverter>();
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleResourceConverter") {
-					converters.Add((ModuleResourceConverter) part_module);
-				}
-			}
-
-			if (converters.Count == 0) return null;
-			return converters;
-		}
-
-		public static ModuleParachute GetParachuteModule(Part part)
-		{
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleParachute") {
-					return (ModuleParachute) part_module;
-				}
-			}
-
-			return null;
-		}
-
-		public static ModuleProceduralFairing GetFairingModule(Part part)
-		{
-			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleProceduralFairing") {
-					return (ModuleProceduralFairing) part_module;
-				}
-			}
-
-			return null;
-		}
 
 		public static float CalculateImprovementFactor(float base_improvement, float improvement_scale, int upgrade_level)
 		{
@@ -285,7 +133,7 @@ namespace KRnD.Source
 						var engine_module_number = 0; // There might be multiple modules of this type
 						foreach (var info in part.moduleInfos) {
 							if (info.moduleName.ToLower() == "engine") {
-								var engines = GetEngineModules(part.partPrefab);
+								var engines = PartStats.GetEngineModules(part.partPrefab);
 								if (engines != null && engines.Count > 0) {
 									var engine = engines[engine_module_number];
 									info.info = engine.GetInfo();
@@ -293,41 +141,41 @@ namespace KRnD.Source
 									engine_module_number++;
 								}
 							} else if (info.moduleName.ToLower() == "rcs") {
-								var rcs = GetRcsModule(part.partPrefab);
+								var rcs = PartStats.GetRcsModule(part.partPrefab);
 								if (rcs) info.info = rcs.GetInfo();
 							} else if (info.moduleName.ToLower() == "reaction wheel") {
-								var reaction_wheel = GetReactionWheelModule(part.partPrefab);
+								var reaction_wheel = PartStats.GetReactionWheelModule(part.partPrefab);
 								if (reaction_wheel) info.info = reaction_wheel.GetInfo();
 							} else if (info.moduleName.ToLower() == "deployable solar panel") {
-								var solar_panel = GetSolarPanelModule(part.partPrefab);
+								var solar_panel = PartStats.GetSolarPanelModule(part.partPrefab);
 								if (solar_panel) info.info = GetSolarPanelInfo(solar_panel);
 							} else if (info.moduleName.ToLower() == "landing leg") {
-								var landing_leg = GetLandingLegModule(part.partPrefab);
+								var landing_leg = PartStats.GetLandingLegModule(part.partPrefab);
 								if (landing_leg) info.info = landing_leg.GetInfo();
 							} else if (info.moduleName.ToLower() == "fission generator") {
-								var fission_generator = GetFissionGeneratorModule(part.partPrefab);
+								var fission_generator = PartStats.GetFissionGeneratorModule(part.partPrefab);
 								if (fission_generator) info.info = fission_generator.GetInfo();
 							} else if (info.moduleName.ToLower() == "generator") {
-								var generator = GetGeneratorModule(part.partPrefab);
+								var generator = PartStats.GetGeneratorModule(part.partPrefab);
 								if (generator) info.info = generator.GetInfo();
 							} else if (info.moduleName.ToLower() == "resource converter") {
-								var converter_list = GetConverterModules(part.partPrefab);
+								var converter_list = PartStats.GetConverterModules(part.partPrefab);
 								if (converter_list != null && converter_list.Count > 0) {
 									var converter = converter_list[converter_module_number];
 									info.info = converter.GetInfo();
 									converter_module_number++;
 								}
 							} else if (info.moduleName.ToLower() == "parachute") {
-								var parachute = GetParachuteModule(part.partPrefab);
+								var parachute = PartStats.GetParachuteModule(part.partPrefab);
 								if (parachute) info.info = parachute.GetInfo();
 							} else if (info.moduleName.ToLower() == "custom-built fairing") {
-								var fairing = GetFairingModule(part.partPrefab);
+								var fairing = PartStats.GetFairingModule(part.partPrefab);
 								if (fairing) info.info = fairing.GetInfo();
 							}
 						}
 
-						var fuel_resources = GetFuelResources(part.partPrefab);
-						var electric_charge = GetChargeResource(part.partPrefab);
+						var fuel_resources = PartStats.GetFuelResources(part.partPrefab);
+						var electric_charge = PartStats.GetChargeResource(part.partPrefab);
 						// The Resource-Names are not always formatted the same way, eg "Electric Charge" vs "ElectricCharge", so we do some reformatting.
 						foreach (var info in part.resourceInfos) {
 							if (electric_charge != null && info.resourceName.Replace(" ", "").ToLower() == electric_charge.resourceName.Replace(" ", "").ToLower()) {
@@ -383,7 +231,7 @@ namespace KRnD.Source
 				}
 			} else {
 				// Extract current upgrades of the part and set those stats:
-				var rnd_module = GetKRnDModule(part);
+				var rnd_module = PartStats.GetKRnDModule(part);
 				if (rnd_module != null && (upgrades_to_apply = rnd_module.GetCurrentUpgrades()) != null) {
 					// Apply upgrades from the RnD-Module:
 					UpdatePart(part, upgrades_to_apply);
@@ -407,7 +255,7 @@ namespace KRnD.Source
 		{
 			try {
 				// Find all relevant modules of this part:
-				var rnd_module = GetKRnDModule(part);
+				var rnd_module = PartStats.GetKRnDModule(part);
 				if (rnd_module == null) return;
 				if (upgrades == null) throw new Exception("upgrades-dictionary missing");
 				if (KRnD.originalStats == null) throw new Exception("original-stats-dictionary missing");
@@ -430,15 +278,15 @@ namespace KRnD.Source
 				part.prefabMass = part.mass; // New in ksp 1.1, if this is correct is just guesswork however...
 
 				// Dry Mass also improves fairing mass:
-				var fairng_module = GetFairingModule(part);
+				var fairng_module = PartStats.GetFairingModule(part);
 				if (fairng_module) fairng_module.UnitAreaMass = original_stats.fairingAreaMass * dry_mass_factor;
 
 				// Max Int/Skin Temp:
 				rnd_module.maxTemperature_upgrades = upgrades_to_apply.maxTemperature;
 
 #if true
-				UpgradeData u_data = KRnDSettings.GetData(StringConstants.MAX_TEMPERATURE);
-				double upgrade_factor = u_data.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
+				UpgradeConstants u_constants = InitConstants.GetData(StringConstants.MAX_TEMPERATURE);
+				double upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
 				part.skinMaxTemp = original_stats.skinMaxTemp * upgrade_factor;
 				part.maxTemp = original_stats.intMaxTemp * upgrade_factor;
 
@@ -451,10 +299,10 @@ namespace KRnD.Source
 
 
 				// Fuel Flow:
-				u_data = KRnDSettings.GetData(StringConstants.FUEL_FLOW);
-				upgrade_factor = u_data.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
-				var engine_modules = GetEngineModules(part);
-				var rcs_module = GetRcsModule(part);
+				u_constants = InitConstants.GetData(StringConstants.FUEL_FLOW);
+				upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
+				var engine_modules = PartStats.GetEngineModules(part);
+				var rcs_module = PartStats.GetRcsModule(part);
 				if (engine_modules != null || rcs_module) {
 					rnd_module.fuelFlow_upgrades = upgrades_to_apply.fuelFlow;
 					for (var i = 0; i < original_stats.maxFuelFlows.Count; i++) {
@@ -510,10 +358,14 @@ namespace KRnD.Source
 				}
 
 				// Torque:
-				var reaction_wheel = GetReactionWheelModule(part);
+				var reaction_wheel = PartStats.GetReactionWheelModule(part);
 				if (reaction_wheel) {
-					rnd_module.torque_upgrades = upgrades_to_apply.torque;
-					var torque = original_stats.torqueStrength * (1 + CalculateImprovementFactor(rnd_module.torque_improvement, rnd_module.torque_improvementScale, upgrades_to_apply.torque));
+					rnd_module.torque_upgrades = upgrades_to_apply.torqueStrength;
+
+					u_constants = InitConstants.GetData(StringConstants.TORQUE);
+					float torque = original_stats.torqueStrength * u_constants.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
+
+					//var torque = original_stats.torqueStrength * (1 + CalculateImprovementFactor(rnd_module.torque_improvement, rnd_module.torque_improvementScale, upgrades_to_apply.torque));
 					reaction_wheel.PitchTorque = torque;
 					reaction_wheel.YawTorque = torque;
 					reaction_wheel.RollTorque = torque;
@@ -522,27 +374,31 @@ namespace KRnD.Source
 				}
 
 				// Charge Rate:
-				var solar_panel = GetSolarPanelModule(part);
+				var solar_panel = PartStats.GetSolarPanelModule(part);
 				if (solar_panel) {
 					rnd_module.chargeRate_upgrades = upgrades_to_apply.chargeRate;
-					var charge_efficiency = 1 + CalculateImprovementFactor(rnd_module.chargeRate_improvement, rnd_module.chargeRate_improvementScale, upgrades_to_apply.chargeRate);
+
+					u_constants = InitConstants.GetData(StringConstants.CHARGE_RATE);
+					solar_panel.efficiencyMult = u_constants.CalculateImprovementValue(0, upgrades_to_apply.chargeRate);
+
+					//var charge_efficiency = 1 + CalculateImprovementFactor(rnd_module.chargeRate_improvement, rnd_module.chargeRate_improvementScale, upgrades_to_apply.chargeRate);
 					// Somehow changing the charge-rate stopped working in KSP 1.1, so we use the efficiency instead. This however does not
 					// show up in the module-info (probably a bug in KSP), which is why we have another workaround to update the info-texts.
 					// float chargeRate = originalStats.chargeRate * chargeEfficiency;
 					// solarPanel.chargeRate = chargeRate;
-					solar_panel.efficiencyMult = charge_efficiency;
+					//solar_panel.efficiencyMult = charge_efficiency;
 				} else {
 					rnd_module.chargeRate_upgrades = 0;
 				}
 
 				// Crash Tolerance (only for landing legs):
-				var landing_leg = GetLandingLegModule(part);
+				var landing_leg = PartStats.GetLandingLegModule(part);
 				if (landing_leg) {
 
 					rnd_module.crashTolerance_upgrades = upgrades_to_apply.crashTolerance;
 
-					u_data = KRnDSettings.GetData(StringConstants.CRASH_TOLERANCE);
-					part.crashTolerance = u_data.CalculateImprovementValue(original_stats.crashTolerance, upgrades_to_apply.crashTolerance);
+					u_constants = InitConstants.GetData(StringConstants.CRASH_TOLERANCE);
+					part.crashTolerance = u_constants.CalculateImprovementValue(original_stats.crashTolerance, upgrades_to_apply.crashTolerance);
 					//var crash_tolerance = original_stats.crashTolerance * (1 + CalculateImprovementFactor(rnd_module.crashTolerance_improvement, rnd_module.crashTolerance_improvementScale, upgrades_to_apply.crashTolerance));
 					//part.crashTolerance = crash_tolerance;
 				} else {
@@ -550,10 +406,13 @@ namespace KRnD.Source
 				}
 
 				// Battery Charge:
-				var electric_charge = GetChargeResource(part);
+				var electric_charge = PartStats.GetChargeResource(part);
 				if (electric_charge != null) {
 					rnd_module.batteryCharge_upgrades = upgrades_to_apply.batteryCharge;
-					var battery_charge = original_stats.batteryCharge * (1 + CalculateImprovementFactor(rnd_module.batteryCharge_improvement, rnd_module.batteryCharge_improvementScale, upgrades_to_apply.batteryCharge));
+
+					u_constants = InitConstants.GetData(StringConstants.BATTERY_CHARGE);
+					var battery_charge = original_stats.batteryCharge * u_constants.CalculateImprovementFactor(upgrades_to_apply.batteryCharge);
+					//var battery_charge = original_stats.batteryCharge * (1 + CalculateImprovementFactor(rnd_module.batteryCharge_improvement, rnd_module.batteryCharge_improvementScale, upgrades_to_apply.batteryCharge));
 					battery_charge = Math.Round(battery_charge); // We don't want half units of electric charge
 
 					bool battery_is_full = Math.Abs(electric_charge.amount - electric_charge.maxAmount) < float.Epsilon;
@@ -565,8 +424,8 @@ namespace KRnD.Source
 				}
 
 				// Generator & Fission-Generator Efficiency:
-				var generator = GetGeneratorModule(part);
-				var fission_generator = GetFissionGeneratorModule(part);
+				var generator = PartStats.GetGeneratorModule(part);
+				var fission_generator = PartStats.GetFissionGeneratorModule(part);
 				if (generator || fission_generator) {
 					rnd_module.generatorEfficiency_upgrades = upgrades_to_apply.generatorEfficiency;
 
@@ -579,14 +438,14 @@ namespace KRnD.Source
 
 					if (fission_generator) {
 						var power_generation = original_stats.fissionPowerGeneration * (1 + CalculateImprovementFactor(rnd_module.generatorEfficiency_improvement, rnd_module.generatorEfficiency_improvementScale, upgrades_to_apply.generatorEfficiency));
-						SetGenericModuleValue(fission_generator, "PowerGeneration", power_generation);
+						PartStats.SetGenericModuleValue(fission_generator, "PowerGeneration", power_generation);
 					}
 				} else {
 					rnd_module.generatorEfficiency_upgrades = 0;
 				}
 
 				// Converter Efficiency:
-				var converter_list = GetConverterModules(part);
+				var converter_list = PartStats.GetConverterModules(part);
 				if (converter_list != null) {
 					foreach (var converter in converter_list) {
 						if (!original_stats.converterEfficiency.TryGetValue(converter.ConverterName, out var original_output_resources)) continue;
@@ -605,17 +464,20 @@ namespace KRnD.Source
 				}
 
 				// Parachute Strength:
-				var parachute = GetParachuteModule(part);
+				var parachute = PartStats.GetParachuteModule(part);
 				if (parachute) {
 					rnd_module.parachuteStrength_upgrades = upgrades_to_apply.parachuteStrength;
-					var chute_max_temp = original_stats.chuteMaxTemp * (1 + CalculateImprovementFactor(rnd_module.parachuteStrength_improvement, rnd_module.parachuteStrength_improvementScale, upgrades_to_apply.parachuteStrength));
+
+					u_constants = InitConstants.GetData(StringConstants.PARACHUTE_STRENGTH);
+					var chute_max_temp = original_stats.chuteMaxTemp * u_constants.CalculateImprovementFactor(upgrades_to_apply.parachuteStrength);
+					//var chute_max_temp = original_stats.chuteMaxTemp * (1 + CalculateImprovementFactor(rnd_module.parachuteStrength_improvement, rnd_module.parachuteStrength_improvementScale, upgrades_to_apply.parachuteStrength));
 					parachute.chuteMaxTemp = chute_max_temp; // The safe deployment-speed is derived from the temperature
 				} else {
 					rnd_module.parachuteStrength_upgrades = 0;
 				}
 
 				// Fuel Capacity:
-				var fuel_resources = GetFuelResources(part);
+				var fuel_resources = PartStats.GetFuelResources(part);
 				if (fuel_resources != null && original_stats.fuelCapacities != null) {
 					rnd_module.fuelCapacity_upgrades = upgrades_to_apply.fuelCapacity;
 					double improvement_factor = 1 + CalculateImprovementFactor(rnd_module.fuelCapacity_improvement, rnd_module.fuelCapacity_improvementScale, upgrades_to_apply.fuelCapacity);
@@ -652,7 +514,7 @@ namespace KRnD.Source
 				// Iterate through all parts:
 				foreach (var part in vessel.parts) {
 					// We only have to update parts which have the RnD-Module:
-					var rnd_module = GetKRnDModule(part);
+					var rnd_module = PartStats.GetKRnDModule(part);
 					if (rnd_module == null) continue;
 
 					if (vessel.situation == Vessel.Situations.PRELAUNCH) {
@@ -673,28 +535,12 @@ namespace KRnD.Source
 			}
 		}
 
-		// Is called every time the active vessel changes (on entering a scene, switching the vessel or on docking).
-		private void OnVesselChange(Vessel vessel)
-		{
-			try {
-				UpdateVessel(vessel);
-			} catch (Exception e) {
-				Debug.LogError("[KRnD] OnVesselChange(): " + e);
-			}
-		}
 
-		// Is called when we interact with a part in the editor.
-		private void EditorPartEvent(ConstructionEventType ev, Part part)
-		{
-			try {
-				if (ev != ConstructionEventType.PartCreated && ev != ConstructionEventType.PartDetached && ev != ConstructionEventType.PartAttached && ev != ConstructionEventType.PartDragging) return;
-				UpgradeUI.selectedPart = part;
-			} catch (Exception e) {
-				Debug.LogError("[KRnD] EditorPartEvent(): " + e);
-			}
-		}
-
-		public List<string> GetBlacklistedModules()
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Loads blacklisted module list from the blacklist.cfg file.</summary>
+		///
+		/// <returns> The blacklisted modules.</returns>
+		public List<string> LoadBlacklistedModules()
 		{
 			var blacklisted_modules = new List<string>();
 			try {
@@ -712,7 +558,12 @@ namespace KRnD.Source
 			return blacklisted_modules;
 		}
 
-		public List<string> GetBlacklistedParts()
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Loads blacklisted parts from blacklist.cfg file.</summary>
+		///
+		/// <returns> The blacklisted parts.</returns>
+		public List<string> LoadBlacklistedParts()
 		{
 			var blacklisted_parts = new List<string>();
 			try {
@@ -730,103 +581,102 @@ namespace KRnD.Source
 			return blacklisted_parts;
 		}
 
-		// Is called when this Add-on is first loaded to initializes all values (eg registration of event-handlers and creation
-		// of original-stats library).
-		[UsedImplicitly]
-		public void Awake()
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Create a backup of all unmodified parts before we update them. We will later use these backup-
+		/// 		  parts for all calculations of upgraded stats.</summary>
+		///
+		/// <returns> all part statistics.</returns>
+		private static Dictionary<string, PartStats> FetchAllPartStats()
 		{
-			try {
+			var original_stats = new Dictionary<string, PartStats>();
+			foreach (var a_part in PartLoader.LoadedPartsList) {
+				var part = a_part.partPrefab;
 
-				KRnDSettings.Initialize();
+				// Backup this part, if it has the RnD-Module:
+				if (PartStats.GetKRnDModule(part) == null) continue;
 
-				// Create a list of all valid fuel resources:
-				if (fuelResources == null) {
-					fuelResources = new List<string> {"MonoPropellant"};
-					// Always use MonoPropellant as fuel (RCS-Thrusters don't have engine modules and are not found with the code below)
-
-					foreach (var a_part in PartLoader.LoadedPartsList) {
-						var part = a_part.partPrefab;
-						var engine_modules = GetEngineModules(part);
-						if (engine_modules == null) continue;
-						foreach (var engine_module in engine_modules) {
-							if (engine_module.propellants == null) continue;
-							foreach (var propellant in engine_module.propellants) {
-								if (propellant.name == "ElectricCharge") continue; // Electric Charge is improved by batteries.
-								if (propellant.name == "IntakeAir") continue; // This is no real fuel-type.
-								if (propellant.name == "IntakeAtm") continue; // This is no real fuel-type.
-								if (!fuelResources.Contains(propellant.name)) fuelResources.Add(propellant.name);
-							}
-						}
-					}
-
-					var list_string = "";
-					foreach (var fuel_name in fuelResources) {
-						if (list_string != "") list_string += ", ";
-						list_string += fuel_name;
-					}
-
-					//Debug.Log("[KRnD] found " + KRnD.fuelResources.Count.ToString() + " propellants: " + listString);
+				if (!original_stats.ContainsKey(part.name)) {
+					original_stats.Add(part.name, new PartStats(part));
 				}
-
-				// Create a list of blacklisted parts (parts with known incompatible modules of other mods):
-				if (blacklistedParts == null) {
-					blacklistedParts = GetBlacklistedParts();
-					var blacklisted_modules = GetBlacklistedModules();
-
-					foreach (var a_part in PartLoader.LoadedPartsList) {
-						var part = a_part.partPrefab;
-						var skip = false;
-						var blacklisted_module = "N/A";
-
-						foreach (var part_module in part.Modules) {
-							if (blacklisted_modules.Contains(part_module.moduleName)) {
-								blacklisted_module = part_module.moduleName;
-								skip = true;
-								break;
-							}
-						}
-
-						if (skip) {
-							if (!blacklistedParts.Contains(part.name)) {
-								blacklistedParts.Add(part.name);
-							}
-						}
-					}
-
-					//Debug.Log("[KRnD] blacklisted " + KRnD.blacklistedParts.Count.ToString() + " parts, which contained one of " + blacklistedModules.Count.ToString() + " blacklisted modules");
-				}
-
-				// Create a backup of all unmodified parts before we update them. We will later use these backup-parts
-				// for all calculations of upgraded stats.
-				if (originalStats == null) {
-					originalStats = new Dictionary<string, PartStats>();
-					foreach (var a_part in PartLoader.LoadedPartsList) {
-						var part = a_part.partPrefab;
-
-						// Backup this part, if it has the RnD-Module:
-						if (GetKRnDModule(part) != null) {
-							PartStats duplicate;
-							if (originalStats.TryGetValue(part.name, out duplicate)) {
-								//Debug.LogError("[KRnD] Awake(): duplicate part-name: " + part.name.ToString());
-							} else {
-								originalStats.Add(part.name, new PartStats(part));
-							}
-						}
-					}
-				}
-
-				// Execute the following code only once:
-				if (_initialized) return;
-				DontDestroyOnLoad(this);
-
-				// Register event-handlers:
-				GameEvents.onVesselChange.Add(OnVesselChange);
-				GameEvents.onEditorPartEvent.Add(EditorPartEvent);
-
-				_initialized = true;
-			} catch (Exception e) {
-				Debug.LogError("[KRnD] Awake(): " + e);
 			}
+
+			return original_stats;
+		}
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Fetches all blacklisted parts. Start with the pre-defined list and then add in any part that
+		/// 		  contains a blacklisted module.</summary>
+		///
+		/// <returns> All blacklisted parts.</returns>
+		private List<string> FetchAllBlacklistedParts()
+		{
+			// Create a list of blacklisted parts (parts with known incompatible modules of other mods):
+			List<string> blacklisted_parts = LoadBlacklistedParts();
+			var blacklisted_modules = LoadBlacklistedModules();
+
+			foreach (var a_part in PartLoader.LoadedPartsList) {
+				var part = a_part.partPrefab;
+				var should_blacklist = false;
+
+				foreach (var part_module in part.Modules) {
+					if (!blacklisted_modules.Contains(part_module.moduleName)) continue;
+					should_blacklist = true;
+					break;
+				}
+
+				if (!should_blacklist) continue;
+				if (!blacklisted_parts.Contains(part.name)) {
+					blacklisted_parts.Add(part.name);
+				}
+			}
+
+			return blacklisted_parts;
+		}
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Fetches all fuel resources by going through every part and collecting all resources that are
+		/// 		  listed as a propellant. If the propellent is listed in the NON_FUELS list, then don't
+		/// 		  consider it a real fuel so don't add it.</summary>
+		///
+		/// <returns> All fuel resources that are not specifically indicated as a non-fuel propellant.</returns>
+		private static List<string> FetchAllFuelResources()
+		{
+			// Create a list of all valid fuel resources: Always use MonoPropellant as fuel (RCS-Thrusters don't have engine modules and are not found with the code below)
+			var fuel_resources = new List<string> { "MonoPropellant" };
+
+			foreach (var a_part in PartLoader.LoadedPartsList) {
+				var part = a_part.partPrefab;
+				var engine_modules = PartStats.GetEngineModules(part);
+				if (engine_modules == null) continue;
+				foreach (var engine_module in engine_modules) {
+					if (engine_module.propellants == null) continue;
+					foreach (var propellant in engine_module.propellants) {
+
+						// Don't consider a propellant to actually be a fuel if it is specifically part of the non-fuel list.
+						if (StringConstants.NON_FUELS.Contains(propellant.name)) continue;
+
+						//if (propellant.name == "ElectricCharge") continue; // Electric Charge is improved by batteries.
+						//if (propellant.name == "IntakeAir") continue; // This is no real fuel-type.
+						//if (propellant.name == "IntakeAtm") continue; // This is no real fuel-type.
+						if (!fuel_resources.Contains(propellant.name)) fuel_resources.Add(propellant.name);
+					}
+				}
+			}
+
+#if false
+				var list_string = "";
+				foreach (var fuel_name in fuel_resources) {
+					if (list_string != "") list_string += ", ";
+					list_string += fuel_name;
+				}
+
+				Debug.Log("[KRnD] found " + KRnD.fuel_resources.Count.ToString() + " propellants: " + listString);
+#endif
+
+			return fuel_resources;
 		}
 	}
 }

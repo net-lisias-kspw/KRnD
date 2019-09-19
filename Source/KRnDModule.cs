@@ -3,26 +3,26 @@
 	[KSPModule("R&D")]
 	public class KRnDModule : PartModule
 	{
-		[KSPField(isPersistant = false)] public float batteryCharge_costScale = 2f;
+		//[KSPField(isPersistant = false)] public float batteryCharge_costScale = 2f;
 
-		[KSPField(isPersistant = false)] public float batteryCharge_costScaleReference = 500f;
+		//[KSPField(isPersistant = false)] public float batteryCharge_costScaleReference = 500f;
 
-		[KSPField(isPersistant = false)] public float batteryCharge_improvement = 0.2f;
+		//[KSPField(isPersistant = false)] public float batteryCharge_improvement = 0.2f;
 
-		[KSPField(isPersistant = false)] public float batteryCharge_improvementScale = 1f;
+		//[KSPField(isPersistant = false)] public float batteryCharge_improvementScale = 1f;
 
-		[KSPField(isPersistant = false)] public int batteryCharge_scienceCost = 10;
+		//[KSPField(isPersistant = false)] public int batteryCharge_scienceCost = 10;
 
 		// Battery Charge
 		[KSPField(isPersistant = true)] public int batteryCharge_upgrades = 0;
 
-		[KSPField(isPersistant = false)] public float chargeRate_costScale = 2f;
+		//[KSPField(isPersistant = false)] public float chargeRate_costScale = 2f;
 
-		[KSPField(isPersistant = false)] public float chargeRate_improvement = 0.05f;
+		//[KSPField(isPersistant = false)] public float chargeRate_improvement = 0.05f;
 
-		[KSPField(isPersistant = false)] public float chargeRate_improvementScale = 1f;
+		//[KSPField(isPersistant = false)] public float chargeRate_improvementScale = 1f;
 
-		[KSPField(isPersistant = false)] public int chargeRate_scienceCost = 10;
+		//[KSPField(isPersistant = false)] public int chargeRate_scienceCost = 10;
 
 		// Charge Rate
 		[KSPField(isPersistant = true)] public int chargeRate_upgrades = 0;
@@ -134,24 +134,24 @@
 		[KSPField(guiActive = true, guiName = "R&D", guiUnits = "", guiFormat = "", isPersistant = false)]
 		public string moduleVersion;
 
-		[KSPField(isPersistant = false)] public float parachuteStrength_costScale = 2f;
+		//[KSPField(isPersistant = false)] public float parachuteStrength_costScale = 2f;
 
-		[KSPField(isPersistant = false)] public float parachuteStrength_improvement = 0.3f;
+		//[KSPField(isPersistant = false)] public float parachuteStrength_improvement = 0.3f;
 
-		[KSPField(isPersistant = false)] public float parachuteStrength_improvementScale = 1f;
+		//[KSPField(isPersistant = false)] public float parachuteStrength_improvementScale = 1f;
 
-		[KSPField(isPersistant = false)] public int parachuteStrength_scienceCost = 10;
+		//[KSPField(isPersistant = false)] public int parachuteStrength_scienceCost = 10;
 
 		// Parachute Strength
 		[KSPField(isPersistant = true)] public int parachuteStrength_upgrades = 0;
 
-		[KSPField(isPersistant = false)] public float torque_costScale = 2f;
+		//[KSPField(isPersistant = false)] public float torque_costScale = 2f;
 
-		[KSPField(isPersistant = false)] public float torque_improvement = 0.25f;
+		//[KSPField(isPersistant = false)] public float torque_improvement = 0.25f;
 
-		[KSPField(isPersistant = false)] public float torque_improvementScale = 1f;
+		//[KSPField(isPersistant = false)] public float torque_improvementScale = 1f;
 
-		[KSPField(isPersistant = false)] public int torque_scienceCost = 5;
+		//[KSPField(isPersistant = false)] public int torque_scienceCost = 5;
 
 		// Torque
 		[KSPField(isPersistant = true)] public int torque_upgrades = 0;
@@ -215,7 +215,7 @@
 			upgrades.fuelFlow = fuelFlow_upgrades;
 			upgrades.ispVac = ispVac_upgrades;
 			upgrades.ispAtm = ispAtm_upgrades;
-			upgrades.torque = torque_upgrades;
+			upgrades.torqueStrength = torque_upgrades;
 			upgrades.chargeRate = chargeRate_upgrades;
 			upgrades.crashTolerance = crashTolerance_upgrades;
 			upgrades.batteryCharge = batteryCharge_upgrades;

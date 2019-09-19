@@ -91,13 +91,13 @@
     <Compile Include="Source\StringConstants.cs" />
     <Compile Include="Source\KRnD.cs" />
     <Compile Include="Source\UIController.cs" />
-    <Compile Include="Source\UpgradeUI.cs" />
+    <Compile Include="Source\KRnDUI.cs" />
     <Compile Include="Source\KRnDModule.cs" />
     <Compile Include="Source\KRnDScenario.cs" />
-    <Compile Include="Source\KRnDSettings.cs" />
+    <Compile Include="Source\InitConstants.cs" />
     <Compile Include="Source\PartUpgrades.cs" />
     <Compile Include="Source\PartStats.cs" />
-    <Compile Include="Source\UpgradeData.cs" />
+    <Compile Include="Source\UpgradeConstants.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

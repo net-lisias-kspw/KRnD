@@ -28,7 +28,7 @@
 		public int ispVac;
 		public int maxTemperature;
 		public int parachuteStrength;
-		public int torque;
+		public int torqueStrength;
 
 #if false
 		public override string ToString()
@@ -58,7 +58,7 @@
 			if (ispAtm > 0) node.AddValue(StringConstants.ISP_ATM, ispAtm.ToString());
 			if (dryMass > 0) node.AddValue(StringConstants.DRY_MASS, dryMass.ToString());
 			if (fuelFlow > 0) node.AddValue(StringConstants.FUEL_FLOW, fuelFlow.ToString());
-			if (torque > 0) node.AddValue(StringConstants.TORQUE, torque.ToString());
+			if (torqueStrength > 0) node.AddValue(StringConstants.TORQUE, torqueStrength.ToString());
 			if (chargeRate > 0) node.AddValue(StringConstants.CHARGE_RATE, chargeRate.ToString());
 			if (crashTolerance > 0) node.AddValue(StringConstants.CRASH_TOLERANCE, crashTolerance.ToString());
 			if (batteryCharge > 0) node.AddValue(StringConstants.BATTERY_CHARGE, batteryCharge.ToString());
@@ -77,7 +77,7 @@
 			if (node.HasValue(StringConstants.ISP_ATM)) upgrade.ispAtm = int.Parse(node.GetValue(StringConstants.ISP_ATM));
 			if (node.HasValue(StringConstants.DRY_MASS)) upgrade.dryMass = int.Parse(node.GetValue(StringConstants.DRY_MASS));
 			if (node.HasValue(StringConstants.FUEL_FLOW)) upgrade.fuelFlow = int.Parse(node.GetValue(StringConstants.FUEL_FLOW));
-			if (node.HasValue(StringConstants.TORQUE)) upgrade.torque = int.Parse(node.GetValue(StringConstants.TORQUE));
+			if (node.HasValue(StringConstants.TORQUE)) upgrade.torqueStrength = int.Parse(node.GetValue(StringConstants.TORQUE));
 			if (node.HasValue(StringConstants.CHARGE_RATE)) upgrade.chargeRate = int.Parse(node.GetValue(StringConstants.CHARGE_RATE));
 			if (node.HasValue(StringConstants.CRASH_TOLERANCE)) upgrade.crashTolerance = int.Parse(node.GetValue(StringConstants.CRASH_TOLERANCE));
 			if (node.HasValue(StringConstants.BATTERY_CHARGE)) upgrade.batteryCharge = int.Parse(node.GetValue(StringConstants.BATTERY_CHARGE));
@@ -97,7 +97,7 @@
 				ispAtm = ispAtm,
 				dryMass = dryMass,
 				fuelFlow = fuelFlow,
-				torque = torque,
+				torqueStrength = torqueStrength,
 				chargeRate = chargeRate,
 				crashTolerance = crashTolerance,
 				batteryCharge = batteryCharge,

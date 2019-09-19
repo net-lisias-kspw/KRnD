@@ -10,9 +10,9 @@ namespace KRnD.Source
 	/// <summary> This class holds essentially all the game constants that control the balance and behavior of this
 	/// 		  mod. The values in this class are initialized from the "Config.cfg" file.</summary>
 	[KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
-	public class KRnDSettings : MonoBehaviour
+	public class InitConstants : MonoBehaviour
 	{
-		public static Dictionary<string, UpgradeData> upgradeDatabase = new Dictionary<string, UpgradeData>();
+		public static Dictionary<string, UpgradeConstants> upgradeDatabase = new Dictionary<string, UpgradeConstants>();
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,21 +37,21 @@ namespace KRnD.Source
 			try {
 				// Default upgrade control data used only if no config file found. Every modifiable aspect needs to be listed here since
 				// the dictionary is populated by this step as a side effect.
-				upgradeDatabase = new Dictionary<string, UpgradeData>
+				upgradeDatabase = new Dictionary<string, UpgradeConstants>
 				{
-					[StringConstants.BATTERY_CHARGE] = new UpgradeData(StringConstants.BATTERY_CHARGE, 500, 0.2f, 10),
-					[StringConstants.CHARGE_RATE] = new UpgradeData(StringConstants.CHARGE_RATE, 0, 0.05f, 10),
-					[StringConstants.CONVERTER_EFFICIENCY] = new UpgradeData(StringConstants.CONVERTER_EFFICIENCY, 0, 0.1f, 15),
-					[StringConstants.CRASH_TOLERANCE] = new UpgradeData(StringConstants.CRASH_TOLERANCE, 0, 0.15f, 10),
-					[StringConstants.DRY_MASS] = new UpgradeData(StringConstants.DRY_MASS, 1, -0.1f, 10),
-					[StringConstants.FUEL_CAPACITY] = new UpgradeData(StringConstants.FUEL_CAPACITY, 1000, 0.05f, 5),
-					[StringConstants.FUEL_FLOW] = new UpgradeData(StringConstants.FUEL_FLOW, 0, 0.1f, 10),
-					[StringConstants.GENERATOR_EFFICIENCY] = new UpgradeData(StringConstants.GENERATOR_EFFICIENCY, 0, 0.1f, 15),
-					[StringConstants.ISP_ATM] = new UpgradeData(StringConstants.ISP_ATM, 0, 0.05f, 15),
-					[StringConstants.ISP_VAC] = new UpgradeData(StringConstants.ISP_VAC, 0, 0.05f, 15),
-					[StringConstants.MAX_TEMPERATURE] = new UpgradeData(StringConstants.MAX_TEMPERATURE, 1200, 0.2f, 5),
-					[StringConstants.PARACHUTE_STRENGTH] = new UpgradeData(StringConstants.PARACHUTE_STRENGTH, 250, 0.3f, 10),
-					[StringConstants.TORQUE] = new UpgradeData(StringConstants.TORQUE,  0, 0.25f, 5)
+					[StringConstants.BATTERY_CHARGE] = new UpgradeConstants(StringConstants.BATTERY_CHARGE, 500, 0.2f, 10),
+					[StringConstants.CHARGE_RATE] = new UpgradeConstants(StringConstants.CHARGE_RATE, 0, 0.05f, 10),
+					[StringConstants.CONVERTER_EFFICIENCY] = new UpgradeConstants(StringConstants.CONVERTER_EFFICIENCY, 0, 0.1f, 15),
+					[StringConstants.CRASH_TOLERANCE] = new UpgradeConstants(StringConstants.CRASH_TOLERANCE, 0, 0.15f, 10),
+					[StringConstants.DRY_MASS] = new UpgradeConstants(StringConstants.DRY_MASS, 1, -0.1f, 10),
+					[StringConstants.FUEL_CAPACITY] = new UpgradeConstants(StringConstants.FUEL_CAPACITY, 1000, 0.05f, 5),
+					[StringConstants.FUEL_FLOW] = new UpgradeConstants(StringConstants.FUEL_FLOW, 0, 0.1f, 10),
+					[StringConstants.GENERATOR_EFFICIENCY] = new UpgradeConstants(StringConstants.GENERATOR_EFFICIENCY, 0, 0.1f, 15),
+					[StringConstants.ISP_ATM] = new UpgradeConstants(StringConstants.ISP_ATM, 0, 0.05f, 15),
+					[StringConstants.ISP_VAC] = new UpgradeConstants(StringConstants.ISP_VAC, 0, 0.05f, 15),
+					[StringConstants.MAX_TEMPERATURE] = new UpgradeConstants(StringConstants.MAX_TEMPERATURE, 1200, 0.2f, 5),
+					[StringConstants.PARACHUTE_STRENGTH] = new UpgradeConstants(StringConstants.PARACHUTE_STRENGTH, 250, 0.3f, 10),
+					[StringConstants.TORQUE] = new UpgradeConstants(StringConstants.TORQUE,  0, 0.25f, 5)
 				};
 
 
@@ -76,7 +76,7 @@ namespace KRnD.Source
 			}
 		}
 
-		public static UpgradeData GetData(string key)
+		public static UpgradeConstants GetData(string key)
 		{
 			try { 
 				return upgradeDatabase[key];
