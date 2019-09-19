@@ -13,7 +13,7 @@ namespace KRnD.Source
 	public class UpgradeUI : MonoBehaviour
 	{
 		// TODO: The Application-Button shows up during the flight scene ...
-		private static ApplicationLauncherButton _launcherButton;
+		//private static ApplicationLauncherButton _launcherButton;
 		public static Rect windowPosition = new Rect(300, 60, 450, 400 + 80);
 		private static readonly GUIStyle _windowStyle = new GUIStyle(HighLogic.Skin.window) {fixedWidth = 500f, fixedHeight = 300f + 80};
 		private static readonly GUIStyle _labelStyle = new GUIStyle(HighLogic.Skin.label);
@@ -22,7 +22,7 @@ namespace KRnD.Source
 		private static readonly GUIStyle _scrollStyle = new GUIStyle(HighLogic.Skin.scrollView);
 		private static Vector2 _scrollPos = Vector2.zero;
 		//private static Texture2D texture;
-		private static bool _showGui;
+		public static bool showGui;
 
 		private static Texture2D _closeIcon;
 
@@ -46,57 +46,55 @@ namespace KRnD.Source
 
 			// Add event-handlers to create and destroy our button:
 			//GameEvents.onGUIApplicationLauncherReady.Remove(ReadyEvent);
-			GameEvents.onGUIApplicationLauncherReady.Add(ReadyEvent);
+			//GameEvents.onGUIApplicationLauncherReady.Add(ReadyEvent);
 			//GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
-			GameEvents.onGUIApplicationLauncherDestroyed.Add(DestroyEvent);
+			//GameEvents.onGUIApplicationLauncherDestroyed.Add(DestroyEvent);
 		}
 
 		[UsedImplicitly]
 		private void OnDestroy()
 		{
-			GameEvents.onGUIApplicationLauncherReady.Remove(ReadyEvent);
-			GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
+			//GameEvents.onGUIApplicationLauncherReady.Remove(ReadyEvent);
+			//GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
 		}
 
 		// Fires when a scene is ready so we can install our button.
-		public void ReadyEvent()
-		{
-			if (!ApplicationLauncher.Ready || _launcherButton != null) return;
-
-			var visible_in_scenes = ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
-			var texture_file = Constants.MOD_DIRECTORY + Constants.APP_ICON;
-			_launcherButton = ApplicationLauncher.Instance.AddModApplication(GuiToggle, GuiToggle, null, null, null, null, visible_in_scenes, GameDatabase.Instance.GetTexture(texture_file, false));
-		}
+//		public void ReadyEvent()
+//		{
+//			if (!ApplicationLauncher.Ready || _launcherButton != null) return;
+//			var visible_in_scenes = ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
+//			var texture_file = StringConstants.MOD_DIRECTORY + StringConstants.APP_ICON;
+//			_launcherButton = ApplicationLauncher.Instance.AddModApplication(GuiToggle, GuiToggle, null, null, null, null, visible_in_scenes, GameDatabase.Instance.GetTexture(texture_file, false));
+//		}
 
 		// Fires when a scene is unloaded and we should destroy our button:
-		public void DestroyEvent()
-		{
-			if (_launcherButton == null) return;
+//		public void DestroyEvent()
+//		{
+//			if (_launcherButton == null) return;
+//			ApplicationLauncher.Instance.RemoveModApplication(_launcherButton);
+//			_launcherButton = null;
+//			selectedPart = null;
+//			showGui = false;
+//		}
 
-			ApplicationLauncher.Instance.RemoveModApplication(_launcherButton);
-			_launcherButton = null;
-			selectedPart = null;
-			_showGui = false;
-		}
-
-		private void GuiToggle()
-		{
-			_showGui = !_showGui;
-		}
+//		private void GuiToggle()
+//		{
+//			showGui = !showGui;
+//		}
 
 
 		[UsedImplicitly]
 		public void OnGUI()
 		{
-			if (!_showGui) return;
+			if (!showGui) return;
 
-			if (_closeIcon == null) _closeIcon = GameDatabase.Instance.GetTexture(Constants.MOD_DIRECTORY + Constants.CLOSE_ICON, false);
+			if (_closeIcon == null) _closeIcon = GameDatabase.Instance.GetTexture(StringConstants.MOD_DIRECTORY + StringConstants.CLOSE_ICON, false);
 
 			GUI.depth = 0;
 			windowPosition = GUILayout.Window(100, windowPosition, OnWindow, "", _windowStyle);
 			const int icon_size = 28;
 			if (GUI.Button(new Rect(windowPosition.xMax - (icon_size + 2), windowPosition.yMin + 2, icon_size, icon_size), _closeIcon, GUI.skin.button)) {
-				_showGui = false;
+				showGui = false;
 			}
 		}
 
@@ -572,7 +570,7 @@ namespace KRnD.Source
 					next_upgrade_count = ++next_upgrade.fuelFlow;
 
 #if true
-					UpgradeData u_data = KRnDSettings.GetData(Constants.FUEL_FLOW);
+					UpgradeData u_data = KRnDSettings.GetData(StringConstants.FUEL_FLOW);
 					current_improvement = u_data.CalculateImprovementFactor(current_upgrade.fuelFlow);
 					next_improvement = u_data.CalculateImprovementFactor(next_upgrade.fuelFlow);
 					science_cost = u_data.CalculateScienceCost(0, next_upgrade.fuelFlow);
@@ -617,7 +615,7 @@ namespace KRnD.Source
 					next_upgrade_count = ++next_upgrade.crashTolerance;
 
 #if true
-					UpgradeData u_data = KRnDSettings.GetData(Constants.CRASH_TOLERANCE);
+					UpgradeData u_data = KRnDSettings.GetData(StringConstants.CRASH_TOLERANCE);
 					current_improvement = u_data.CalculateImprovementFactor(current_upgrade.crashTolerance);
 					next_improvement = u_data.CalculateImprovementFactor(next_upgrade.crashTolerance);
 					//if (!KRnD.originalStats.TryGetValue(part.name, out var original_stats)) throw new Exception("no original-stats for part '" + part.name + "'");
@@ -687,7 +685,7 @@ namespace KRnD.Source
 					next_upgrade_count = ++next_upgrade.maxTemperature;
 
 #if true
-					UpgradeData u_data = KRnDSettings.GetData(Constants.MAX_TEMPERATURE);
+					UpgradeData u_data = KRnDSettings.GetData(StringConstants.MAX_TEMPERATURE);
 					current_improvement = u_data.CalculateImprovementFactor(current_upgrade.maxTemperature);
 					next_improvement = u_data.CalculateImprovementFactor(next_upgrade.maxTemperature);
 

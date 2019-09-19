@@ -7,24 +7,23 @@ namespace KRnD.Source
 	{
 		public string name;
 
-		//public string description;
-		//public float costScale;
 		public float costDivisor;
 		public float improvementValue;
-		//public float improvementScale;
 		public int scienceCost;
 
 		public UpgradeData(string name_str, float cost_divisor, float improve_value, int science_cost)
 		{
 			name = name_str;
-			//description = desc_str;
-			//costScale = cost_scale;
 			costDivisor = cost_divisor;
 			improvementValue = improve_value;
-			//improvementScale = improvement_scale;
 			scienceCost = science_cost;
 		}
 
+		public float CalculateImprovementValue(float value, int upgrades)
+		{
+			value *= CalculateImprovementFactor(upgrades);
+			return value;
+		}
 
 
 		public float CalculateImprovementFactor(int upgrades)
@@ -36,11 +35,9 @@ namespace KRnD.Source
 			}
 
 			/*
-			 * Improvement is clamped at a limit of 10% to 400% of original value.
+			 * Improvement is clamped at a limit of 10% to 400% of original value, typically.
 			 */
-			if (factor < 0.1) factor = 0.1f;
-			if (factor > 4) factor = 4.0f;
-			return factor;
+			return Mathf.Clamp(factor, KRnDSettings.minFactor, KRnDSettings.maxFactor);
 		}
 
 		public int CalculateScienceCost(float original_stat, int upgrades)
@@ -62,22 +59,27 @@ namespace KRnD.Source
 
 
 
-		public void SaveToNode(ConfigNode node)
+		public void SaveUpgradeData(ConfigNode node)
 		{
 			var data_node = new ConfigNode(name);
-			data_node.SetValue(Constants.SCIENCE_COST, scienceCost, true);
-			data_node.SetValue(Constants.COST_DIVISOR, costDivisor, true);
-			data_node.SetValue(Constants.IMPROVEMENT, improvementValue, true);
+			data_node.SetValue(StringConstants.SCIENCE_COST, scienceCost, true);
+			data_node.SetValue(StringConstants.COST_DIVISOR, costDivisor, true);
+			data_node.SetValue(StringConstants.IMPROVEMENT, improvementValue, true);
 			node.AddNode(data_node);
 		}
 
-		public void LoadFromNode(ConfigNode node)
+		public void LoadUpgradeData(ConfigNode node)
 		{
+			/*
+			 * There is a possibility that the data does not exist in the saved-game file. This is true
+			 * when this mod is added to an already existing game. In such a case, it will fall back to
+			 * using the defaults.
+			 */
 			try {
 				var data_node = node.GetNode(name);
-				data_node.TryGetValue(Constants.COST_DIVISOR, ref costDivisor);
-				data_node.TryGetValue(Constants.IMPROVEMENT, ref improvementValue);
-				data_node.TryGetValue(Constants.SCIENCE_COST, ref scienceCost);
+				data_node.TryGetValue(StringConstants.COST_DIVISOR, ref costDivisor);
+				data_node.TryGetValue(StringConstants.IMPROVEMENT, ref improvementValue);
+				data_node.TryGetValue(StringConstants.SCIENCE_COST, ref scienceCost);
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] LoadFromNode(): " + e);
 			}

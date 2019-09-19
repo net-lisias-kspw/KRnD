@@ -27,6 +27,10 @@ namespace KRnD.Source
 		/// 		  for example, would mean the cost doubles for each upgrade level.</summary>
 		public static float costRate = 2.0f;
 
+		public static float minFactor = 0.1f;
+
+		public static float maxFactor = 4.0f;
+
 
 		public static void Initialize()
 		{
@@ -35,36 +39,36 @@ namespace KRnD.Source
 				// the dictionary is populated by this step as a side effect.
 				upgradeDatabase = new Dictionary<string, UpgradeData>
 				{
-					[Constants.BATTERY_CHARGE] = new UpgradeData(Constants.BATTERY_CHARGE, 500, 0.2f, 10),
-					[Constants.CHARGE_RATE] = new UpgradeData(Constants.CHARGE_RATE, 0, 0.05f, 10),
-					[Constants.CONVERTER_EFFICIENCY] = new UpgradeData(Constants.CONVERTER_EFFICIENCY, 0, 0.1f, 15),
-					[Constants.CRASH_TOLERANCE] = new UpgradeData(Constants.CRASH_TOLERANCE, 0, 0.15f, 10),
-					[Constants.DRY_MASS] = new UpgradeData(Constants.DRY_MASS, 1, -0.1f, 10),
-					[Constants.FUEL_CAPACITY] = new UpgradeData(Constants.FUEL_CAPACITY, 1000, 0.05f, 5),
-					[Constants.FUEL_FLOW] = new UpgradeData(Constants.FUEL_FLOW, 0, 0.1f, 10),
-					[Constants.GENERATOR_EFFICIENCY] = new UpgradeData(Constants.GENERATOR_EFFICIENCY, 0, 0.1f, 15),
-					[Constants.ISP_ATM] = new UpgradeData(Constants.ISP_ATM, 0, 0.05f, 15),
-					[Constants.ISP_VAC] = new UpgradeData(Constants.ISP_VAC, 0, 0.05f, 15),
-					[Constants.MAX_TEMPERATURE] = new UpgradeData(Constants.MAX_TEMPERATURE, 1200, 0.2f, 5),
-					[Constants.PARACHUTE_STRENGTH] = new UpgradeData(Constants.PARACHUTE_STRENGTH, 250, 0.3f, 10),
-					[Constants.TORQUE] = new UpgradeData(Constants.TORQUE,  0, 0.25f, 5)
+					[StringConstants.BATTERY_CHARGE] = new UpgradeData(StringConstants.BATTERY_CHARGE, 500, 0.2f, 10),
+					[StringConstants.CHARGE_RATE] = new UpgradeData(StringConstants.CHARGE_RATE, 0, 0.05f, 10),
+					[StringConstants.CONVERTER_EFFICIENCY] = new UpgradeData(StringConstants.CONVERTER_EFFICIENCY, 0, 0.1f, 15),
+					[StringConstants.CRASH_TOLERANCE] = new UpgradeData(StringConstants.CRASH_TOLERANCE, 0, 0.15f, 10),
+					[StringConstants.DRY_MASS] = new UpgradeData(StringConstants.DRY_MASS, 1, -0.1f, 10),
+					[StringConstants.FUEL_CAPACITY] = new UpgradeData(StringConstants.FUEL_CAPACITY, 1000, 0.05f, 5),
+					[StringConstants.FUEL_FLOW] = new UpgradeData(StringConstants.FUEL_FLOW, 0, 0.1f, 10),
+					[StringConstants.GENERATOR_EFFICIENCY] = new UpgradeData(StringConstants.GENERATOR_EFFICIENCY, 0, 0.1f, 15),
+					[StringConstants.ISP_ATM] = new UpgradeData(StringConstants.ISP_ATM, 0, 0.05f, 15),
+					[StringConstants.ISP_VAC] = new UpgradeData(StringConstants.ISP_VAC, 0, 0.05f, 15),
+					[StringConstants.MAX_TEMPERATURE] = new UpgradeData(StringConstants.MAX_TEMPERATURE, 1200, 0.2f, 5),
+					[StringConstants.PARACHUTE_STRENGTH] = new UpgradeData(StringConstants.PARACHUTE_STRENGTH, 250, 0.3f, 10),
+					[StringConstants.TORQUE] = new UpgradeData(StringConstants.TORQUE,  0, 0.25f, 5)
 				};
 
 
 				// Load in the default values from the config file.
 
-				string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), Constants.CONFIG_FILENAME);
+				string filename = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), StringConstants.CONFIG_FILENAME);
 				if (File.Exists(filename)) {
 
 					// Read config data from config file.
 					var settings = ConfigNode.Load(filename);
-					LoadFromNode(settings);
+					LoadConstants(settings);
 
 				} else {
 
 					// Create initial config file since it doesn't exist. This shouldn't be needed.
 					var node = new ConfigNode();
-					SaveToNode(node);
+					SaveConstants(node);
 					node.Save(filename);
 				}
 			} catch (Exception e) {
@@ -83,21 +87,21 @@ namespace KRnD.Source
 		}
 
 
-		static void SaveToNode(ConfigNode node)
+		static void SaveConstants(ConfigNode node)
 		{
-			node.SetValue(Constants.COST_RATE, costRate, true);
-			node.SetValue(Constants.IMPROVEMENT_RATE, improvementRate, true);
+			node.SetValue(StringConstants.COST_RATE, costRate, true);
+			node.SetValue(StringConstants.IMPROVEMENT_RATE, improvementRate, true);
 			foreach (var data in upgradeDatabase) {
-				data.Value.SaveToNode(node);
+				data.Value.SaveUpgradeData(node);
 			}
 		}
 
-		static void LoadFromNode(ConfigNode node)
+		static void LoadConstants(ConfigNode node)
 		{
-			node.TryGetValue(Constants.COST_RATE, ref costRate);
-			node.TryGetValue(Constants.IMPROVEMENT_RATE, ref improvementRate);
+			node.TryGetValue(StringConstants.COST_RATE, ref costRate);
+			node.TryGetValue(StringConstants.IMPROVEMENT_RATE, ref improvementRate);
 			foreach (var data in upgradeDatabase) {
-				data.Value.LoadFromNode(node);
+				data.Value.LoadUpgradeData(node);
 			}
 		}
 
@@ -108,7 +112,7 @@ namespace KRnD.Source
 		/// <param name="node"> The saved node.</param>
 		public static void OnSave(ConfigNode node)
 		{
-			SaveToNode(node);
+			SaveConstants(node);
 		}
 
 
@@ -117,7 +121,7 @@ namespace KRnD.Source
 		/// <param name="node"> The node. </param>
 		public static void OnLoad(ConfigNode node)
 		{
-			LoadFromNode(node);
+			LoadConstants(node);
 		}
 
 

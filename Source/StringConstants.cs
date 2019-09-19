@@ -3,7 +3,7 @@
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/// <summary> The constants this mod uses that are tightly coupled to the saved-game file. Changing these will
 	/// 		  break existing games.</summary>
-	public static class Constants
+	public static class StringConstants
 	{
 		#region Upgrade Section Identifier Strings
 

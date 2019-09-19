@@ -437,7 +437,7 @@ namespace KRnD.Source
 				rnd_module.maxTemperature_upgrades = upgrades_to_apply.maxTemperature;
 
 #if true
-				UpgradeData u_data = KRnDSettings.GetData(Constants.MAX_TEMPERATURE);
+				UpgradeData u_data = KRnDSettings.GetData(StringConstants.MAX_TEMPERATURE);
 				double upgrade_factor = u_data.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
 				part.skinMaxTemp = original_stats.skinMaxTemp * upgrade_factor;
 				part.maxTemp = original_stats.intMaxTemp * upgrade_factor;
@@ -451,7 +451,7 @@ namespace KRnD.Source
 
 
 				// Fuel Flow:
-				u_data = KRnDSettings.GetData(Constants.FUEL_FLOW);
+				u_data = KRnDSettings.GetData(StringConstants.FUEL_FLOW);
 				upgrade_factor = u_data.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
 				var engine_modules = GetEngineModules(part);
 				var rcs_module = GetRcsModule(part);
@@ -541,10 +541,10 @@ namespace KRnD.Source
 
 					rnd_module.crashTolerance_upgrades = upgrades_to_apply.crashTolerance;
 
-					u_data = KRnDSettings.GetData(Constants.CRASH_TOLERANCE);
-					var crash_tolerance = original_stats.crashTolerance * u_data.CalculateImprovementFactor(upgrades_to_apply.crashTolerance);
+					u_data = KRnDSettings.GetData(StringConstants.CRASH_TOLERANCE);
+					part.crashTolerance = u_data.CalculateImprovementValue(original_stats.crashTolerance, upgrades_to_apply.crashTolerance);
 					//var crash_tolerance = original_stats.crashTolerance * (1 + CalculateImprovementFactor(rnd_module.crashTolerance_improvement, rnd_module.crashTolerance_improvementScale, upgrades_to_apply.crashTolerance));
-					part.crashTolerance = crash_tolerance;
+					//part.crashTolerance = crash_tolerance;
 				} else {
 					rnd_module.crashTolerance_upgrades = 0;
 				}
@@ -698,7 +698,7 @@ namespace KRnD.Source
 		{
 			var blacklisted_modules = new List<string>();
 			try {
-				var node = ConfigNode.Load(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/" + Constants.BLACKLIST_FILENAME);
+				var node = ConfigNode.Load(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/" + StringConstants.BLACKLIST_FILENAME);
 
 				foreach (var blacklisted_module in node.GetValues("BLACKLISTED_MODULE")) {
 					if (!blacklisted_modules.Contains(blacklisted_module)) {
@@ -716,7 +716,7 @@ namespace KRnD.Source
 		{
 			var blacklisted_parts = new List<string>();
 			try {
-				var node = ConfigNode.Load(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/" + Constants.BLACKLIST_FILENAME);
+				var node = ConfigNode.Load(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/" + StringConstants.BLACKLIST_FILENAME);
 
 				foreach (var blacklisted_part in node.GetValues("BLACKLISTED_PART")) {
 					if (!blacklisted_parts.Contains(blacklisted_part)) {

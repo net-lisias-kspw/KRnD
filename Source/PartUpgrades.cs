@@ -54,38 +54,38 @@
 		public ConfigNode CreateConfigNode(string name)
 		{
 			var node = new ConfigNode(name);
-			if (ispVac > 0) node.AddValue(Constants.ISP_VAC, ispVac.ToString());
-			if (ispAtm > 0) node.AddValue(Constants.ISP_ATM, ispAtm.ToString());
-			if (dryMass > 0) node.AddValue(Constants.DRY_MASS, dryMass.ToString());
-			if (fuelFlow > 0) node.AddValue(Constants.FUEL_FLOW, fuelFlow.ToString());
-			if (torque > 0) node.AddValue(Constants.TORQUE, torque.ToString());
-			if (chargeRate > 0) node.AddValue(Constants.CHARGE_RATE, chargeRate.ToString());
-			if (crashTolerance > 0) node.AddValue(Constants.CRASH_TOLERANCE, crashTolerance.ToString());
-			if (batteryCharge > 0) node.AddValue(Constants.BATTERY_CHARGE, batteryCharge.ToString());
-			if (generatorEfficiency > 0) node.AddValue(Constants.GENERATOR_EFFICIENCY, generatorEfficiency.ToString());
-			if (converterEfficiency > 0) node.AddValue(Constants.CONVERTER_EFFICIENCY, converterEfficiency.ToString());
-			if (parachuteStrength > 0) node.AddValue(Constants.PARACHUTE_STRENGTH, parachuteStrength.ToString());
-			if (maxTemperature > 0) node.AddValue(Constants.MAX_TEMPERATURE, maxTemperature.ToString());
-			if (fuelCapacity > 0) node.AddValue(Constants.FUEL_CAPACITY, fuelCapacity.ToString());
+			if (ispVac > 0) node.AddValue(StringConstants.ISP_VAC, ispVac.ToString());
+			if (ispAtm > 0) node.AddValue(StringConstants.ISP_ATM, ispAtm.ToString());
+			if (dryMass > 0) node.AddValue(StringConstants.DRY_MASS, dryMass.ToString());
+			if (fuelFlow > 0) node.AddValue(StringConstants.FUEL_FLOW, fuelFlow.ToString());
+			if (torque > 0) node.AddValue(StringConstants.TORQUE, torque.ToString());
+			if (chargeRate > 0) node.AddValue(StringConstants.CHARGE_RATE, chargeRate.ToString());
+			if (crashTolerance > 0) node.AddValue(StringConstants.CRASH_TOLERANCE, crashTolerance.ToString());
+			if (batteryCharge > 0) node.AddValue(StringConstants.BATTERY_CHARGE, batteryCharge.ToString());
+			if (generatorEfficiency > 0) node.AddValue(StringConstants.GENERATOR_EFFICIENCY, generatorEfficiency.ToString());
+			if (converterEfficiency > 0) node.AddValue(StringConstants.CONVERTER_EFFICIENCY, converterEfficiency.ToString());
+			if (parachuteStrength > 0) node.AddValue(StringConstants.PARACHUTE_STRENGTH, parachuteStrength.ToString());
+			if (maxTemperature > 0) node.AddValue(StringConstants.MAX_TEMPERATURE, maxTemperature.ToString());
+			if (fuelCapacity > 0) node.AddValue(StringConstants.FUEL_CAPACITY, fuelCapacity.ToString());
 			return node;
 		}
 
 		public static PartUpgrades CreateFromConfigNode(ConfigNode node)
 		{
 			var upgrade = new PartUpgrades();
-			if (node.HasValue(Constants.ISP_VAC)) upgrade.ispVac = int.Parse(node.GetValue(Constants.ISP_VAC));
-			if (node.HasValue(Constants.ISP_ATM)) upgrade.ispAtm = int.Parse(node.GetValue(Constants.ISP_ATM));
-			if (node.HasValue(Constants.DRY_MASS)) upgrade.dryMass = int.Parse(node.GetValue(Constants.DRY_MASS));
-			if (node.HasValue(Constants.FUEL_FLOW)) upgrade.fuelFlow = int.Parse(node.GetValue(Constants.FUEL_FLOW));
-			if (node.HasValue(Constants.TORQUE)) upgrade.torque = int.Parse(node.GetValue(Constants.TORQUE));
-			if (node.HasValue(Constants.CHARGE_RATE)) upgrade.chargeRate = int.Parse(node.GetValue(Constants.CHARGE_RATE));
-			if (node.HasValue(Constants.CRASH_TOLERANCE)) upgrade.crashTolerance = int.Parse(node.GetValue(Constants.CRASH_TOLERANCE));
-			if (node.HasValue(Constants.BATTERY_CHARGE)) upgrade.batteryCharge = int.Parse(node.GetValue(Constants.BATTERY_CHARGE));
-			if (node.HasValue(Constants.GENERATOR_EFFICIENCY)) upgrade.generatorEfficiency = int.Parse(node.GetValue(Constants.GENERATOR_EFFICIENCY));
-			if (node.HasValue(Constants.CONVERTER_EFFICIENCY)) upgrade.converterEfficiency = int.Parse(node.GetValue(Constants.CONVERTER_EFFICIENCY));
-			if (node.HasValue(Constants.PARACHUTE_STRENGTH)) upgrade.parachuteStrength = int.Parse(node.GetValue(Constants.PARACHUTE_STRENGTH));
-			if (node.HasValue(Constants.MAX_TEMPERATURE)) upgrade.maxTemperature = int.Parse(node.GetValue(Constants.MAX_TEMPERATURE));
-			if (node.HasValue(Constants.FUEL_CAPACITY)) upgrade.fuelCapacity = int.Parse(node.GetValue(Constants.FUEL_CAPACITY));
+			if (node.HasValue(StringConstants.ISP_VAC)) upgrade.ispVac = int.Parse(node.GetValue(StringConstants.ISP_VAC));
+			if (node.HasValue(StringConstants.ISP_ATM)) upgrade.ispAtm = int.Parse(node.GetValue(StringConstants.ISP_ATM));
+			if (node.HasValue(StringConstants.DRY_MASS)) upgrade.dryMass = int.Parse(node.GetValue(StringConstants.DRY_MASS));
+			if (node.HasValue(StringConstants.FUEL_FLOW)) upgrade.fuelFlow = int.Parse(node.GetValue(StringConstants.FUEL_FLOW));
+			if (node.HasValue(StringConstants.TORQUE)) upgrade.torque = int.Parse(node.GetValue(StringConstants.TORQUE));
+			if (node.HasValue(StringConstants.CHARGE_RATE)) upgrade.chargeRate = int.Parse(node.GetValue(StringConstants.CHARGE_RATE));
+			if (node.HasValue(StringConstants.CRASH_TOLERANCE)) upgrade.crashTolerance = int.Parse(node.GetValue(StringConstants.CRASH_TOLERANCE));
+			if (node.HasValue(StringConstants.BATTERY_CHARGE)) upgrade.batteryCharge = int.Parse(node.GetValue(StringConstants.BATTERY_CHARGE));
+			if (node.HasValue(StringConstants.GENERATOR_EFFICIENCY)) upgrade.generatorEfficiency = int.Parse(node.GetValue(StringConstants.GENERATOR_EFFICIENCY));
+			if (node.HasValue(StringConstants.CONVERTER_EFFICIENCY)) upgrade.converterEfficiency = int.Parse(node.GetValue(StringConstants.CONVERTER_EFFICIENCY));
+			if (node.HasValue(StringConstants.PARACHUTE_STRENGTH)) upgrade.parachuteStrength = int.Parse(node.GetValue(StringConstants.PARACHUTE_STRENGTH));
+			if (node.HasValue(StringConstants.MAX_TEMPERATURE)) upgrade.maxTemperature = int.Parse(node.GetValue(StringConstants.MAX_TEMPERATURE));
+			if (node.HasValue(StringConstants.FUEL_CAPACITY)) upgrade.fuelCapacity = int.Parse(node.GetValue(StringConstants.FUEL_CAPACITY));
 			return upgrade;
 		}
 
