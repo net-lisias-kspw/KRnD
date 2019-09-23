@@ -76,6 +76,10 @@ namespace KRnD.Source
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary> The torque is the reaction-wheel strength.</summary>
 		public static string TORQUE = "torque";
+
+		public static string PACKET_SIZE = "packetSize";
+		public static string ANTENNA_POWER = "antennaPower";
+		public static string DATA_STORAGE = "dataStorage";
 		#endregion
 
 

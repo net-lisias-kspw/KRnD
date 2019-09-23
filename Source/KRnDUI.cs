@@ -188,6 +188,75 @@ namespace KRnD.Source
 			return 0;
 		}
 
+
+
+		public static int UpgradePacketSize(Part part)
+		{
+			try {
+				if (!KRnD.upgrades.TryGetValue(part.name, out var store)) {
+					store = new PartUpgrades();
+					KRnD.upgrades.Add(part.name, store);
+				}
+
+				store.packetSize++;
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] UpgradePacketSize(): " + e);
+			}
+
+			return 0;
+		}
+
+		public static int UpgradeAntennaPower(Part part)
+		{
+			try {
+				if (!KRnD.upgrades.TryGetValue(part.name, out var store)) {
+					store = new PartUpgrades();
+					KRnD.upgrades.Add(part.name, store);
+				}
+
+				store.antennaPower++;
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] UpgradeAntennaPower(): " + e);
+			}
+
+			return 0;
+		}
+
+
+		public static int UpgradeDataStorage(Part part)
+		{
+			try {
+				if (!KRnD.upgrades.TryGetValue(part.name, out var store)) {
+					store = new PartUpgrades();
+					KRnD.upgrades.Add(part.name, store);
+				}
+
+				store.dataStorage++;
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] UpgradeDataStorage(): " + e);
+			}
+
+			return 0;
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
 		public static int UpgradeChargeRate(Part part)
 		{
 			try {
@@ -355,6 +424,8 @@ namespace KRnD.Source
 				var parachute_module = PartStats.GetParachuteModule(part);
 				var fairing_module = PartStats.GetFairingModule(part);
 				var fuel_resources = PartStats.GetFuelResources(part);
+				var antenna_module = PartStats.GetDataTransmitter(part);
+				var science_module = PartStats.GetScienceLab(part);
 
 				// Basic stats:
 				info = "<color=#FFFFFF><b>Dry Mass:</b> " + part.mass.ToString("0.#### t") + "\n";
@@ -394,6 +465,8 @@ namespace KRnD.Source
 						info += "<color=#99FF00><b>Converter " + converter_module.ConverterName + ":</b></color>\n" + converter_module.GetInfo() + "\n";
 				if (parachute_module) info += "<color=#99FF00><b>Parachute:</b></color>\n" + parachute_module.GetInfo();
 				if (fairing_module) info += "<color=#99FF00><b>Fairing:</b></color>\n" + fairing_module.GetInfo();
+				if (antenna_module) info += "<color=#99FF00><b>Antenna:</b></color>\n" + antenna_module.GetInfo();
+				if (science_module) info += "<color=#99FF00><b>Science Lab:</b></color>\n" + science_module.GetInfo();
 				info += "</color>";
 			} catch (Exception e) {
 				Debug.LogError("[KRnDGUI] getPartInfo(): " + e);
@@ -451,7 +524,11 @@ namespace KRnD.Source
 				PartModule fission_generator = null;
 				List<ModuleResourceConverter> converter_modules = null;
 				ModuleParachute parachute_module = null;
+				ModuleDataTransmitter antenna_module = null;
+				ModuleScienceLab science_lab = null;
 				List<PartResource> fuel_resources = null;
+
+
 				if (selectedPart != null) {
 					foreach (var a_part in PartLoader.LoadedPartsList)
 						if (a_part.partPrefab.name == selectedPart.name) {
@@ -461,6 +538,8 @@ namespace KRnD.Source
 						}
 
 					if (part) {
+						antenna_module = PartStats.GetDataTransmitter(part);
+						science_lab = PartStats.GetScienceLab(part);
 						rnd_module = PartStats.GetKRnDModule(part);
 						engine_modules = PartStats.GetEngineModules(part);
 						rcs_module = PartStats.GetRcsModule(part);
@@ -525,6 +604,10 @@ namespace KRnD.Source
 					options.Add("Fuel Flow");
 				}
 
+				if (antenna_module != null) options.Add("Antenna Power");
+				if (antenna_module != null && antenna_module.packetSize > 0) options.Add("Packet Size");
+				if (science_lab != null) options.Add("Data Storage");
+
 				if (reaction_wheel_module != null) options.Add("Torque");
 				if (solar_panel_module != null) options.Add("Charge Rate");
 				if (landing_leg_module != null) options.Add("Crash Tolerance");
@@ -570,7 +653,7 @@ namespace KRnD.Source
 					next_upgrade_count = ++next_upgrade.fuelFlow;
 
 #if true
-					UpgradeConstants u_constants = InitConstants.GetData(StringConstants.FUEL_FLOW);
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.FUEL_FLOW);
 					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.fuelFlow);
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.fuelFlow);
 					science_cost = u_constants.CalculateScienceCost(0, next_upgrade.fuelFlow);
@@ -601,7 +684,7 @@ namespace KRnD.Source
 					next_upgrade_count = ++next_upgrade.torqueStrength;
 
 #if true
-					UpgradeConstants u_constants = InitConstants.GetData(StringConstants.TORQUE);
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.TORQUE);
 					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.torqueStrength);
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.torqueStrength);
 					science_cost = u_constants.CalculateScienceCost(original_stats.torqueStrength, next_upgrade.torqueStrength);
@@ -611,12 +694,46 @@ namespace KRnD.Source
 					science_cost = KRnD.CalculateScienceCost(rnd_module.torque_scienceCost, rnd_module.torque_costScale, next_upgrade.torque);
 #endif
 
+				} else if (selected_upgrade_option == "Antenna Power") {
+					upgrade_function = UpgradeAntennaPower;
+					current_upgrade_count = current_upgrade.antennaPower;
+					next_upgrade_count = ++next_upgrade.antennaPower;
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.ANTENNA_POWER);
+					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.antennaPower);
+					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.antennaPower);
+					science_cost = u_constants.CalculateScienceCost((float)original_stats.antennaPower, next_upgrade.antennaPower);
+
+				} else if (selected_upgrade_option == "Packet Size") {
+					upgrade_function = UpgradePacketSize;
+					current_upgrade_count = current_upgrade.packetSize;
+					next_upgrade_count = ++next_upgrade.packetSize;
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.PACKET_SIZE);
+					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.packetSize);
+					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.packetSize);
+					science_cost = u_constants.CalculateScienceCost(original_stats.packetSize, next_upgrade.packetSize);
+
+				} else if (selected_upgrade_option == "Data Storage") {
+					upgrade_function = UpgradeDataStorage;
+					current_upgrade_count = current_upgrade.dataStorage;
+					next_upgrade_count = ++next_upgrade.dataStorage;
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.DATA_STORAGE);
+					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.dataStorage);
+					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.dataStorage);
+					science_cost = u_constants.CalculateScienceCost(original_stats.dataStorage, next_upgrade.dataStorage);
+
+
+
+
+
+
+
+
 				} else if (selected_upgrade_option == "Charge Rate") {
 					upgrade_function = UpgradeChargeRate;
 					current_upgrade_count = current_upgrade.chargeRate;
 					next_upgrade_count = ++next_upgrade.chargeRate;
 
-					UpgradeConstants u_constants = InitConstants.GetData(StringConstants.CHARGE_RATE);
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.CHARGE_RATE);
 					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.chargeRate);
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.chargeRate);
 					science_cost = u_constants.CalculateScienceCost(original_stats.chargeRate, next_upgrade.chargeRate);
@@ -630,7 +747,7 @@ namespace KRnD.Source
 					next_upgrade_count = ++next_upgrade.crashTolerance;
 
 #if true
-					UpgradeConstants u_constants = InitConstants.GetData(StringConstants.CRASH_TOLERANCE);
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.CRASH_TOLERANCE);
 					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.crashTolerance);
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.crashTolerance);
 					//if (!KRnD.originalStats.TryGetValue(part.name, out var original_stats)) throw new Exception("no original-stats for part '" + part.name + "'");
@@ -646,7 +763,7 @@ namespace KRnD.Source
 					current_upgrade_count = current_upgrade.batteryCharge;
 					next_upgrade_count = ++next_upgrade.batteryCharge;
 
-					UpgradeConstants u_constants = InitConstants.GetData(StringConstants.BATTERY_CHARGE);
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.BATTERY_CHARGE);
 
 					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.batteryCharge);
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.batteryCharge);
@@ -698,7 +815,7 @@ namespace KRnD.Source
 					next_upgrade_count = ++next_upgrade.parachuteStrength;
 
 #if true
-					UpgradeConstants u_constants = InitConstants.GetData(StringConstants.PARACHUTE_STRENGTH);
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.PARACHUTE_STRENGTH);
 					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.parachuteStrength);
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.parachuteStrength);
 					//if (!KRnD.originalStats.TryGetValue(part.name, out var original_stats)) throw new Exception("no original-stats for part '" + part.name + "'");
@@ -716,7 +833,7 @@ namespace KRnD.Source
 					next_upgrade_count = ++next_upgrade.maxTemperature;
 
 #if true
-					UpgradeConstants u_constants = InitConstants.GetData(StringConstants.MAX_TEMPERATURE);
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.MAX_TEMPERATURE);
 					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.maxTemperature);
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.maxTemperature);
 					//if (!KRnD.originalStats.TryGetValue(part.name, out var original_stats)) throw new Exception("no original-stats for part '" + part.name + "'");
@@ -737,7 +854,7 @@ namespace KRnD.Source
 
 				// Current stats:
 				GUILayout.BeginArea(new Rect(10 + options_width + 10, 30, _windowStyle.fixedWidth, 20));
-				GUILayout.Label("<color=#FFFFFF><b>Current:</b> " + current_upgrade_count + " (" + current_improvement.ToString("+0.##;-0.##;-") + ")</color>", _labelStyle);
+				GUILayout.Label("<color=#FFFFFF><b>Current:</b> " + current_upgrade_count + " (" + current_improvement.ToString("+0.##%;-0.##%;-") + ")</color>", _labelStyle);
 				GUILayout.EndArea();
 
 				var area_width = (_windowStyle.fixedWidth - 20 - options_width) / 2;
@@ -761,7 +878,7 @@ namespace KRnD.Source
 				GUILayout.EndArea();
 
 				// Bottom-line (display only if the upgrade would have an effect):
-				if (current_improvement != next_improvement) {
+				if (Math.Abs(current_improvement - next_improvement) > float.Epsilon) {
 					GUILayout.BeginArea(new Rect(10, _windowStyle.fixedHeight - 25, _windowStyle.fixedWidth, 30));
 					float current_science = 0;
 					if (ResearchAndDevelopment.Instance != null) current_science = ResearchAndDevelopment.Instance.Science;

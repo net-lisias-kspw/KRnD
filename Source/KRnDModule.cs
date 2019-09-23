@@ -156,8 +156,19 @@
 		// Torque
 		[KSPField(isPersistant = true)] public int torque_upgrades = 0;
 
+
+
+		[KSPField(isPersistant = true)] public int packetSize_upgrades = 0;
+		[KSPField(isPersistant = true)] public int antennaPower_upgrades = 0;
+		[KSPField(isPersistant = true)] public int dataStorage_upgrades = 0;
+
+
+
 		// Flag, which can be set by other mods to apply latest upgrades on load:
 		[KSPField(isPersistant = true)] public int upgradeToLatest = 0;
+
+
+
 
 		public static string ToRoman(int number)
 		{
@@ -182,6 +193,9 @@
 		{
 			var upgrades =
 				dryMass_upgrades +
+				packetSize_upgrades +
+				antennaPower_upgrades +
+				dataStorage_upgrades +
 				fuelFlow_upgrades +
 				ispVac_upgrades +
 				ispAtm_upgrades +
@@ -211,6 +225,9 @@
 		public PartUpgrades GetCurrentUpgrades()
 		{
 			var upgrades = new PartUpgrades();
+			upgrades.packetSize = packetSize_upgrades;
+			upgrades.antennaPower = antennaPower_upgrades;
+			upgrades.dataStorage = dataStorage_upgrades;
 			upgrades.dryMass = dryMass_upgrades;
 			upgrades.fuelFlow = fuelFlow_upgrades;
 			upgrades.ispVac = ispVac_upgrades;

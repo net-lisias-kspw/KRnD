@@ -25,6 +25,9 @@ namespace KRnD.Source
 		public List<float> maxFuelFlows;
 		public double skinMaxTemp;
 		public float torqueStrength;
+		public float packetSize;
+		public double antennaPower;
+		public float dataStorage;
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,13 +111,28 @@ namespace KRnD.Source
 			if (fairing) fairingAreaMass = fairing.UnitAreaMass;
 
 			var fuel_resources = GetFuelResources(part);
-			if (fuel_resources == null) return;
-			fuelCapacities = new Dictionary<string, double>();
-			fuelCapacitiesSum = 0;
-			foreach (var fuel_resource in fuel_resources) {
-				fuelCapacities.Add(fuel_resource.resourceName, fuel_resource.maxAmount);
-				fuelCapacitiesSum += fuel_resource.maxAmount;
+			if (fuel_resources != null) {
+				fuelCapacities = new Dictionary<string, double>();
+				fuelCapacitiesSum = 0;
+				foreach (var fuel_resource in fuel_resources) {
+					fuelCapacities.Add(fuel_resource.resourceName, fuel_resource.maxAmount);
+					fuelCapacitiesSum += fuel_resource.maxAmount;
+				}
 			}
+
+			// Fetch antenna stats
+			var transmitter = GetDataTransmitter(part);
+			if (transmitter != null) {
+				packetSize = transmitter.packetSize;
+				antennaPower = transmitter.antennaPower;
+			}
+
+			// Fetch science lab stats
+			var lab = GetScienceLab(part);
+			if (lab != null) {
+				dataStorage = lab.dataStorage;
+			}
+			
 		}
 
 		public static KRnDModule GetKRnDModule(Part part)
@@ -227,6 +245,30 @@ namespace KRnD.Source
 			if (part_fuels.Count == 0) return null;
 			return part_fuels;
 		}
+
+		public static ModuleDataTransmitter GetDataTransmitter(Part part)
+		{
+			foreach (var part_module in part.Modules) {
+				if (part_module.moduleName == "ModuleDataTransmitter") {
+					return (ModuleDataTransmitter)part_module;
+				}
+			}
+
+			return null;
+		}
+
+
+		public static ModuleScienceLab GetScienceLab(Part part)
+		{
+			foreach (var part_module in part.Modules) {
+				if (part_module.moduleName == "ModuleScienceLab") {
+					return (ModuleScienceLab)part_module;
+				}
+			}
+
+			return null;
+		}
+
 
 		public static ModuleGenerator GetGeneratorModule(Part part)
 		{

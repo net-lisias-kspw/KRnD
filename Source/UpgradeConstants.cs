@@ -25,28 +25,41 @@ namespace KRnD.Source
 			return value;
 		}
 
+		public double CalculateImprovementValue(double value, int upgrades)
+		{
+			value *= CalculateImprovementFactor(upgrades);
+			return value;
+		}
+
+		public int CalculateImprovementValue(int value, int upgrades)
+		{
+			value = (int)(value * CalculateImprovementFactor(upgrades));
+			return value;
+		}
+
 
 		public float CalculateImprovementFactor(int upgrades)
 		{
 			float factor = 1;
 			if (upgrades < 0) upgrades = 0;
 			for (var i = 0; i < upgrades; i++) {
-				factor += improvementValue * (float)Math.Pow(InitConstants.improvementRate, i);
+				factor += improvementValue * (float)Math.Pow(ValueConstants.improvementRate, i);
 			}
 
 			/*
 			 * Improvement is clamped at a limit of 10% to 400% of original value, typically.
 			 */
-			return Mathf.Clamp(factor, InitConstants.minFactor, InitConstants.maxFactor);
+			return Mathf.Clamp(factor, ValueConstants.minFactor, ValueConstants.maxFactor);
 		}
 
 		public int CalculateScienceCost(float original_stat, int upgrades)
 		{
 			float cost_total = 0;
-			float cost_base = scienceCost * costDivisor > 0 ? (original_stat / costDivisor) : 1;
+			float cost_base = scienceCost * (costDivisor > 0 ? (original_stat / costDivisor) : 1);
+			cost_base = Math.Max(cost_base, 1);
 			if (upgrades < 0) upgrades = 0;
 			for (var i = 0; i < upgrades; i++) {
-				cost_total += cost_base * (float)Math.Pow(InitConstants.costRate, i);
+				cost_total += cost_base * (float)Math.Pow(ValueConstants.costRate, i);
 			}
 
 			/*
@@ -81,7 +94,7 @@ namespace KRnD.Source
 				data_node.TryGetValue(StringConstants.IMPROVEMENT, ref improvementValue);
 				data_node.TryGetValue(StringConstants.SCIENCE_COST, ref scienceCost);
 			} catch (Exception e) {
-				Debug.LogError("[KRnD] LoadFromNode(): " + e);
+				Debug.LogError("[KRnD] LoadUpgradeData(" + name + "): " + e);
 			}
 		}
 	}

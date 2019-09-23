@@ -35,7 +35,7 @@ namespace KRnD.Source
 				GameEvents.onVesselChange.Add(OnVesselChange);
 				GameEvents.onEditorPartEvent.Add(OnEditorPartEvent);
 
-				InitConstants.Initialize();
+				ValueConstants.Initialize();
 
 				fuelResources = FetchAllFuelResources();
 				blacklistedParts = FetchAllBlacklistedParts();
@@ -158,6 +158,19 @@ namespace KRnD.Source
 							} else if (info.moduleName.ToLower() == "generator") {
 								var generator = PartStats.GetGeneratorModule(part.partPrefab);
 								if (generator) info.info = generator.GetInfo();
+
+
+							} else if (info.moduleName.ToLower() == "data transmitter") {
+								var antenna = PartStats.GetDataTransmitter(part.partPrefab);
+								if (antenna) info.info = antenna.GetInfo();
+
+
+							} else if (info.moduleName.ToLower() == "science lab") {
+								var lab = PartStats.GetScienceLab(part.partPrefab);
+								if (lab) info.info = lab.GetInfo();
+
+
+
 							} else if (info.moduleName.ToLower() == "resource converter") {
 								var converter_list = PartStats.GetConverterModules(part.partPrefab);
 								if (converter_list != null && converter_list.Count > 0) {
@@ -285,10 +298,13 @@ namespace KRnD.Source
 				rnd_module.maxTemperature_upgrades = upgrades_to_apply.maxTemperature;
 
 #if true
-				UpgradeConstants u_constants = InitConstants.GetData(StringConstants.MAX_TEMPERATURE);
-				double upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
-				part.skinMaxTemp = original_stats.skinMaxTemp * upgrade_factor;
-				part.maxTemp = original_stats.intMaxTemp * upgrade_factor;
+				//UpgradeConstants u_constants = InitConstants.GetData(StringConstants.MAX_TEMPERATURE);
+				//double upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
+				//part.skinMaxTemp = original_stats.skinMaxTemp * upgrade_factor;
+				//part.maxTemp = original_stats.intMaxTemp * upgrade_factor;
+
+				part.skinMaxTemp = ValueConstants.GetData(StringConstants.MAX_TEMPERATURE).CalculateImprovementValue(original_stats.skinMaxTemp, upgrades_to_apply.maxTemperature);
+				part.maxTemp = ValueConstants.GetData(StringConstants.MAX_TEMPERATURE).CalculateImprovementValue(original_stats.intMaxTemp, upgrades_to_apply.maxTemperature);
 
 #else
 				double temp_factor = 1 + CalculateImprovementFactor(rnd_module.maxTemperature_improvement, rnd_module.maxTemperature_improvementScale, upgrades_to_apply.maxTemperature);
@@ -297,10 +313,9 @@ namespace KRnD.Source
 #endif
 
 
-
 				// Fuel Flow:
-				u_constants = InitConstants.GetData(StringConstants.FUEL_FLOW);
-				upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
+				UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.FUEL_FLOW);
+				float upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
 				var engine_modules = PartStats.GetEngineModules(part);
 				var rcs_module = PartStats.GetRcsModule(part);
 				if (engine_modules != null || rcs_module) {
@@ -362,8 +377,8 @@ namespace KRnD.Source
 				if (reaction_wheel) {
 					rnd_module.torque_upgrades = upgrades_to_apply.torqueStrength;
 
-					u_constants = InitConstants.GetData(StringConstants.TORQUE);
-					float torque = original_stats.torqueStrength * u_constants.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
+					u_constants = ValueConstants.GetData(StringConstants.TORQUE);
+					float torque =  u_constants.CalculateImprovementValue(original_stats.torqueStrength, upgrades_to_apply.torqueStrength);
 
 					//var torque = original_stats.torqueStrength * (1 + CalculateImprovementFactor(rnd_module.torque_improvement, rnd_module.torque_improvementScale, upgrades_to_apply.torque));
 					reaction_wheel.PitchTorque = torque;
@@ -378,7 +393,7 @@ namespace KRnD.Source
 				if (solar_panel) {
 					rnd_module.chargeRate_upgrades = upgrades_to_apply.chargeRate;
 
-					u_constants = InitConstants.GetData(StringConstants.CHARGE_RATE);
+					u_constants = ValueConstants.GetData(StringConstants.CHARGE_RATE);
 					solar_panel.efficiencyMult = u_constants.CalculateImprovementValue(0, upgrades_to_apply.chargeRate);
 
 					//var charge_efficiency = 1 + CalculateImprovementFactor(rnd_module.chargeRate_improvement, rnd_module.chargeRate_improvementScale, upgrades_to_apply.chargeRate);
@@ -397,7 +412,7 @@ namespace KRnD.Source
 
 					rnd_module.crashTolerance_upgrades = upgrades_to_apply.crashTolerance;
 
-					u_constants = InitConstants.GetData(StringConstants.CRASH_TOLERANCE);
+					u_constants = ValueConstants.GetData(StringConstants.CRASH_TOLERANCE);
 					part.crashTolerance = u_constants.CalculateImprovementValue(original_stats.crashTolerance, upgrades_to_apply.crashTolerance);
 					//var crash_tolerance = original_stats.crashTolerance * (1 + CalculateImprovementFactor(rnd_module.crashTolerance_improvement, rnd_module.crashTolerance_improvementScale, upgrades_to_apply.crashTolerance));
 					//part.crashTolerance = crash_tolerance;
@@ -410,8 +425,8 @@ namespace KRnD.Source
 				if (electric_charge != null) {
 					rnd_module.batteryCharge_upgrades = upgrades_to_apply.batteryCharge;
 
-					u_constants = InitConstants.GetData(StringConstants.BATTERY_CHARGE);
-					var battery_charge = original_stats.batteryCharge * u_constants.CalculateImprovementFactor(upgrades_to_apply.batteryCharge);
+					u_constants = ValueConstants.GetData(StringConstants.BATTERY_CHARGE);
+					var battery_charge = u_constants.CalculateImprovementValue(original_stats.batteryCharge, upgrades_to_apply.batteryCharge);
 					//var battery_charge = original_stats.batteryCharge * (1 + CalculateImprovementFactor(rnd_module.batteryCharge_improvement, rnd_module.batteryCharge_improvementScale, upgrades_to_apply.batteryCharge));
 					battery_charge = Math.Round(battery_charge); // We don't want half units of electric charge
 
@@ -463,12 +478,31 @@ namespace KRnD.Source
 					rnd_module.converterEfficiency_upgrades = 0;
 				}
 
+
+				// Antenna
+				var antenna = PartStats.GetDataTransmitter(part);
+				if (antenna) {
+					rnd_module.antennaPower_upgrades = upgrades_to_apply.antennaPower;
+					antenna.antennaPower = ValueConstants.GetData(StringConstants.ANTENNA_POWER).CalculateImprovementValue(original_stats.antennaPower, upgrades_to_apply.antennaPower);
+
+					rnd_module.packetSize_upgrades = upgrades_to_apply.packetSize;
+					antenna.packetSize = ValueConstants.GetData(StringConstants.PACKET_SIZE).CalculateImprovementValue(original_stats.packetSize, upgrades_to_apply.packetSize);
+				}
+
+				var science_lab = PartStats.GetScienceLab(part);
+				if (science_lab) {
+					rnd_module.dataStorage_upgrades = upgrades_to_apply.dataStorage;
+					science_lab.dataStorage = ValueConstants.GetData(StringConstants.DATA_STORAGE).CalculateImprovementValue(original_stats.dataStorage, upgrades_to_apply.dataStorage);
+				}
+
+
+
 				// Parachute Strength:
 				var parachute = PartStats.GetParachuteModule(part);
 				if (parachute) {
 					rnd_module.parachuteStrength_upgrades = upgrades_to_apply.parachuteStrength;
 
-					u_constants = InitConstants.GetData(StringConstants.PARACHUTE_STRENGTH);
+					u_constants = ValueConstants.GetData(StringConstants.PARACHUTE_STRENGTH);
 					var chute_max_temp = original_stats.chuteMaxTemp * u_constants.CalculateImprovementFactor(upgrades_to_apply.parachuteStrength);
 					//var chute_max_temp = original_stats.chuteMaxTemp * (1 + CalculateImprovementFactor(rnd_module.parachuteStrength_improvement, rnd_module.parachuteStrength_improvementScale, upgrades_to_apply.parachuteStrength));
 					parachute.chuteMaxTemp = chute_max_temp; // The safe deployment-speed is derived from the temperature

@@ -94,7 +94,7 @@
     <Compile Include="Source\KRnDUI.cs" />
     <Compile Include="Source\KRnDModule.cs" />
     <Compile Include="Source\KRnDScenario.cs" />
-    <Compile Include="Source\InitConstants.cs" />
+    <Compile Include="Source\ValueConstants.cs" />
     <Compile Include="Source\PartUpgrades.cs" />
     <Compile Include="Source\PartStats.cs" />
     <Compile Include="Source\UpgradeConstants.cs" />

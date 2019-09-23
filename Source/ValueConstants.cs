@@ -10,7 +10,7 @@ namespace KRnD.Source
 	/// <summary> This class holds essentially all the game constants that control the balance and behavior of this
 	/// 		  mod. The values in this class are initialized from the "Config.cfg" file.</summary>
 	[KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
-	public class InitConstants : MonoBehaviour
+	public class ValueConstants : MonoBehaviour
 	{
 		public static Dictionary<string, UpgradeConstants> upgradeDatabase = new Dictionary<string, UpgradeConstants>();
 
@@ -51,7 +51,10 @@ namespace KRnD.Source
 					[StringConstants.ISP_VAC] = new UpgradeConstants(StringConstants.ISP_VAC, 0, 0.05f, 15),
 					[StringConstants.MAX_TEMPERATURE] = new UpgradeConstants(StringConstants.MAX_TEMPERATURE, 1200, 0.2f, 5),
 					[StringConstants.PARACHUTE_STRENGTH] = new UpgradeConstants(StringConstants.PARACHUTE_STRENGTH, 250, 0.3f, 10),
-					[StringConstants.TORQUE] = new UpgradeConstants(StringConstants.TORQUE,  0, 0.25f, 5)
+					[StringConstants.TORQUE] = new UpgradeConstants(StringConstants.TORQUE,  0, 0.25f, 5),
+					[StringConstants.PACKET_SIZE] = new UpgradeConstants(StringConstants.PACKET_SIZE, 0, 0.10f, 10),
+					[StringConstants.ANTENNA_POWER] = new UpgradeConstants(StringConstants.ANTENNA_POWER,  0, 0.10f, 10),
+					[StringConstants.DATA_STORAGE] = new UpgradeConstants(StringConstants.DATA_STORAGE,  0, 0.40f, 10),
 				};
 
 

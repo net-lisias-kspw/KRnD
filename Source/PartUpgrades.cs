@@ -29,6 +29,9 @@
 		public int maxTemperature;
 		public int parachuteStrength;
 		public int torqueStrength;
+		public int antennaPower;
+		public int packetSize;
+		public int dataStorage;
 
 #if false
 		public override string ToString()
@@ -54,6 +57,9 @@
 		public ConfigNode CreateConfigNode(string name)
 		{
 			var node = new ConfigNode(name);
+			if (packetSize > 0) node.AddValue(StringConstants.PACKET_SIZE, packetSize.ToString());
+			if (antennaPower > 0) node.AddValue(StringConstants.ANTENNA_POWER, antennaPower.ToString());
+			if (dataStorage > 0) node.AddValue(StringConstants.DATA_STORAGE, dataStorage.ToString());
 			if (ispVac > 0) node.AddValue(StringConstants.ISP_VAC, ispVac.ToString());
 			if (ispAtm > 0) node.AddValue(StringConstants.ISP_ATM, ispAtm.ToString());
 			if (dryMass > 0) node.AddValue(StringConstants.DRY_MASS, dryMass.ToString());
@@ -73,6 +79,9 @@
 		public static PartUpgrades CreateFromConfigNode(ConfigNode node)
 		{
 			var upgrade = new PartUpgrades();
+			if (node.HasValue(StringConstants.PACKET_SIZE)) upgrade.packetSize = int.Parse(node.GetValue(StringConstants.PACKET_SIZE));
+			if (node.HasValue(StringConstants.ANTENNA_POWER)) upgrade.antennaPower = int.Parse(node.GetValue(StringConstants.ANTENNA_POWER));
+			if (node.HasValue(StringConstants.DATA_STORAGE)) upgrade.dataStorage = int.Parse(node.GetValue(StringConstants.DATA_STORAGE));
 			if (node.HasValue(StringConstants.ISP_VAC)) upgrade.ispVac = int.Parse(node.GetValue(StringConstants.ISP_VAC));
 			if (node.HasValue(StringConstants.ISP_ATM)) upgrade.ispAtm = int.Parse(node.GetValue(StringConstants.ISP_ATM));
 			if (node.HasValue(StringConstants.DRY_MASS)) upgrade.dryMass = int.Parse(node.GetValue(StringConstants.DRY_MASS));
@@ -93,6 +102,9 @@
 		{
 			var copy = new PartUpgrades
 			{
+				packetSize = packetSize,
+				antennaPower = antennaPower,
+				dataStorage = dataStorage,
 				ispVac = ispVac,
 				ispAtm = ispAtm,
 				dryMass = dryMass,

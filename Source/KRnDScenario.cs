@@ -13,7 +13,7 @@ namespace KRnD.Source
 		public override void OnSave(ConfigNode node)
 		{
 			try {
-				InitConstants.OnSave(node);
+				ValueConstants.OnSave(node);
 
 				double time = DateTime.Now.Ticks;
 				var upgrade_nodes = new ConfigNode("upgrades");
@@ -40,7 +40,7 @@ namespace KRnD.Source
 		public override void OnLoad(ConfigNode node)
 		{
 			try {
-				InitConstants.OnLoad(node);
+				ValueConstants.OnLoad(node);
 
 				double time = DateTime.Now.Ticks;
 
