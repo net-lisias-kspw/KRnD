@@ -181,6 +181,9 @@ namespace KRnD.Source
 							} else if (info.moduleName.ToLower() == "parachute") {
 								var parachute = PartStats.GetParachuteModule(part.partPrefab);
 								if (parachute) info.info = parachute.GetInfo();
+							} else if (info.moduleName.ToLower() == "resource harvester") {
+								var harvester = PartStats.GetResourceHarvesterModule(part.partPrefab);
+								if (harvester) info.info = harvester.GetInfo();
 							} else if (info.moduleName.ToLower() == "custom-built fairing") {
 								var fairing = PartStats.GetFairingModule(part.partPrefab);
 								if (fairing) info.info = fairing.GetInfo();
@@ -515,8 +518,6 @@ namespace KRnD.Source
 					science_lab.dataStorage = ValueConstants.GetData(StringConstants.DATA_STORAGE).CalculateImprovementValue(original_stats.dataStorage, upgrades_to_apply.dataStorage);
 				}
 
-
-
 				// Parachute Strength:
 				var parachute = PartStats.GetParachuteModule(part);
 				if (parachute) {
@@ -529,6 +530,22 @@ namespace KRnD.Source
 				} else {
 					rnd_module.parachuteStrength_upgrades = 0;
 				}
+
+
+
+				// Resource Harvester
+				var harvester = PartStats.GetResourceHarvesterModule(part);
+				if (harvester) {
+					rnd_module.resourceHarvester_upgrades = upgrades_to_apply.resourceHarvester;
+
+					u_constants = ValueConstants.GetData(StringConstants.RESOURCE_HARVESTER);
+					harvester.Efficiency = u_constants.CalculateImprovementValue(original_stats.resourceHarvester, upgrades_to_apply.resourceHarvester);
+				} else {
+					rnd_module.resourceHarvester_upgrades = 0;
+				}
+
+
+
 
 				// Fuel Capacity:
 				var fuel_resources = PartStats.GetFuelResources(part);

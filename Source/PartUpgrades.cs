@@ -32,6 +32,7 @@
 		public int antennaPower;
 		public int packetSize;
 		public int dataStorage;
+		public int resourceHarvester;
 
 #if false
 		public override string ToString()
@@ -73,6 +74,7 @@
 			if (parachuteStrength > 0) node.AddValue(StringConstants.PARACHUTE_STRENGTH, parachuteStrength.ToString());
 			if (maxTemperature > 0) node.AddValue(StringConstants.MAX_TEMPERATURE, maxTemperature.ToString());
 			if (fuelCapacity > 0) node.AddValue(StringConstants.FUEL_CAPACITY, fuelCapacity.ToString());
+			if (resourceHarvester > 0) node.AddValue(StringConstants.RESOURCE_HARVESTER, resourceHarvester.ToString());
 			return node;
 		}
 
@@ -95,6 +97,7 @@
 			if (node.HasValue(StringConstants.PARACHUTE_STRENGTH)) upgrade.parachuteStrength = int.Parse(node.GetValue(StringConstants.PARACHUTE_STRENGTH));
 			if (node.HasValue(StringConstants.MAX_TEMPERATURE)) upgrade.maxTemperature = int.Parse(node.GetValue(StringConstants.MAX_TEMPERATURE));
 			if (node.HasValue(StringConstants.FUEL_CAPACITY)) upgrade.fuelCapacity = int.Parse(node.GetValue(StringConstants.FUEL_CAPACITY));
+			if (node.HasValue(StringConstants.RESOURCE_HARVESTER)) upgrade.resourceHarvester = int.Parse(node.GetValue(StringConstants.RESOURCE_HARVESTER));
 			return upgrade;
 		}
 
@@ -117,7 +120,8 @@
 				converterEfficiency = converterEfficiency,
 				parachuteStrength = parachuteStrength,
 				maxTemperature = maxTemperature,
-				fuelCapacity = fuelCapacity
+				fuelCapacity = fuelCapacity,
+				resourceHarvester = resourceHarvester
 			};
 			return copy;
 		}

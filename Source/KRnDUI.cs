@@ -207,6 +207,23 @@ namespace KRnD.Source
 
 			return 0;
 		}
+		public static int UpgradeResourceHarvester(Part part)
+		{
+			try {
+				if (!KRnD.upgrades.TryGetValue(part.name, out var store)) {
+					store = new PartUpgrades();
+					KRnD.upgrades.Add(part.name, store);
+				}
+
+				store.resourceHarvester++;
+				KRnD.UpdateGlobalParts();
+				KRnD.UpdateEditorVessel();
+			} catch (Exception e) {
+				Debug.LogError("[KRnD] UpgradeResourceHarvester(): " + e);
+			}
+
+			return 0;
+		}
 
 		public static int UpgradeAntennaPower(Part part)
 		{
@@ -426,6 +443,7 @@ namespace KRnD.Source
 				var fuel_resources = PartStats.GetFuelResources(part);
 				var antenna_module = PartStats.GetDataTransmitter(part);
 				var science_module = PartStats.GetScienceLab(part);
+				var harvester_module = PartStats.GetResourceHarvesterModule(part);
 
 				// Basic stats:
 				info = "<color=#FFFFFF><b>Dry Mass:</b> " + part.mass.ToString("0.#### t") + "\n";
@@ -467,6 +485,9 @@ namespace KRnD.Source
 				if (fairing_module) info += "<color=#99FF00><b>Fairing:</b></color>\n" + fairing_module.GetInfo();
 				if (antenna_module) info += "<color=#99FF00><b>Antenna:</b></color>\n" + antenna_module.GetInfo();
 				if (science_module) info += "<color=#99FF00><b>Science Lab:</b></color>\n" + science_module.GetInfo();
+				if (harvester_module) info += "<color=#99FF00><b>Harvester:</b></color>\n" + harvester_module.GetInfo();
+
+
 				info += "</color>";
 			} catch (Exception e) {
 				Debug.LogError("[KRnDGUI] getPartInfo(): " + e);
@@ -527,6 +548,7 @@ namespace KRnD.Source
 				ModuleDataTransmitter antenna_module = null;
 				ModuleScienceLab science_lab = null;
 				List<PartResource> fuel_resources = null;
+				ModuleResourceHarvester harvester_module = null;
 
 
 				if (selectedPart != null) {
@@ -552,6 +574,7 @@ namespace KRnD.Source
 						converter_modules = PartStats.GetConverterModules(part);
 						parachute_module = PartStats.GetParachuteModule(part);
 						fuel_resources = PartStats.GetFuelResources(part);
+						harvester_module = PartStats.GetResourceHarvesterModule(part);
 					}
 				}
 
@@ -605,7 +628,7 @@ namespace KRnD.Source
 				}
 
 				if (antenna_module != null) options.Add("Antenna Power");
-				if (antenna_module != null && antenna_module.packetSize > 0) options.Add("Packet Size");
+				if (antenna_module != null && antenna_module.antennaType != AntennaType.INTERNAL) options.Add("Packet Size");
 				if (science_lab != null) options.Add("Data Storage");
 
 				if (reaction_wheel_module != null) options.Add("Torque");
@@ -616,6 +639,8 @@ namespace KRnD.Source
 				if (generator_module || fission_generator) options.Add("Generator");
 				if (converter_modules != null) options.Add("Converter");
 				if (parachute_module) options.Add("Parachute");
+				if (harvester_module) options.Add("Harvester");
+
 				if (_selectedUpgradeOption >= options.Count) _selectedUpgradeOption = 0;
 				_selectedUpgradeOption = GUILayout.SelectionGrid(_selectedUpgradeOption, options.ToArray(), 1, _buttonStyle);
 
@@ -749,9 +774,14 @@ namespace KRnD.Source
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.dataStorage);
 					science_cost = u_constants.CalculateScienceCost(original_stats.dataStorage, next_upgrade.dataStorage);
 
-
-
-
+				} else if (selected_upgrade_option == "Harvester") {
+					upgrade_function = UpgradeResourceHarvester;
+					current_upgrade_count = current_upgrade.resourceHarvester;
+					next_upgrade_count = ++next_upgrade.resourceHarvester;
+					UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.RESOURCE_HARVESTER);
+					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.resourceHarvester);
+					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.resourceHarvester);
+					science_cost = u_constants.CalculateScienceCost(original_stats.resourceHarvester, next_upgrade.resourceHarvester);
 
 
 
@@ -892,7 +922,7 @@ namespace KRnD.Source
 					current_improvement = u_constants.CalculateImprovementFactor(current_upgrade.maxTemperature);
 					next_improvement = u_constants.CalculateImprovementFactor(next_upgrade.maxTemperature);
 					//if (!KRnD.originalStats.TryGetValue(part.name, out var original_stats)) throw new Exception("no original-stats for part '" + part.name + "'");
-					science_cost = u_constants.CalculateScienceCost((float)original_stats.skinMaxTemp, next_upgrade.maxTemperature);
+					science_cost = u_constants.CalculateScienceCost((float)original_stats.intMaxTemp, next_upgrade.maxTemperature);
 #else
 
 					currentImprovement = KRnD.CalculateImprovementFactor(rndModule.maxTemperature_improvement, rndModule.maxTemperature_improvementScale, currentUpgrade.maxTemperature);

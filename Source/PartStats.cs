@@ -28,6 +28,7 @@ namespace KRnD.Source
 		public float packetSize;
 		public double antennaPower;
 		public float dataStorage;
+		public float resourceHarvester;
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +104,9 @@ namespace KRnD.Source
 					converterEfficiency.Add(converter.ConverterName, this_converter_efficiency);
 				}
 			}
+
+			var harvester = GetResourceHarvesterModule(part);
+			if (harvester) resourceHarvester = harvester.Efficiency;
 
 			var parachute = GetParachuteModule(part);
 			if (parachute) chuteMaxTemp = parachute.chuteMaxTemp;
@@ -305,6 +309,18 @@ namespace KRnD.Source
 
 			if (converters.Count == 0) return null;
 			return converters;
+		}
+
+
+		public static ModuleResourceHarvester GetResourceHarvesterModule(Part part)
+		{
+			foreach (var part_module in part.Modules) {
+				if (part_module.moduleName == "ModuleResourceHarvester") {
+					return (ModuleResourceHarvester)part_module;
+				}
+			}
+
+			return null;
 		}
 
 		public static ModuleParachute GetParachuteModule(Part part)

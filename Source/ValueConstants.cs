@@ -55,6 +55,7 @@ namespace KRnD.Source
 					[StringConstants.PACKET_SIZE] = new UpgradeConstants(StringConstants.PACKET_SIZE, 0, 0.10f, 10),
 					[StringConstants.ANTENNA_POWER] = new UpgradeConstants(StringConstants.ANTENNA_POWER,  0, 0.10f, 10),
 					[StringConstants.DATA_STORAGE] = new UpgradeConstants(StringConstants.DATA_STORAGE,  0, 0.40f, 10),
+					[StringConstants.RESOURCE_HARVESTER] = new UpgradeConstants(StringConstants.RESOURCE_HARVESTER,  0, 0.10f, 10),
 				};
 
 

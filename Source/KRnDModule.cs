@@ -51,6 +51,7 @@
 		[KSPField(isPersistant = true)] public int packetSize_upgrades = 0;
 		[KSPField(isPersistant = true)] public int antennaPower_upgrades = 0;
 		[KSPField(isPersistant = true)] public int dataStorage_upgrades = 0;
+		[KSPField(isPersistant = true)] public int resourceHarvester_upgrades = 0;
 
 
 
@@ -97,6 +98,7 @@
 				converterEfficiency_upgrades +
 				parachuteStrength_upgrades +
 				maxTemperature_upgrades +
+				resourceHarvester_upgrades +
 				fuelCapacity_upgrades;
 			if (upgrades == 0) return "";
 			return "Mk " + ToRoman(upgrades + 1); // Mk I is the part without upgrades, Mk II the first upgraded version.
@@ -131,7 +133,8 @@
 				converterEfficiency = converterEfficiency_upgrades,
 				parachuteStrength = parachuteStrength_upgrades,
 				maxTemperature = maxTemperature_upgrades,
-				fuelCapacity = fuelCapacity_upgrades
+				fuelCapacity = fuelCapacity_upgrades,
+				resourceHarvester = resourceHarvester_upgrades
 			};
 		}
 	}

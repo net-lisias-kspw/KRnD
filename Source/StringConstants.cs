@@ -80,6 +80,7 @@ namespace KRnD.Source
 		public static string PACKET_SIZE = "packetSize";
 		public static string ANTENNA_POWER = "antennaPower";
 		public static string DATA_STORAGE = "dataStorage";
+		public static string RESOURCE_HARVESTER = "resourceHarvester";
 		#endregion
 
 
