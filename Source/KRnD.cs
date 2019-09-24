@@ -286,17 +286,23 @@ namespace KRnD.Source
 
 				// Dry Mass:
 				rnd_module.dryMass_upgrades = upgrades_to_apply.dryMass;
-				var dry_mass_factor = 1 + CalculateImprovementFactor(rnd_module.dryMass_improvement, rnd_module.dryMass_improvementScale, upgrades_to_apply.dryMass);
-				part.mass = original_stats.dryMass * dry_mass_factor;
-				part.prefabMass = part.mass; // New in ksp 1.1, if this is correct is just guesswork however...
+				//var dry_mass_factor = 1 + CalculateImprovementFactor(rnd_module.dryMass_improvement, rnd_module.dryMass_improvementScale, upgrades_to_apply.dryMass);
+				//part.mass = original_stats.dryMass * dry_mass_factor;
+				//part.prefabMass = part.mass; // New in ksp 1.1, if this is correct is just guesswork however...
+				UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.DRY_MASS);
+				part.prefabMass = part.mass = u_constants.CalculateImprovementValue(original_stats.dryMass, upgrades_to_apply.dryMass);
 
 				// Dry Mass also improves fairing mass:
-				var fairng_module = PartStats.GetFairingModule(part);
-				if (fairng_module) fairng_module.UnitAreaMass = original_stats.fairingAreaMass * dry_mass_factor;
+				var fairing_module = PartStats.GetFairingModule(part);
+				if (fairing_module) {
+					fairing_module.UnitAreaMass = u_constants.CalculateImprovementValue(original_stats.fairingAreaMass, upgrades_to_apply.dryMass);
+
+					//fairng_module.UnitAreaMass = original_stats.fairingAreaMass * dry_mass_factor;
+				}
+				
 
 				// Max Int/Skin Temp:
 				rnd_module.maxTemperature_upgrades = upgrades_to_apply.maxTemperature;
-
 #if true
 				//UpgradeConstants u_constants = InitConstants.GetData(StringConstants.MAX_TEMPERATURE);
 				//double upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
@@ -314,7 +320,7 @@ namespace KRnD.Source
 
 
 				// Fuel Flow:
-				UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.FUEL_FLOW);
+				u_constants = ValueConstants.GetData(StringConstants.FUEL_FLOW);
 				float upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
 				var engine_modules = PartStats.GetEngineModules(part);
 				var rcs_module = PartStats.GetRcsModule(part);
@@ -337,8 +343,12 @@ namespace KRnD.Source
 				if (engine_modules != null || rcs_module) {
 					rnd_module.ispVac_upgrades = upgrades_to_apply.ispVac;
 					rnd_module.ispAtm_upgrades = upgrades_to_apply.ispAtm;
-					var improvement_factor_vac = 1 + CalculateImprovementFactor(rnd_module.ispVac_improvement, rnd_module.ispVac_improvementScale, upgrades_to_apply.ispVac);
-					var improvement_factor_atm = 1 + CalculateImprovementFactor(rnd_module.ispAtm_improvement, rnd_module.ispAtm_improvementScale, upgrades_to_apply.ispAtm);
+					var data_vac = ValueConstants.GetData(StringConstants.ISP_VAC);
+					var data_atm = ValueConstants.GetData(StringConstants.ISP_ATM);
+					var improvement_factor_vac = data_vac.CalculateImprovementFactor(upgrades_to_apply.ispVac);
+					var improvement_factor_atm = data_atm.CalculateImprovementFactor(upgrades_to_apply.ispAtm);
+					//var improvement_factor_vac = 1 + CalculateImprovementFactor(rnd_module.ispVac_improvement, rnd_module.ispVac_improvementScale, upgrades_to_apply.ispVac);
+					//var improvement_factor_atm = 1 + CalculateImprovementFactor(rnd_module.ispAtm_improvement, rnd_module.ispAtm_improvementScale, upgrades_to_apply.ispAtm);
 
 					for (var i = 0; i < original_stats.atmosphereCurves.Count; i++) {
 						var is_airbreather = false;
@@ -444,15 +454,19 @@ namespace KRnD.Source
 				if (generator || fission_generator) {
 					rnd_module.generatorEfficiency_upgrades = upgrades_to_apply.generatorEfficiency;
 
+					u_constants = ValueConstants.GetData(StringConstants.GENERATOR_EFFICIENCY);
+
 					if (generator) {
 						foreach (var output_resource in generator.resHandler.outputResources) {
 							if (!original_stats.generatorEfficiency.TryGetValue(output_resource.name, out var original_rate)) continue;
-							output_resource.rate = (float) (original_rate * (1 + CalculateImprovementFactor(rnd_module.generatorEfficiency_improvement, rnd_module.generatorEfficiency_improvementScale, upgrades_to_apply.generatorEfficiency)));
+							output_resource.rate = u_constants.CalculateImprovementValue(original_rate, upgrades_to_apply.generatorEfficiency);
+							//output_resource.rate = (float) (original_rate * (1 + CalculateImprovementFactor(rnd_module.generatorEfficiency_improvement, rnd_module.generatorEfficiency_improvementScale, upgrades_to_apply.generatorEfficiency)));
 						}
 					}
 
 					if (fission_generator) {
-						var power_generation = original_stats.fissionPowerGeneration * (1 + CalculateImprovementFactor(rnd_module.generatorEfficiency_improvement, rnd_module.generatorEfficiency_improvementScale, upgrades_to_apply.generatorEfficiency));
+						var power_generation = u_constants.CalculateImprovementValue(original_stats.fissionPowerGeneration, upgrades_to_apply.generatorEfficiency);
+						//var power_generation = original_stats.fissionPowerGeneration * (1 + CalculateImprovementFactor(rnd_module.generatorEfficiency_improvement, rnd_module.generatorEfficiency_improvementScale, upgrades_to_apply.generatorEfficiency));
 						PartStats.SetGenericModuleValue(fission_generator, "PowerGeneration", power_generation);
 					}
 				} else {
@@ -462,6 +476,9 @@ namespace KRnD.Source
 				// Converter Efficiency:
 				var converter_list = PartStats.GetConverterModules(part);
 				if (converter_list != null) {
+					u_constants = ValueConstants.GetData(StringConstants.CONVERTER_EFFICIENCY);
+
+
 					foreach (var converter in converter_list) {
 						if (!original_stats.converterEfficiency.TryGetValue(converter.ConverterName, out var original_output_resources)) continue;
 
@@ -470,7 +487,10 @@ namespace KRnD.Source
 						for (var i = 0; i < converter.outputList.Count; i++) {
 							var resource_ratio = converter.outputList[i];
 							if (!original_output_resources.TryGetValue(resource_ratio.ResourceName, out var original_ratio)) continue;
-							resource_ratio.Ratio = (float) (original_ratio * (1 + CalculateImprovementFactor(rnd_module.converterEfficiency_improvement, rnd_module.converterEfficiency_improvementScale, upgrades_to_apply.converterEfficiency)));
+
+							resource_ratio.Ratio = u_constants.CalculateImprovementValue(original_ratio, upgrades_to_apply.converterEfficiency);
+//							resource_ratio.Ratio = (float) (original_ratio * (1 + CalculateImprovementFactor(rnd_module.converterEfficiency_improvement, rnd_module.converterEfficiency_improvementScale, upgrades_to_apply.converterEfficiency)));
+
 							converter.outputList[i] = resource_ratio;
 						}
 					}
@@ -514,7 +534,12 @@ namespace KRnD.Source
 				var fuel_resources = PartStats.GetFuelResources(part);
 				if (fuel_resources != null && original_stats.fuelCapacities != null) {
 					rnd_module.fuelCapacity_upgrades = upgrades_to_apply.fuelCapacity;
-					double improvement_factor = 1 + CalculateImprovementFactor(rnd_module.fuelCapacity_improvement, rnd_module.fuelCapacity_improvementScale, upgrades_to_apply.fuelCapacity);
+
+					u_constants = ValueConstants.GetData(StringConstants.FUEL_CAPACITY);
+
+
+					double improvement_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.fuelCapacity);
+					//double improvement_factor = 1 + CalculateImprovementFactor(rnd_module.fuelCapacity_improvement, rnd_module.fuelCapacity_improvementScale, upgrades_to_apply.fuelCapacity);
 
 					foreach (var fuel_resource in fuel_resources) {
 						if (!original_stats.fuelCapacities.ContainsKey(fuel_resource.resourceName)) continue;
