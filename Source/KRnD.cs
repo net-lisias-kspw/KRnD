@@ -133,7 +133,7 @@ namespace KRnD.Source
 						var engine_module_number = 0; // There might be multiple modules of this type
 						foreach (var info in part.moduleInfos) {
 							if (info.moduleName.ToLower() == "engine") {
-								var engines = PartStats.GetEngineModules(part.partPrefab);
+								var engines = PartStats.GetModuleEnginesList(part.partPrefab);
 								if (engines != null && engines.Count > 0) {
 									var engine = engines[engine_module_number];
 									info.info = engine.GetInfo();
@@ -141,57 +141,57 @@ namespace KRnD.Source
 									engine_module_number++;
 								}
 							} else if (info.moduleName.ToLower() == "rcs") {
-								var rcs = PartStats.GetRcsModule(part.partPrefab);
+								var rcs = PartStats.GetModuleRCS(part.partPrefab);
 								if (rcs) info.info = rcs.GetInfo();
 							} else if (info.moduleName.ToLower() == "reaction wheel") {
-								var reaction_wheel = PartStats.GetReactionWheelModule(part.partPrefab);
+								var reaction_wheel = PartStats.GetModuleReactionWheel(part.partPrefab);
 								if (reaction_wheel) info.info = reaction_wheel.GetInfo();
 							} else if (info.moduleName.ToLower() == "deployable solar panel") {
-								var solar_panel = PartStats.GetSolarPanelModule(part.partPrefab);
+								var solar_panel = PartStats.GetModuleDeployableSolarPanel(part.partPrefab);
 								if (solar_panel) info.info = GetSolarPanelInfo(solar_panel);
 							} else if (info.moduleName.ToLower() == "landing leg") {
-								var landing_leg = PartStats.GetLandingLegModule(part.partPrefab);
+								var landing_leg = PartStats.GetModuleWheelBase(part.partPrefab);
 								if (landing_leg) info.info = landing_leg.GetInfo();
 							} else if (info.moduleName.ToLower() == "fission generator") {
-								var fission_generator = PartStats.GetFissionGeneratorModule(part.partPrefab);
+								var fission_generator = PartStats.GetFissionGenerator(part.partPrefab);
 								if (fission_generator) info.info = fission_generator.GetInfo();
 							} else if (info.moduleName.ToLower() == "generator") {
-								var generator = PartStats.GetGeneratorModule(part.partPrefab);
+								var generator = PartStats.GetModuleGenerator(part.partPrefab);
 								if (generator) info.info = generator.GetInfo();
 
 
 							} else if (info.moduleName.ToLower() == "data transmitter") {
-								var antenna = PartStats.GetDataTransmitter(part.partPrefab);
+								var antenna = PartStats.GetModuleDataTransmitter(part.partPrefab);
 								if (antenna) info.info = antenna.GetInfo();
 
 
 							} else if (info.moduleName.ToLower() == "science lab") {
-								var lab = PartStats.GetScienceLab(part.partPrefab);
+								var lab = PartStats.GetModluleScienceLab(part.partPrefab);
 								if (lab) info.info = lab.GetInfo();
 
 
 
 							} else if (info.moduleName.ToLower() == "resource converter") {
-								var converter_list = PartStats.GetConverterModules(part.partPrefab);
+								var converter_list = PartStats.GetModuleResourceConverterList(part.partPrefab);
 								if (converter_list != null && converter_list.Count > 0) {
 									var converter = converter_list[converter_module_number];
 									info.info = converter.GetInfo();
 									converter_module_number++;
 								}
 							} else if (info.moduleName.ToLower() == "parachute") {
-								var parachute = PartStats.GetParachuteModule(part.partPrefab);
+								var parachute = PartStats.GetModluleParachute(part.partPrefab);
 								if (parachute) info.info = parachute.GetInfo();
 							} else if (info.moduleName.ToLower() == "resource harvester") {
-								var harvester = PartStats.GetResourceHarvesterModule(part.partPrefab);
+								var harvester = PartStats.GetModuleResourceHarvester(part.partPrefab);
 								if (harvester) info.info = harvester.GetInfo();
 							} else if (info.moduleName.ToLower() == "custom-built fairing") {
-								var fairing = PartStats.GetFairingModule(part.partPrefab);
+								var fairing = PartStats.GetModuleProceduralFairing(part.partPrefab);
 								if (fairing) info.info = fairing.GetInfo();
 							}
 						}
 
 						var fuel_resources = PartStats.GetFuelResources(part.partPrefab);
-						var electric_charge = PartStats.GetChargeResource(part.partPrefab);
+						var electric_charge = PartStats.GetElectricCharge(part.partPrefab);
 						// The Resource-Names are not always formatted the same way, eg "Electric Charge" vs "ElectricCharge", so we do some reformatting.
 						foreach (var info in part.resourceInfos) {
 							if (electric_charge != null && info.resourceName.Replace(" ", "").ToLower() == electric_charge.resourceName.Replace(" ", "").ToLower()) {
@@ -296,7 +296,7 @@ namespace KRnD.Source
 				part.prefabMass = part.mass = u_constants.CalculateImprovementValue(original_stats.dryMass, upgrades_to_apply.dryMass);
 
 				// Dry Mass also improves fairing mass:
-				var fairing_module = PartStats.GetFairingModule(part);
+				var fairing_module = PartStats.GetModuleProceduralFairing(part);
 				if (fairing_module) {
 					fairing_module.UnitAreaMass = u_constants.CalculateImprovementValue(original_stats.fairingAreaMass, upgrades_to_apply.dryMass);
 
@@ -325,8 +325,8 @@ namespace KRnD.Source
 				// Fuel Flow:
 				u_constants = ValueConstants.GetData(StringConstants.FUEL_FLOW);
 				float upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
-				var engine_modules = PartStats.GetEngineModules(part);
-				var rcs_module = PartStats.GetRcsModule(part);
+				var engine_modules = PartStats.GetModuleEnginesList(part);
+				var rcs_module = PartStats.GetModuleRCS(part);
 				if (engine_modules != null || rcs_module) {
 					rnd_module.fuelFlow_upgrades = upgrades_to_apply.fuelFlow;
 					for (var i = 0; i < original_stats.maxFuelFlows.Count; i++) {
@@ -386,7 +386,7 @@ namespace KRnD.Source
 				}
 
 				// Torque:
-				var reaction_wheel = PartStats.GetReactionWheelModule(part);
+				var reaction_wheel = PartStats.GetModuleReactionWheel(part);
 				if (reaction_wheel) {
 					rnd_module.torque_upgrades = upgrades_to_apply.torqueStrength;
 
@@ -402,7 +402,7 @@ namespace KRnD.Source
 				}
 
 				// Charge Rate:
-				var solar_panel = PartStats.GetSolarPanelModule(part);
+				var solar_panel = PartStats.GetModuleDeployableSolarPanel(part);
 				if (solar_panel) {
 					rnd_module.chargeRate_upgrades = upgrades_to_apply.chargeRate;
 
@@ -420,7 +420,7 @@ namespace KRnD.Source
 				}
 
 				// Crash Tolerance (only for landing legs):
-				var landing_leg = PartStats.GetLandingLegModule(part);
+				var landing_leg = PartStats.GetModuleWheelBase(part);
 				if (landing_leg) {
 
 					rnd_module.crashTolerance_upgrades = upgrades_to_apply.crashTolerance;
@@ -434,7 +434,7 @@ namespace KRnD.Source
 				}
 
 				// Battery Charge:
-				var electric_charge = PartStats.GetChargeResource(part);
+				var electric_charge = PartStats.GetElectricCharge(part);
 				if (electric_charge != null) {
 					rnd_module.batteryCharge_upgrades = upgrades_to_apply.batteryCharge;
 
@@ -452,8 +452,8 @@ namespace KRnD.Source
 				}
 
 				// Generator & Fission-Generator Efficiency:
-				var generator = PartStats.GetGeneratorModule(part);
-				var fission_generator = PartStats.GetFissionGeneratorModule(part);
+				var generator = PartStats.GetModuleGenerator(part);
+				var fission_generator = PartStats.GetFissionGenerator(part);
 				if (generator || fission_generator) {
 					rnd_module.generatorEfficiency_upgrades = upgrades_to_apply.generatorEfficiency;
 
@@ -477,7 +477,7 @@ namespace KRnD.Source
 				}
 
 				// Converter Efficiency:
-				var converter_list = PartStats.GetConverterModules(part);
+				var converter_list = PartStats.GetModuleResourceConverterList(part);
 				if (converter_list != null) {
 					u_constants = ValueConstants.GetData(StringConstants.CONVERTER_EFFICIENCY);
 
@@ -503,7 +503,7 @@ namespace KRnD.Source
 
 
 				// Antenna
-				var antenna = PartStats.GetDataTransmitter(part);
+				var antenna = PartStats.GetModuleDataTransmitter(part);
 				if (antenna) {
 					rnd_module.antennaPower_upgrades = upgrades_to_apply.antennaPower;
 					antenna.antennaPower = ValueConstants.GetData(StringConstants.ANTENNA_POWER).CalculateImprovementValue(original_stats.antennaPower, upgrades_to_apply.antennaPower);
@@ -512,14 +512,14 @@ namespace KRnD.Source
 					antenna.packetSize = ValueConstants.GetData(StringConstants.PACKET_SIZE).CalculateImprovementValue(original_stats.packetSize, upgrades_to_apply.packetSize);
 				}
 
-				var science_lab = PartStats.GetScienceLab(part);
+				var science_lab = PartStats.GetModluleScienceLab(part);
 				if (science_lab) {
 					rnd_module.dataStorage_upgrades = upgrades_to_apply.dataStorage;
 					science_lab.dataStorage = ValueConstants.GetData(StringConstants.DATA_STORAGE).CalculateImprovementValue(original_stats.dataStorage, upgrades_to_apply.dataStorage);
 				}
 
 				// Parachute Strength:
-				var parachute = PartStats.GetParachuteModule(part);
+				var parachute = PartStats.GetModluleParachute(part);
 				if (parachute) {
 					rnd_module.parachuteStrength_upgrades = upgrades_to_apply.parachuteStrength;
 
@@ -534,7 +534,7 @@ namespace KRnD.Source
 
 
 				// Resource Harvester
-				var harvester = PartStats.GetResourceHarvesterModule(part);
+				var harvester = PartStats.GetModuleResourceHarvester(part);
 				if (harvester) {
 					rnd_module.resourceHarvester_upgrades = upgrades_to_apply.resourceHarvester;
 
@@ -725,7 +725,7 @@ namespace KRnD.Source
 
 			foreach (var a_part in PartLoader.LoadedPartsList) {
 				var part = a_part.partPrefab;
-				var engine_modules = PartStats.GetEngineModules(part);
+				var engine_modules = PartStats.GetModuleEnginesList(part);
 				if (engine_modules == null) continue;
 				foreach (var engine_module in engine_modules) {
 					if (engine_module.propellants == null) continue;

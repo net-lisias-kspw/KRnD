@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace KRnD.Source
 {
@@ -42,8 +43,8 @@ namespace KRnD.Source
 			intMaxTemp = part.maxTemp;
 
 			// There should only be one or the other, engines or RCS:
-			var engine_modules = GetEngineModules(part);
-			var rcs_module = GetRcsModule(part);
+			var engine_modules = GetModuleEnginesList(part);
+			var rcs_module = GetModuleRCS(part);
 			if (engine_modules != null) {
 				maxFuelFlows = new List<float>();
 				atmosphereCurves = new List<FloatCurve>();
@@ -73,29 +74,29 @@ namespace KRnD.Source
 				atmosphereCurves.Add(atmosphere_curve);
 			}
 
-			var reaction_wheel = GetReactionWheelModule(part);
+			var reaction_wheel = GetModuleReactionWheel(part);
 			if (reaction_wheel) torqueStrength = reaction_wheel.RollTorque; // There is also pitch- and yaw-torque, but they should all be the same
 
-			var solar_panel = GetSolarPanelModule(part);
+			var solar_panel = GetModuleDeployableSolarPanel(part);
 			if (solar_panel) chargeRate = solar_panel.chargeRate;
 
-			var landing_leg = GetLandingLegModule(part);
+			var landing_leg = GetModuleWheelBase(part);
 			if (landing_leg) crashTolerance = part.crashTolerance; // Every part has a crash tolerance, but we only want to improve landing legs.
 
-			var electric_charge = GetChargeResource(part);
+			var electric_charge = GetElectricCharge(part);
 			if (electric_charge != null) batteryCharge = electric_charge.maxAmount;
 
-			var generator = GetGeneratorModule(part);
+			var generator = GetModuleGenerator(part);
 			if (generator != null) {
 				generatorEfficiency = new Dictionary<string, double>();
 				foreach (var output_resource in generator.resHandler.outputResources) generatorEfficiency.Add(output_resource.name, output_resource.rate);
 			}
 
-			var fission_generator = GetFissionGeneratorModule(part);
+			var fission_generator = GetFissionGenerator(part);
 			if (fission_generator != null) fissionPowerGeneration = GetGenericModuleValue(fission_generator, "PowerGeneration");
 
 			// There might be different converter-modules in the same part with different names (eg for Fuel, Mono-propellant, etc):
-			var converter_list = GetConverterModules(part);
+			var converter_list = GetModuleResourceConverterList(part);
 			if (converter_list != null) {
 				converterEfficiency = new Dictionary<string, Dictionary<string, double>>();
 				foreach (var converter in converter_list) {
@@ -105,13 +106,13 @@ namespace KRnD.Source
 				}
 			}
 
-			var harvester = GetResourceHarvesterModule(part);
+			var harvester = GetModuleResourceHarvester(part);
 			if (harvester) resourceHarvester = harvester.Efficiency;
 
-			var parachute = GetParachuteModule(part);
+			var parachute = GetModluleParachute(part);
 			if (parachute) chuteMaxTemp = parachute.chuteMaxTemp;
 
-			var fairing = GetFairingModule(part);
+			var fairing = GetModuleProceduralFairing(part);
 			if (fairing) fairingAreaMass = fairing.UnitAreaMass;
 
 			var fuel_resources = GetFuelResources(part);
@@ -125,14 +126,14 @@ namespace KRnD.Source
 			}
 
 			// Fetch antenna stats
-			var transmitter = GetDataTransmitter(part);
+			var transmitter = GetModuleDataTransmitter(part);
 			if (transmitter != null) {
 				packetSize = transmitter.packetSize;
 				antennaPower = transmitter.antennaPower;
 			}
 
 			// Fetch science lab stats
-			var lab = GetScienceLab(part);
+			var lab = GetModluleScienceLab(part);
 			if (lab != null) {
 				dataStorage = lab.dataStorage;
 			}
@@ -160,7 +161,7 @@ namespace KRnD.Source
 
 
 		// Multi-Mode engines have multiple Engine-Modules which we return as a list.
-		public static List<ModuleEngines> GetEngineModules(Part part)
+		public static List<ModuleEngines> GetModuleEnginesList(Part part)
 		{
 			var engines = new List<ModuleEngines>();
 			foreach (var part_module in part.Modules) {
@@ -173,7 +174,7 @@ namespace KRnD.Source
 			return null;
 		}
 
-		public static ModuleWheelBase GetLandingLegModule(Part part)
+		public static ModuleWheelBase GetModuleWheelBase(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName != "ModuleWheelBase") continue;
@@ -185,7 +186,7 @@ namespace KRnD.Source
 		}
 
 
-		public static ModuleReactionWheel GetReactionWheelModule(Part part)
+		public static ModuleReactionWheel GetModuleReactionWheel(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleReactionWheel") {
@@ -196,7 +197,7 @@ namespace KRnD.Source
 			return null;
 		}
 
-		public static ModuleDeployableSolarPanel GetSolarPanelModule(Part part)
+		public static ModuleDeployableSolarPanel GetModuleDeployableSolarPanel(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleDeployableSolarPanel") {
@@ -208,7 +209,7 @@ namespace KRnD.Source
 		}
 
 
-		public static PartResource GetChargeResource(Part part)
+		public static PartResource GetElectricCharge(Part part)
 		{
 			if (part.Resources == null) return null;
 			foreach (var part_resource in part.Resources)
@@ -224,7 +225,7 @@ namespace KRnD.Source
 
 
 
-		public static ModuleRCS GetRcsModule(Part part)
+		public static ModuleRCS GetModuleRCS(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleRCS" || part_module.moduleName == "ModuleRCSFX") {
@@ -250,7 +251,7 @@ namespace KRnD.Source
 			return part_fuels;
 		}
 
-		public static ModuleDataTransmitter GetDataTransmitter(Part part)
+		public static ModuleDataTransmitter GetModuleDataTransmitter(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleDataTransmitter") {
@@ -262,7 +263,7 @@ namespace KRnD.Source
 		}
 
 
-		public static ModuleScienceLab GetScienceLab(Part part)
+		public static ModuleScienceLab GetModluleScienceLab(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleScienceLab") {
@@ -274,7 +275,7 @@ namespace KRnD.Source
 		}
 
 
-		public static ModuleGenerator GetGeneratorModule(Part part)
+		public static ModuleGenerator GetModuleGenerator(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleGenerator") {
@@ -285,7 +286,7 @@ namespace KRnD.Source
 			return null;
 		}
 
-		public static PartModule GetFissionGeneratorModule(Part part)
+		public static PartModule GetFissionGenerator(Part part)
 		{
 			foreach (var part_module in part.Modules)
 			// We are only interested in "FissionGenerator" with the tunable attribute "PowerGeneration":
@@ -298,7 +299,7 @@ namespace KRnD.Source
 			return null;
 		}
 
-		public static List<ModuleResourceConverter> GetConverterModules(Part part)
+		public static List<ModuleResourceConverter> GetModuleResourceConverterList(Part part)
 		{
 			var converters = new List<ModuleResourceConverter>();
 			foreach (var part_module in part.Modules) {
@@ -312,7 +313,7 @@ namespace KRnD.Source
 		}
 
 
-		public static ModuleResourceHarvester GetResourceHarvesterModule(Part part)
+		public static ModuleResourceHarvester GetModuleResourceHarvester(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleResourceHarvester") {
@@ -323,7 +324,7 @@ namespace KRnD.Source
 			return null;
 		}
 
-		public static ModuleParachute GetParachuteModule(Part part)
+		public static ModuleParachute GetModluleParachute(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleParachute") {
@@ -334,7 +335,7 @@ namespace KRnD.Source
 			return null;
 		}
 
-		public static ModuleProceduralFairing GetFairingModule(Part part)
+		public static ModuleProceduralFairing GetModuleProceduralFairing(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleProceduralFairing") {
@@ -343,6 +344,40 @@ namespace KRnD.Source
 			}
 
 			return null;
+		}
+
+
+		public static double GetGenericPartValue(Part module, string field_name)
+		{
+			var type = module.GetType();
+			foreach (var info in type.GetFields()) {
+				if (info.Name == field_name) {
+					return Convert.ToDouble(info.GetValue(module));
+				}
+			}
+
+			throw new Exception("field " + field_name + " not found in part " + module.name);
+		}
+
+
+
+		public static void SetGenericPartValue(Part module, string field_name, double value)
+		{
+			var type = module.GetType();
+			foreach (var info in type.GetFields()) {
+				if (info.Name != field_name) continue;
+				info.SetValue(module, Convert.ChangeType(value, info.FieldType));
+				return;
+			}
+
+			throw new Exception("field " + field_name + " not found in part " + module.name);
+		}
+
+
+		public static bool HasGenericPartField(Part module, string field_name)
+		{
+			var type = module.GetType();
+			return type.GetFields().Any(info => info.Name == field_name);
 		}
 
 
@@ -364,10 +399,9 @@ namespace KRnD.Source
 		{
 			var type = module.GetType();
 			foreach (var info in type.GetFields()) {
-				if (info.Name == field_name) {
-					info.SetValue(module, Convert.ChangeType(value, info.FieldType));
-					return;
-				}
+				if (info.Name != field_name) continue;
+				info.SetValue(module, Convert.ChangeType(value, info.FieldType));
+				return;
 			}
 
 			throw new Exception("field " + field_name + " not found in module " + module.moduleName);

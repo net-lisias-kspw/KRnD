@@ -429,21 +429,21 @@ namespace KRnD.Source
 
 				// Upgrade the part to get the correct info, we revert it back to its previous values in the finally block below:
 				KRnD.UpdatePart(part, upgrades_to_apply);
-				var engine_modules = PartStats.GetEngineModules(part);
-				var rcs_module = PartStats.GetRcsModule(part);
-				var reaction_wheel_module = PartStats.GetReactionWheelModule(part);
-				var solar_panel_module = PartStats.GetSolarPanelModule(part);
-				var landing_leg_module = PartStats.GetLandingLegModule(part);
-				var electric_charge_resource = PartStats.GetChargeResource(part);
-				var generator_module = PartStats.GetGeneratorModule(part);
-				var fission_generator = PartStats.GetFissionGeneratorModule(part);
-				var converter_modules = PartStats.GetConverterModules(part);
-				var parachute_module = PartStats.GetParachuteModule(part);
-				var fairing_module = PartStats.GetFairingModule(part);
+				var engine_modules = PartStats.GetModuleEnginesList(part);
+				var rcs_module = PartStats.GetModuleRCS(part);
+				var reaction_wheel_module = PartStats.GetModuleReactionWheel(part);
+				var solar_panel_module = PartStats.GetModuleDeployableSolarPanel(part);
+				var landing_leg_module = PartStats.GetModuleWheelBase(part);
+				var electric_charge_resource = PartStats.GetElectricCharge(part);
+				var generator_module = PartStats.GetModuleGenerator(part);
+				var fission_generator = PartStats.GetFissionGenerator(part);
+				var converter_modules = PartStats.GetModuleResourceConverterList(part);
+				var parachute_module = PartStats.GetModluleParachute(part);
+				var fairing_module = PartStats.GetModuleProceduralFairing(part);
 				var fuel_resources = PartStats.GetFuelResources(part);
-				var antenna_module = PartStats.GetDataTransmitter(part);
-				var science_module = PartStats.GetScienceLab(part);
-				var harvester_module = PartStats.GetResourceHarvesterModule(part);
+				var antenna_module = PartStats.GetModuleDataTransmitter(part);
+				var science_module = PartStats.GetModluleScienceLab(part);
+				var harvester_module = PartStats.GetModuleResourceHarvester(part);
 
 				// Basic stats:
 				info = "<color=#FFFFFF><b>Dry Mass:</b> " + part.mass.ToString("0.#### t") + "\n";
@@ -560,21 +560,21 @@ namespace KRnD.Source
 						}
 
 					if (part) {
-						antenna_module = PartStats.GetDataTransmitter(part);
-						science_lab = PartStats.GetScienceLab(part);
+						antenna_module = PartStats.GetModuleDataTransmitter(part);
+						science_lab = PartStats.GetModluleScienceLab(part);
 						rnd_module = PartStats.GetKRnDModule(part);
-						engine_modules = PartStats.GetEngineModules(part);
-						rcs_module = PartStats.GetRcsModule(part);
-						reaction_wheel_module = PartStats.GetReactionWheelModule(part);
-						solar_panel_module = PartStats.GetSolarPanelModule(part);
-						landing_leg_module = PartStats.GetLandingLegModule(part);
-						electric_charge_resource = PartStats.GetChargeResource(part);
-						generator_module = PartStats.GetGeneratorModule(part);
-						fission_generator = PartStats.GetFissionGeneratorModule(part);
-						converter_modules = PartStats.GetConverterModules(part);
-						parachute_module = PartStats.GetParachuteModule(part);
+						engine_modules = PartStats.GetModuleEnginesList(part);
+						rcs_module = PartStats.GetModuleRCS(part);
+						reaction_wheel_module = PartStats.GetModuleReactionWheel(part);
+						solar_panel_module = PartStats.GetModuleDeployableSolarPanel(part);
+						landing_leg_module = PartStats.GetModuleWheelBase(part);
+						electric_charge_resource = PartStats.GetElectricCharge(part);
+						generator_module = PartStats.GetModuleGenerator(part);
+						fission_generator = PartStats.GetFissionGenerator(part);
+						converter_modules = PartStats.GetModuleResourceConverterList(part);
+						parachute_module = PartStats.GetModluleParachute(part);
 						fuel_resources = PartStats.GetFuelResources(part);
-						harvester_module = PartStats.GetResourceHarvesterModule(part);
+						harvester_module = PartStats.GetModuleResourceHarvester(part);
 					}
 				}
 
