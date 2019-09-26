@@ -42,6 +42,11 @@ namespace KRnD.Source
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> The energy transfer of the Active Radiator module.</summary>
+		public static string ENERGY_TRANSFER = "maxEnergyTransfer";
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary> The fuel flow which actually translates directly to thrust (by way of the ISP factor).</summary>
 		public static string FUEL_FLOW = "fuelFlow";
 
@@ -113,6 +118,8 @@ namespace KRnD.Source
 		/// 		  upgrade level. The actual upgrade amount is subject to diminishing returns if the
 		/// 		  "improvementRate" constant is less than 1.</summary>
 		public static string IMPROVEMENT = "improvement";
+
+		public static string ROUNDED = "rounded";
 		#endregion
 
 

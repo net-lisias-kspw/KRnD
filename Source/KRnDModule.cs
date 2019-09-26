@@ -20,6 +20,7 @@
 		[KSPField(isPersistant = true)] public int antennaPower_upgrades = 0;
 		[KSPField(isPersistant = true)] public int dataStorage_upgrades = 0;
 		[KSPField(isPersistant = true)] public int resourceHarvester_upgrades = 0;
+		[KSPField(isPersistant = true)] public int maxEnergyTransfer_upgrades = 0;
 
 		// Flag, which can be set by other mods to apply latest upgrades on load:
 		[KSPField(isPersistant = true)] public int upgradeToLatest = 0;
@@ -65,6 +66,7 @@
 				parachuteStrength_upgrades +
 				maxTemperature_upgrades +
 				resourceHarvester_upgrades +
+				maxEnergyTransfer_upgrades +
 				fuelCapacity_upgrades;
 			if (upgrades == 0) return "";
 			return "Mk " + ToRoman(upgrades + 1); // Mk I is the part without upgrades, Mk II the first upgraded version.
@@ -77,6 +79,29 @@
 				Fields[0].guiActive = false;
 			else
 				Fields[0].guiActive = true;
+		}
+
+
+		public void ApplyUpgrades(PartUpgrades upgrades_to_apply)
+		{
+			packetSize_upgrades = upgrades_to_apply.packetSize;
+			antennaPower_upgrades = upgrades_to_apply.antennaPower;
+			dataStorage_upgrades = upgrades_to_apply.dataStorage;
+			dryMass_upgrades = upgrades_to_apply.dryMass;
+			fuelFlow_upgrades = upgrades_to_apply.fuelFlow;
+			ispVac_upgrades = upgrades_to_apply.ispVac;
+			ispAtm_upgrades = upgrades_to_apply.ispAtm;
+			torque_upgrades = upgrades_to_apply.torqueStrength;
+			chargeRate_upgrades = upgrades_to_apply.efficiencyMult;
+			crashTolerance_upgrades = upgrades_to_apply.crashTolerance;
+			batteryCharge_upgrades = upgrades_to_apply.batteryCharge;
+			generatorEfficiency_upgrades = upgrades_to_apply.generatorEfficiency;
+			converterEfficiency_upgrades = upgrades_to_apply.converterEfficiency;
+			parachuteStrength_upgrades = upgrades_to_apply.parachuteStrength;
+			maxTemperature_upgrades = upgrades_to_apply.maxTemperature;
+			fuelCapacity_upgrades = upgrades_to_apply.fuelCapacity;
+			resourceHarvester_upgrades = upgrades_to_apply.resourceHarvester;
+			maxEnergyTransfer_upgrades = upgrades_to_apply.maxEnergyTransfer;
 		}
 
 		// Returns the upgrade-stats which this module represents.
@@ -92,7 +117,7 @@
 				ispVac = ispVac_upgrades,
 				ispAtm = ispAtm_upgrades,
 				torqueStrength = torque_upgrades,
-				chargeRate = chargeRate_upgrades,
+				efficiencyMult = chargeRate_upgrades,
 				crashTolerance = crashTolerance_upgrades,
 				batteryCharge = batteryCharge_upgrades,
 				generatorEfficiency = generatorEfficiency_upgrades,
@@ -100,7 +125,8 @@
 				parachuteStrength = parachuteStrength_upgrades,
 				maxTemperature = maxTemperature_upgrades,
 				fuelCapacity = fuelCapacity_upgrades,
-				resourceHarvester = resourceHarvester_upgrades
+				resourceHarvester = resourceHarvester_upgrades,
+				maxEnergyTransfer = maxEnergyTransfer_upgrades
 			};
 		}
 	}

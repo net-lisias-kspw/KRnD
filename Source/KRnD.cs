@@ -70,37 +70,6 @@ namespace KRnD.Source
 		}
 
 
-		public static float CalculateImprovementFactor(float base_improvement, float improvement_scale, int upgrade_level)
-		{
-			float factor = 0;
-			if (upgrade_level < 0) upgrade_level = 0;
-			for (var i = 0; i < upgrade_level; i++) {
-				if (i == 0) {
-					factor += base_improvement;
-				} else {
-					factor += base_improvement * (float) Math.Pow(improvement_scale, i - 1);
-				}
-			}
-
-			if (base_improvement < 0 && factor < -0.9) factor = -0.9f;
-			return (float) Math.Round(factor, 4);
-		}
-
-		public static int CalculateScienceCost(int base_cost, float cost_scale, int upgrade_level)
-		{
-			float cost = 0;
-			if (upgrade_level < 0) upgrade_level = 0;
-			for (var i = 0; i < upgrade_level; i++) {
-				if (i == 0) {
-					cost = base_cost;
-				} else {
-					cost += base_cost * (float) Math.Pow(cost_scale, i - 1);
-				}
-			}
-
-			if (cost > 2147483647) return 2147483647; // Cap at signed 32 bit int
-			return (int) Math.Round(cost);
-		}
 
 		// Since KSP 1.1 the info-text of solar panels is not updated correctly, so we have use this workaround-function
 		// to create our own text.
@@ -158,26 +127,21 @@ namespace KRnD.Source
 							} else if (info.moduleName.ToLower() == "generator") {
 								var generator = PartStats.GetModuleGenerator(part.partPrefab);
 								if (generator) info.info = generator.GetInfo();
-
-
 							} else if (info.moduleName.ToLower() == "data transmitter") {
 								var antenna = PartStats.GetModuleDataTransmitter(part.partPrefab);
 								if (antenna) info.info = antenna.GetInfo();
-
-
 							} else if (info.moduleName.ToLower() == "science lab") {
 								var lab = PartStats.GetModluleScienceLab(part.partPrefab);
 								if (lab) info.info = lab.GetInfo();
-
-
-
+							} else if (info.moduleName.ToLower() == "active radiator") {
+								var lab = PartStats.GetModuleActiveRadiator(part.partPrefab);
+								if (lab) info.info = lab.GetInfo();
 							} else if (info.moduleName.ToLower() == "resource converter") {
 								var converter_list = PartStats.GetModuleResourceConverterList(part.partPrefab);
-								if (converter_list != null && converter_list.Count > 0) {
-									var converter = converter_list[converter_module_number];
-									info.info = converter.GetInfo();
-									converter_module_number++;
-								}
+								if (converter_list == null || converter_list.Count <= 0) continue;
+								var converter = converter_list[converter_module_number];
+								info.info = converter.GetInfo();
+								converter_module_number++;
 							} else if (info.moduleName.ToLower() == "parachute") {
 								var parachute = PartStats.GetModluleParachute(part.partPrefab);
 								if (parachute) info.info = parachute.GetInfo();
@@ -237,7 +201,7 @@ namespace KRnD.Source
 		{
 			PartUpgrades upgrades_to_apply;
 			if (update_to_latest_model) {
-				if (upgrades.TryGetValue(SanatizePartName(part.name), out upgrades_to_apply)) {
+				if (upgrades.TryGetValue(SanitizePartName(part.name), out upgrades_to_apply)) {
 					// Apply upgrades from global list:
 					UpdatePart(part, upgrades_to_apply);
 				} else {
@@ -261,10 +225,281 @@ namespace KRnD.Source
 
 		// Sometimes the name of the root-part of a vessel is extended by the vessel-name like "Mk1Pod (X-Bird)", this function can be used
 		// as wrapper to always return the real name:
-		public static string SanatizePartName(string part_name)
+		public static string SanitizePartName(string part_name)
 		{
 			return Regex.Replace(part_name, @" \(.*\)$", "");
 		}
+
+
+		public static int UpdateDryMass(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			part.prefabMass = part.mass = u_constants.CalculateImprovementValue(original_stats.dryMass, upgrades_to_apply);
+
+			// Dry Mass also improves fairing mass:
+			var fairing_module = PartStats.GetModuleProceduralFairing(part);
+			if (fairing_module) {
+				fairing_module.UnitAreaMass = u_constants.CalculateImprovementValue(original_stats.fairingAreaMass, upgrades_to_apply);
+			}
+
+			return 0;
+		}
+
+		public static int UpdateMaxTemperature(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			part.skinMaxTemp = u_constants.CalculateImprovementValue(original_stats.skinMaxTemp, upgrades_to_apply);
+			part.maxTemp = u_constants.CalculateImprovementValue(original_stats.intMaxTemp, upgrades_to_apply);
+			return 0;
+		}
+
+
+		public static int UpdateFuelFlow(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply);
+			var engine_modules = PartStats.GetModuleEnginesList(part);
+			var rcs_module = PartStats.GetModuleRCS(part);
+			if (engine_modules == null && !rcs_module) return 0;
+
+			for (var i = 0; i < original_stats.maxFuelFlows.Count; i++) {
+				var max_fuel_flow = original_stats.maxFuelFlows[i] * upgrade_factor;
+				if (engine_modules != null) {
+					engine_modules[i].maxFuelFlow = max_fuel_flow;
+				} else if (rcs_module) {
+					rcs_module.thrusterPower = max_fuel_flow; // There is only one rcs-module
+				}
+			}
+
+			return 0;
+		}
+
+
+		public static int UpdateISPVacAtm(UpgradeConstants data_vac, UpgradeConstants data_atm, Part part, PartStats original_stats, int isp_vac, int isp_atm)
+		{
+			List<ModuleEngines> engine_modules = PartStats.GetModuleEnginesList(part);
+			ModuleRCS rcs_module = PartStats.GetModuleRCS(part);
+
+			if (engine_modules == null && !rcs_module) return 0;
+
+			var improvement_factor_vac = data_vac.CalculateImprovementFactor(isp_vac);
+			var improvement_factor_atm = data_atm.CalculateImprovementFactor(isp_atm);
+
+			for (var i = 0; i < original_stats.atmosphereCurves.Count; i++) {
+				var is_air_breather = false;
+				if (engine_modules != null)
+					is_air_breather = engine_modules[i].engineType == EngineType.Turbine ||
+					                  engine_modules[i].engineType == EngineType.Piston ||
+					                  engine_modules[i].engineType == EngineType.ScramJet;
+				var fc = new FloatCurve();
+				for (var v = 0; v < original_stats.atmosphereCurves[i].Curve.length; v++) {
+					var frame = original_stats.atmosphereCurves[i].Curve[v];
+
+					var pressure = frame.time;
+					//var value = frame.value;
+
+
+					float factor_at_this_pressure = 1;
+					if (is_air_breather && original_stats.atmosphereCurves[i].Curve.length == 1) {
+						factor_at_this_pressure = improvement_factor_atm; // Air-breathing engines have a pressure curve starting at 0, but they should use Atm. as improvement factor.
+					} else if (Math.Abs(pressure) < Single.Epsilon) {
+						factor_at_this_pressure = improvement_factor_vac; // In complete vacuum
+					} else if (pressure >= 1) {
+						factor_at_this_pressure = improvement_factor_atm; // At lowest kerbal atmosphere
+					} else {
+						factor_at_this_pressure = (1 - pressure) * improvement_factor_vac + pressure * improvement_factor_atm; // Mix both
+					}
+
+					var new_value = frame.value * factor_at_this_pressure;
+					fc.Add(pressure, new_value);
+				}
+
+				if (engine_modules != null) {
+					engine_modules[i].atmosphereCurve = fc;
+				} else if (rcs_module) {
+					rcs_module.atmosphereCurve = fc; // There is only one rcs-module
+				}
+			}
+
+			return 0;
+		}
+
+
+		public static int UpdateTorque(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var reaction_wheel = PartStats.GetModuleReactionWheel(part);
+			if (!reaction_wheel) return 0;
+
+			var torque = u_constants.CalculateImprovementValue(original_stats.torqueStrength, upgrades_to_apply);
+			reaction_wheel.PitchTorque = torque;
+			reaction_wheel.YawTorque = torque;
+			reaction_wheel.RollTorque = torque;
+			return 0;
+		}
+
+
+		public static int UpdateChargeRate(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var solar_panel = PartStats.GetModuleDeployableSolarPanel(part);
+			if (solar_panel) {
+				solar_panel.efficiencyMult = u_constants.CalculateImprovementValue(original_stats.efficiencyMult, upgrades_to_apply);
+			}
+
+			return 0;
+		}
+
+
+		public static int UpdateCrashTolerance(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var landing_leg = PartStats.GetModuleWheelBase(part);
+			if (landing_leg) {
+				part.crashTolerance = u_constants.CalculateImprovementValue(original_stats.crashTolerance, upgrades_to_apply);
+			}
+
+			return 0;
+		}
+
+
+		public static int UpdateBatteryCharge(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var electric_charge = PartStats.GetElectricCharge(part);
+			if (electric_charge == null) return 0;
+
+			var max_charge = Math.Round(u_constants.CalculateImprovementValue(original_stats.batteryCharge, upgrades_to_apply));
+			var percentage_full = electric_charge.amount / electric_charge.maxAmount;
+			electric_charge.maxAmount = max_charge;
+			electric_charge.amount = max_charge * percentage_full;
+			return 0;
+		}
+
+
+		public static int UpdateGeneratorEfficiency(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var generator = PartStats.GetModuleGenerator(part);
+			if (generator) {
+				foreach (var output_resource in generator.resHandler.outputResources) {
+					if (!original_stats.generatorEfficiency.TryGetValue(output_resource.name, out var original_rate)) continue;
+					output_resource.rate = u_constants.CalculateImprovementValue(original_rate, upgrades_to_apply);
+				}
+			}
+
+			var fission_generator = PartStats.GetFissionGenerator(part);
+			if (fission_generator) {
+				var power_generation = u_constants.CalculateImprovementValue(original_stats.fissionPowerGeneration, upgrades_to_apply);
+				PartStats.SetGenericModuleValue(fission_generator, "PowerGeneration", power_generation);
+			}
+
+			return 0;
+		}
+
+
+		public static int UpdateConverterEfficiency(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			// Converter Efficiency:
+			var converter_list = PartStats.GetModuleResourceConverterList(part);
+			if (converter_list == null) return 0;
+
+			foreach (var converter in converter_list) {
+				if (!original_stats.converterEfficiency.TryGetValue(converter.ConverterName, out var original_output_resources)) continue;
+
+				// Since KSP 1.2 this can't be done in a foreach anymore, we have to read and write back the entire ResourceRatio-Object:
+				for (var i = 0; i < converter.outputList.Count; i++) {
+					var resource_ratio = converter.outputList[i];
+					if (!original_output_resources.TryGetValue(resource_ratio.ResourceName, out var original_ratio)) continue;
+
+					resource_ratio.Ratio = u_constants.CalculateImprovementValue(original_ratio, upgrades_to_apply);
+					converter.outputList[i] = resource_ratio;
+				}
+			}
+
+			return 0;
+		}
+
+
+		public static int UpdateAntennaPower(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var antenna = PartStats.GetModuleDataTransmitter(part);
+			if (antenna) {
+				antenna.antennaPower = u_constants.CalculateImprovementValue(original_stats.antennaPower, upgrades_to_apply);
+			}
+
+			return 0;
+		}
+
+		public static int UpdatePacketSize(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var antenna = PartStats.GetModuleDataTransmitter(part);
+			if (antenna) {
+				antenna.packetSize = u_constants.CalculateImprovementValue(original_stats.packetSize, upgrades_to_apply);
+			}
+
+			return 0;
+		}
+
+		public static int UpdateDataStorage(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var science_lab = PartStats.GetModluleScienceLab(part);
+			if (science_lab) {
+				science_lab.dataStorage = u_constants.CalculateImprovementValue(original_stats.dataStorage, upgrades_to_apply);
+			}
+
+			return 0;
+		}
+
+		public static int UpdateParachuteStrength(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			// Parachute Strength:
+			var parachute = PartStats.GetModluleParachute(part);
+			if (parachute) {
+				// The safe deployment-speed is derived from the temperature
+				parachute.chuteMaxTemp = original_stats.chuteMaxTemp * u_constants.CalculateImprovementFactor(upgrades_to_apply);
+			}
+
+			return 0;
+		}
+
+		public static int UpdateResourceHarvester(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			// Resource Harvester
+			var harvester = PartStats.GetModuleResourceHarvester(part);
+			if (harvester) {
+				harvester.Efficiency = u_constants.CalculateImprovementValue(original_stats.resourceHarvester, upgrades_to_apply);
+			}
+
+			// TODO: Update surface harvester module too?
+			return 0;
+		}
+
+
+		public static int UpdateFuelCapacity(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			// Fuel Capacity:
+			var fuel_resources = PartStats.GetFuelResources(part);
+			if (fuel_resources == null || original_stats.fuelCapacities == null) return 0;
+
+			double improvement_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply);
+
+			foreach (var fuel_resource in fuel_resources) {
+				if (!original_stats.fuelCapacities.ContainsKey(fuel_resource.resourceName)) continue;
+				var original_capacity = original_stats.fuelCapacities[fuel_resource.resourceName];
+				var new_capacity = Math.Round(original_capacity * improvement_factor);
+				var percentage_full = fuel_resource.amount / fuel_resource.maxAmount;
+
+				fuel_resource.maxAmount = new_capacity;
+				fuel_resource.amount = new_capacity * percentage_full;
+			}
+
+			return 0;
+		}
+
+		public static int UpdateActiveRadiator(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
+		{
+			var radiator = PartStats.GetModuleActiveRadiator(part);
+			if (radiator) {
+				radiator.maxEnergyTransfer = u_constants.CalculateImprovementValue(original_stats.maxEnergyTransfer, upgrades_to_apply);
+			}
+
+			return 0;
+
+		}
+
 
 		// Updates the given part with all upgrades provided in "upgradesToApply".
 		public static void UpdatePart(Part part, PartUpgrades upgrades_to_apply)
@@ -274,19 +509,45 @@ namespace KRnD.Source
 				var rnd_module = PartStats.GetKRnDModule(part);
 				if (rnd_module == null) return;
 				if (upgrades == null) throw new Exception("upgrades-dictionary missing");
-				if (KRnD.originalStats == null) throw new Exception("original-stats-dictionary missing");
+				if (originalStats == null) throw new Exception("original-stats-dictionary missing");
 
 				// Get the part-name ("):
-				var part_name = SanatizePartName(part.name);
+				var part_name = SanitizePartName(part.name);
 
 				// Get the original part-stats:
-				PartStats original_stats;
-				if (!originalStats.TryGetValue(part_name, out original_stats)) throw new Exception("no original-stats for part '" + part_name + "'");
+				if (!originalStats.TryGetValue(part_name, out var original_stats)) throw new Exception("no original-stats for part '" + part_name + "'");
 
-				PartUpgrades latest_model;
-				if (!upgrades.TryGetValue(part_name, out latest_model)) latest_model = null;
+				//PartUpgrades latest_model;
+				//if (!upgrades.TryGetValue(part_name, out latest_model)) latest_model = null;
 
 
+
+#if true
+				/*
+				 * Updates the part to match the upgrade levels specified in the upgrades_to_apply parameter. This provides the hard
+				 * link between the ValueConstants class, the upgrade level field in PartUpgrades class, and the algorithm to actually
+				 * update the part -- sometimes the algorithm is simple, but could be more complex such as with ISP efficiency
+				 * curves.
+				 */
+				UpdateDryMass(ValueConstants.GetData(StringConstants.DRY_MASS), part, original_stats, upgrades_to_apply.dryMass);
+				UpdateMaxTemperature(ValueConstants.GetData(StringConstants.MAX_TEMPERATURE), part, original_stats, upgrades_to_apply.maxTemperature);
+				UpdateFuelFlow(ValueConstants.GetData(StringConstants.FUEL_FLOW), part, original_stats, upgrades_to_apply.fuelFlow);
+				UpdateISPVacAtm(ValueConstants.GetData(StringConstants.ISP_VAC), ValueConstants.GetData(StringConstants.ISP_ATM), part, original_stats, upgrades_to_apply.ispVac, upgrades_to_apply.ispAtm);
+				UpdateTorque(ValueConstants.GetData(StringConstants.TORQUE), part, original_stats, upgrades_to_apply.torqueStrength);
+				UpdateChargeRate(ValueConstants.GetData(StringConstants.CHARGE_RATE), part, original_stats, upgrades_to_apply.efficiencyMult);
+				UpdateCrashTolerance(ValueConstants.GetData(StringConstants.CRASH_TOLERANCE), part, original_stats, upgrades_to_apply.crashTolerance);
+				UpdateBatteryCharge(ValueConstants.GetData(StringConstants.BATTERY_CHARGE), part, original_stats, upgrades_to_apply.batteryCharge);
+				UpdateGeneratorEfficiency(ValueConstants.GetData(StringConstants.GENERATOR_EFFICIENCY), part, original_stats, upgrades_to_apply.generatorEfficiency);
+				UpdateConverterEfficiency(ValueConstants.GetData(StringConstants.CONVERTER_EFFICIENCY), part, original_stats, upgrades_to_apply.converterEfficiency);
+				UpdateAntennaPower(ValueConstants.GetData(StringConstants.ANTENNA_POWER), part, original_stats, upgrades_to_apply.antennaPower);
+				UpdatePacketSize(ValueConstants.GetData(StringConstants.PACKET_SIZE), part, original_stats, upgrades_to_apply.packetSize);
+				UpdateDataStorage(ValueConstants.GetData(StringConstants.DATA_STORAGE), part, original_stats, upgrades_to_apply.dataStorage);
+				UpdateParachuteStrength(ValueConstants.GetData(StringConstants.PARACHUTE_STRENGTH), part, original_stats, upgrades_to_apply.parachuteStrength);
+				UpdateResourceHarvester(ValueConstants.GetData(StringConstants.RESOURCE_HARVESTER), part, original_stats, upgrades_to_apply.resourceHarvester);
+				UpdateFuelCapacity(ValueConstants.GetData(StringConstants.FUEL_CAPACITY), part, original_stats, upgrades_to_apply.fuelCapacity);
+				UpdateActiveRadiator(ValueConstants.GetData(StringConstants.ENERGY_TRANSFER), part, original_stats, upgrades_to_apply.maxEnergyTransfer);
+
+#else
 				// Dry Mass:
 				rnd_module.dryMass_upgrades = upgrades_to_apply.dryMass;
 				//var dry_mass_factor = 1 + CalculateImprovementFactor(rnd_module.dryMass_improvement, rnd_module.dryMass_improvementScale, upgrades_to_apply.dryMass);
@@ -300,26 +561,13 @@ namespace KRnD.Source
 				if (fairing_module) {
 					fairing_module.UnitAreaMass = u_constants.CalculateImprovementValue(original_stats.fairingAreaMass, upgrades_to_apply.dryMass);
 
-					//fairng_module.UnitAreaMass = original_stats.fairingAreaMass * dry_mass_factor;
+					//fairing_module.UnitAreaMass = original_stats.fairingAreaMass * dry_mass_factor;
 				}
-				
 
 				// Max Int/Skin Temp:
 				rnd_module.maxTemperature_upgrades = upgrades_to_apply.maxTemperature;
-#if true
-				//UpgradeConstants u_constants = InitConstants.GetData(StringConstants.MAX_TEMPERATURE);
-				//double upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.maxTemperature);
-				//part.skinMaxTemp = original_stats.skinMaxTemp * upgrade_factor;
-				//part.maxTemp = original_stats.intMaxTemp * upgrade_factor;
-
 				part.skinMaxTemp = ValueConstants.GetData(StringConstants.MAX_TEMPERATURE).CalculateImprovementValue(original_stats.skinMaxTemp, upgrades_to_apply.maxTemperature);
 				part.maxTemp = ValueConstants.GetData(StringConstants.MAX_TEMPERATURE).CalculateImprovementValue(original_stats.intMaxTemp, upgrades_to_apply.maxTemperature);
-
-#else
-				double temp_factor = 1 + CalculateImprovementFactor(rnd_module.maxTemperature_improvement, rnd_module.maxTemperature_improvementScale, upgrades_to_apply.maxTemperature);
-				part.skinMaxTemp = original_stats.skinMaxTemp * temp_factor;
-				part.maxTemp = original_stats.intMaxTemp * temp_factor;
-#endif
 
 
 				// Fuel Flow:
@@ -341,6 +589,7 @@ namespace KRnD.Source
 				} else {
 					rnd_module.fuelFlow_upgrades = 0;
 				}
+
 
 				// ISP Vac & Atm:
 				if (engine_modules != null || rcs_module) {
@@ -385,6 +634,7 @@ namespace KRnD.Source
 					rnd_module.ispAtm_upgrades = 0;
 				}
 
+
 				// Torque:
 				var reaction_wheel = PartStats.GetModuleReactionWheel(part);
 				if (reaction_wheel) {
@@ -401,13 +651,14 @@ namespace KRnD.Source
 					rnd_module.torque_upgrades = 0;
 				}
 
+
 				// Charge Rate:
 				var solar_panel = PartStats.GetModuleDeployableSolarPanel(part);
 				if (solar_panel) {
-					rnd_module.chargeRate_upgrades = upgrades_to_apply.chargeRate;
+					rnd_module.chargeRate_upgrades = upgrades_to_apply.efficiencyMult;
 
 					u_constants = ValueConstants.GetData(StringConstants.CHARGE_RATE);
-					solar_panel.efficiencyMult = u_constants.CalculateImprovementValue(0, upgrades_to_apply.chargeRate);
+					solar_panel.efficiencyMult = u_constants.CalculateImprovementValue(0, upgrades_to_apply.efficiencyMult);
 
 					//var charge_efficiency = 1 + CalculateImprovementFactor(rnd_module.chargeRate_improvement, rnd_module.chargeRate_improvementScale, upgrades_to_apply.chargeRate);
 					// Somehow changing the charge-rate stopped working in KSP 1.1, so we use the efficiency instead. This however does not
@@ -418,6 +669,7 @@ namespace KRnD.Source
 				} else {
 					rnd_module.chargeRate_upgrades = 0;
 				}
+
 
 				// Crash Tolerance (only for landing legs):
 				var landing_leg = PartStats.GetModuleWheelBase(part);
@@ -432,6 +684,7 @@ namespace KRnD.Source
 				} else {
 					rnd_module.crashTolerance_upgrades = 0;
 				}
+
 
 				// Battery Charge:
 				var electric_charge = PartStats.GetElectricCharge(part);
@@ -501,7 +754,6 @@ namespace KRnD.Source
 					rnd_module.converterEfficiency_upgrades = 0;
 				}
 
-
 				// Antenna
 				var antenna = PartStats.GetModuleDataTransmitter(part);
 				if (antenna) {
@@ -518,6 +770,7 @@ namespace KRnD.Source
 					science_lab.dataStorage = ValueConstants.GetData(StringConstants.DATA_STORAGE).CalculateImprovementValue(original_stats.dataStorage, upgrades_to_apply.dataStorage);
 				}
 
+
 				// Parachute Strength:
 				var parachute = PartStats.GetModluleParachute(part);
 				if (parachute) {
@@ -532,7 +785,6 @@ namespace KRnD.Source
 				}
 
 
-
 				// Resource Harvester
 				var harvester = PartStats.GetModuleResourceHarvester(part);
 				if (harvester) {
@@ -543,8 +795,6 @@ namespace KRnD.Source
 				} else {
 					rnd_module.resourceHarvester_upgrades = 0;
 				}
-
-
 
 
 				// Fuel Capacity:
@@ -572,6 +822,17 @@ namespace KRnD.Source
 				} else {
 					rnd_module.fuelCapacity_upgrades = 0;
 				}
+#endif
+
+
+
+				/*
+				 * Update the RnD module to reflect the upgrades specified.
+				 */
+				rnd_module.ApplyUpgrades(upgrades_to_apply);
+
+
+
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] updatePart(" + part.name + "): " + e);
 			}
@@ -753,6 +1014,100 @@ namespace KRnD.Source
 #endif
 
 			return fuel_resources;
+		}
+
+
+		public static int ImproveIspVac(PartUpgrades store)
+		{
+			return ++store.ispVac;
+		}
+
+		public static int ImproveIspAtm(PartUpgrades store)
+		{
+			return ++store.ispAtm;
+		}
+
+		public static int ImproveDryMass(PartUpgrades store)
+		{
+			return ++store.dryMass;
+		}
+
+		public static int ImproveFuelFlow(PartUpgrades store)
+		{
+			return ++store.fuelFlow;
+		}
+
+		public static int ImproveTorque(PartUpgrades store)
+		{
+			return ++store.torqueStrength;
+		}
+
+
+		public static int ImprovePacketSize(PartUpgrades store)
+		{
+			return ++store.packetSize;
+		}
+
+		public static int ImproveResourceHarvester(PartUpgrades store)
+		{
+			return ++store.resourceHarvester;
+		}
+
+
+		public static int ImproveActiveRadiator(PartUpgrades store)
+		{
+			return ++store.maxEnergyTransfer;
+		}
+
+		public static int ImproveAntennaPower(PartUpgrades store)
+		{
+			return ++store.antennaPower;
+		}
+
+
+		public static int ImproveDataStorage(PartUpgrades store)
+		{
+			return ++store.dataStorage;
+		}
+
+		public static int ImproveChargeRate(PartUpgrades store)
+		{
+			return ++store.efficiencyMult;
+		}
+
+		public static int ImproveCrashTolerance(PartUpgrades store)
+		{
+			return ++store.crashTolerance;
+		}
+
+		public static int ImproveBatteryCharge(PartUpgrades store)
+		{
+			return ++store.batteryCharge;
+		}
+
+		public static int ImproveGeneratorEfficiency(PartUpgrades store)
+		{
+			return ++store.generatorEfficiency;
+		}
+
+		public static int ImproveConverterEfficiency(PartUpgrades store)
+		{
+			return ++store.converterEfficiency;
+		}
+
+		public static int ImproveParachuteStrength(PartUpgrades store)
+		{
+			return ++store.parachuteStrength;
+		}
+
+		public static int ImproveMaxTemperature(PartUpgrades store)
+		{
+			return ++store.maxTemperature;
+		}
+
+		public static int ImproveFuelCapacity(PartUpgrades store)
+		{
+			return ++store.fuelCapacity;
 		}
 	}
 }

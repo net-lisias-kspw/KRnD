@@ -10,24 +10,36 @@ namespace KRnD.Source
 		public float costDivisor;
 		public float improvementValue;
 		public int scienceCost;
+		public bool rounded;
 
-		public UpgradeConstants(string name_str, float cost_divisor, float improve_value, int science_cost)
+		public Func<PartUpgrades, int> upgradeFunction;
+
+		public Func<UpgradeConstants, Part, PartStats, int, int> applyUpgradeFunction;
+
+
+
+		public UpgradeConstants(string name_str, float cost_divisor, float improve_value, int science_cost, bool round, Func<PartUpgrades, int> upgrade_function = null, Func<UpgradeConstants, Part, PartStats, int, int> apply_upgrade = null)
 		{
 			name = name_str;
 			costDivisor = cost_divisor;
 			improvementValue = improve_value;
 			scienceCost = science_cost;
+			rounded = round;
+			upgradeFunction = upgrade_function;
+			applyUpgradeFunction = apply_upgrade;
 		}
 
 		public float CalculateImprovementValue(float value, int upgrades)
 		{
 			value *= CalculateImprovementFactor(upgrades);
+			if (rounded) value = (float)Math.Round(value);
 			return value;
 		}
 
 		public double CalculateImprovementValue(double value, int upgrades)
 		{
 			value *= CalculateImprovementFactor(upgrades);
+			if (rounded) value = Math.Round(value);
 			return value;
 		}
 
@@ -78,6 +90,7 @@ namespace KRnD.Source
 			data_node.SetValue(StringConstants.SCIENCE_COST, scienceCost, true);
 			data_node.SetValue(StringConstants.COST_DIVISOR, costDivisor, true);
 			data_node.SetValue(StringConstants.IMPROVEMENT, improvementValue, true);
+			data_node.SetValue(StringConstants.ROUNDED, rounded, true);
 			node.AddNode(data_node);
 		}
 
@@ -93,6 +106,7 @@ namespace KRnD.Source
 				data_node.TryGetValue(StringConstants.COST_DIVISOR, ref costDivisor);
 				data_node.TryGetValue(StringConstants.IMPROVEMENT, ref improvementValue);
 				data_node.TryGetValue(StringConstants.SCIENCE_COST, ref scienceCost);
+				data_node.TryGetValue(StringConstants.ROUNDED, ref rounded);
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] LoadUpgradeData(" + name + "): " + e);
 			}

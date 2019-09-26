@@ -3,21 +3,8 @@
 	// This class stores all types of upgrades a part can have.
 	public class PartUpgrades
 	{
-		//public const string ISP_VAC = "ispVac";
-		//public const string ISP_ATM = "ispAtm";
-		//public const string DRY_MASS = "dryMass";
-		//public const string FUEL_FLOW = "fuelFlow";
-		//public const string TORQUE = "torque";
-		//public const string CHARGE_RATE = "chargeRate";
-		//public const string CRASH_TOLERANCE = "crashTolerance";
-		//public const string BATTERY_CHARGE = "batteryCharge";
-		//public const string GENERATOR_EFFICIENCY = "generatorEfficiency";
-		//public const string CONVERTER_EFFICIENCY = "converterEfficiency";
-		//public const string PARACHUTE_STRENGTH = "parachuteStrength";
-		//public const string MAX_TEMPERATURE = "maxTemperature";
-		//public const string FUEL_CAPACITY = "fuelCapacity";
 		public int batteryCharge;
-		public int chargeRate;
+		public int efficiencyMult;
 		public int converterEfficiency;
 		public int crashTolerance;
 		public int dryMass;
@@ -33,27 +20,7 @@
 		public int packetSize;
 		public int dataStorage;
 		public int resourceHarvester;
-
-#if false
-		public override string ToString()
-		{
-			return "KRnDUpgrade(" +
-				   Constants.ISP_VAC + ":" + ispVac + "," +
-				   Constants.ISP_ATM + ":" + ispAtm + "," +
-				   Constants.DRY_MASS + ":" + dryMass + "," +
-				   Constants.FUEL_FLOW + ":" + fuelFlow + "," +
-				   Constants.TORQUE + ":" + torque + "," +
-				   Constants.CHARGE_RATE + ":" + chargeRate + "," +
-				   Constants.CRASH_TOLERANCE + ":" + crashTolerance + "," +
-				   Constants.BATTERY_CHARGE + ":" + batteryCharge + "," +
-				   Constants.GENERATOR_EFFICIENCY + ":" + generatorEfficiency + "," +
-				   Constants.CONVERTER_EFFICIENCY + ":" + converterEfficiency + "," +
-				   Constants.PARACHUTE_STRENGTH + ":" + parachuteStrength + "," +
-				   Constants.MAX_TEMPERATURE + ":" + maxTemperature + "," +
-				   Constants.FUEL_CAPACITY + ":" + fuelCapacity +
-				   ")";
-		}
-#endif
+		public int maxEnergyTransfer;
 
 		public ConfigNode CreateConfigNode(string name)
 		{
@@ -66,7 +33,7 @@
 			if (dryMass > 0) node.AddValue(StringConstants.DRY_MASS, dryMass.ToString());
 			if (fuelFlow > 0) node.AddValue(StringConstants.FUEL_FLOW, fuelFlow.ToString());
 			if (torqueStrength > 0) node.AddValue(StringConstants.TORQUE, torqueStrength.ToString());
-			if (chargeRate > 0) node.AddValue(StringConstants.CHARGE_RATE, chargeRate.ToString());
+			if (efficiencyMult > 0) node.AddValue(StringConstants.CHARGE_RATE, efficiencyMult.ToString());
 			if (crashTolerance > 0) node.AddValue(StringConstants.CRASH_TOLERANCE, crashTolerance.ToString());
 			if (batteryCharge > 0) node.AddValue(StringConstants.BATTERY_CHARGE, batteryCharge.ToString());
 			if (generatorEfficiency > 0) node.AddValue(StringConstants.GENERATOR_EFFICIENCY, generatorEfficiency.ToString());
@@ -75,6 +42,7 @@
 			if (maxTemperature > 0) node.AddValue(StringConstants.MAX_TEMPERATURE, maxTemperature.ToString());
 			if (fuelCapacity > 0) node.AddValue(StringConstants.FUEL_CAPACITY, fuelCapacity.ToString());
 			if (resourceHarvester > 0) node.AddValue(StringConstants.RESOURCE_HARVESTER, resourceHarvester.ToString());
+			if (maxEnergyTransfer > 0) node.AddValue(StringConstants.ENERGY_TRANSFER, maxEnergyTransfer.ToString());
 			return node;
 		}
 
@@ -89,7 +57,7 @@
 			if (node.HasValue(StringConstants.DRY_MASS)) upgrade.dryMass = int.Parse(node.GetValue(StringConstants.DRY_MASS));
 			if (node.HasValue(StringConstants.FUEL_FLOW)) upgrade.fuelFlow = int.Parse(node.GetValue(StringConstants.FUEL_FLOW));
 			if (node.HasValue(StringConstants.TORQUE)) upgrade.torqueStrength = int.Parse(node.GetValue(StringConstants.TORQUE));
-			if (node.HasValue(StringConstants.CHARGE_RATE)) upgrade.chargeRate = int.Parse(node.GetValue(StringConstants.CHARGE_RATE));
+			if (node.HasValue(StringConstants.CHARGE_RATE)) upgrade.efficiencyMult = int.Parse(node.GetValue(StringConstants.CHARGE_RATE));
 			if (node.HasValue(StringConstants.CRASH_TOLERANCE)) upgrade.crashTolerance = int.Parse(node.GetValue(StringConstants.CRASH_TOLERANCE));
 			if (node.HasValue(StringConstants.BATTERY_CHARGE)) upgrade.batteryCharge = int.Parse(node.GetValue(StringConstants.BATTERY_CHARGE));
 			if (node.HasValue(StringConstants.GENERATOR_EFFICIENCY)) upgrade.generatorEfficiency = int.Parse(node.GetValue(StringConstants.GENERATOR_EFFICIENCY));
@@ -98,32 +66,13 @@
 			if (node.HasValue(StringConstants.MAX_TEMPERATURE)) upgrade.maxTemperature = int.Parse(node.GetValue(StringConstants.MAX_TEMPERATURE));
 			if (node.HasValue(StringConstants.FUEL_CAPACITY)) upgrade.fuelCapacity = int.Parse(node.GetValue(StringConstants.FUEL_CAPACITY));
 			if (node.HasValue(StringConstants.RESOURCE_HARVESTER)) upgrade.resourceHarvester = int.Parse(node.GetValue(StringConstants.RESOURCE_HARVESTER));
+			if (node.HasValue(StringConstants.ENERGY_TRANSFER)) upgrade.maxEnergyTransfer = int.Parse(node.GetValue(StringConstants.ENERGY_TRANSFER));
 			return upgrade;
 		}
 
 		public PartUpgrades Clone()
 		{
-			var copy = new PartUpgrades
-			{
-				packetSize = packetSize,
-				antennaPower = antennaPower,
-				dataStorage = dataStorage,
-				ispVac = ispVac,
-				ispAtm = ispAtm,
-				dryMass = dryMass,
-				fuelFlow = fuelFlow,
-				torqueStrength = torqueStrength,
-				chargeRate = chargeRate,
-				crashTolerance = crashTolerance,
-				batteryCharge = batteryCharge,
-				generatorEfficiency = generatorEfficiency,
-				converterEfficiency = converterEfficiency,
-				parachuteStrength = parachuteStrength,
-				maxTemperature = maxTemperature,
-				fuelCapacity = fuelCapacity,
-				resourceHarvester = resourceHarvester
-			};
-			return copy;
+			return (PartUpgrades) MemberwiseClone();
 		}
 	}
 }

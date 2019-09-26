@@ -12,7 +12,7 @@ namespace KRnD.Source
 	{
 		public List<FloatCurve> atmosphereCurves;
 		public double batteryCharge;
-		public float chargeRate;
+		public float efficiencyMult;
 		public double chuteMaxTemp;
 		public Dictionary<string, Dictionary<string, double>> converterEfficiency; // Converter Name, (Resource-Name, Ratio)
 		public float crashTolerance;
@@ -30,6 +30,7 @@ namespace KRnD.Source
 		public double antennaPower;
 		public float dataStorage;
 		public float resourceHarvester;
+		public double maxEnergyTransfer;
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,7 +79,7 @@ namespace KRnD.Source
 			if (reaction_wheel) torqueStrength = reaction_wheel.RollTorque; // There is also pitch- and yaw-torque, but they should all be the same
 
 			var solar_panel = GetModuleDeployableSolarPanel(part);
-			if (solar_panel) chargeRate = solar_panel.chargeRate;
+			if (solar_panel) efficiencyMult = solar_panel.efficiencyMult;
 
 			var landing_leg = GetModuleWheelBase(part);
 			if (landing_leg) crashTolerance = part.crashTolerance; // Every part has a crash tolerance, but we only want to improve landing legs.
@@ -137,7 +138,12 @@ namespace KRnD.Source
 			if (lab != null) {
 				dataStorage = lab.dataStorage;
 			}
-			
+
+			var radiator = GetModuleActiveRadiator(part);
+			if (radiator != null) {
+				maxEnergyTransfer = radiator.maxEnergyTransfer;
+			}
+
 		}
 
 		public static KRnDModule GetKRnDModule(Part part)
@@ -146,7 +152,7 @@ namespace KRnD.Source
 			// this because using module-manager-magic to prevent RnD from getting installed with other, incompatible
 			// modules from other mods depends on the order in which module-manager applies the patches; this way
 			// we can avoid these problems. It means though that parts might have the RnD-Module, which isn't used though.
-			if (KRnD.blacklistedParts.Contains(KRnD.SanatizePartName(part.name))) return null;
+			if (KRnD.blacklistedParts.Contains(KRnD.SanitizePartName(part.name))) return null;
 
 			// Check if this part has the RnD-Module and return it:
 			foreach (var part_module in part.Modules) {
@@ -200,7 +206,7 @@ namespace KRnD.Source
 		public static ModuleDeployableSolarPanel GetModuleDeployableSolarPanel(Part part)
 		{
 			foreach (var part_module in part.Modules) {
-				if (part_module.moduleName == "ModuleDeployableSolarPanel") {
+				if (part_module.moduleName == "ModuleDeployableSolarPanel" || part_module.moduleName == "KopernicusSolarPanel") {
 					return (ModuleDeployableSolarPanel)part_module;
 				}
 			}
@@ -212,9 +218,7 @@ namespace KRnD.Source
 		public static PartResource GetElectricCharge(Part part)
 		{
 			if (part.Resources == null) return null;
-			foreach (var part_resource in part.Resources)
-				// Engines with an alternator might have a max-amount of 0, skip those:
-			{
+			foreach (var part_resource in part.Resources) {
 				if (part_resource.resourceName == "ElectricCharge" && part_resource.maxAmount > 0) {
 					return part_resource;
 				}
@@ -258,7 +262,6 @@ namespace KRnD.Source
 					return (ModuleDataTransmitter)part_module;
 				}
 			}
-
 			return null;
 		}
 
@@ -270,7 +273,16 @@ namespace KRnD.Source
 					return (ModuleScienceLab)part_module;
 				}
 			}
+			return null;
+		}
 
+		public static ModuleActiveRadiator GetModuleActiveRadiator(Part part)
+		{
+			foreach (var part_module in part.Modules) {
+				if (part_module.moduleName == "ModuleActiveRadiator") {
+					return (ModuleActiveRadiator)part_module;
+				}
+			}
 			return null;
 		}
 
@@ -282,20 +294,18 @@ namespace KRnD.Source
 					return (ModuleGenerator)part_module;
 				}
 			}
-
 			return null;
 		}
 
+
 		public static PartModule GetFissionGenerator(Part part)
 		{
-			foreach (var part_module in part.Modules)
 			// We are only interested in "FissionGenerator" with the tunable attribute "PowerGeneration":
-			{
+			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "FissionGenerator" && HasGenericModuleField(part_module, "PowerGeneration")) {
 					return part_module;
 				}
 			}
-
 			return null;
 		}
 
@@ -320,7 +330,6 @@ namespace KRnD.Source
 					return (ModuleResourceHarvester)part_module;
 				}
 			}
-
 			return null;
 		}
 
@@ -331,7 +340,6 @@ namespace KRnD.Source
 					return (ModuleParachute)part_module;
 				}
 			}
-
 			return null;
 		}
 
@@ -342,7 +350,6 @@ namespace KRnD.Source
 					return (ModuleProceduralFairing)part_module;
 				}
 			}
-
 			return null;
 		}
 
@@ -355,7 +362,6 @@ namespace KRnD.Source
 					return Convert.ToDouble(info.GetValue(module));
 				}
 			}
-
 			throw new Exception("field " + field_name + " not found in part " + module.name);
 		}
 
@@ -369,7 +375,6 @@ namespace KRnD.Source
 				info.SetValue(module, Convert.ChangeType(value, info.FieldType));
 				return;
 			}
-
 			throw new Exception("field " + field_name + " not found in part " + module.name);
 		}
 
