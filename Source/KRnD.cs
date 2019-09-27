@@ -131,7 +131,7 @@ namespace KRnD.Source
 								var antenna = PartStats.GetModuleDataTransmitter(part.partPrefab);
 								if (antenna) info.info = antenna.GetInfo();
 							} else if (info.moduleName.ToLower() == "science lab") {
-								var lab = PartStats.GetModluleScienceLab(part.partPrefab);
+								var lab = PartStats.GetModuleScienceLab(part.partPrefab);
 								if (lab) info.info = lab.GetInfo();
 							} else if (info.moduleName.ToLower() == "active radiator") {
 								var lab = PartStats.GetModuleActiveRadiator(part.partPrefab);
@@ -143,7 +143,7 @@ namespace KRnD.Source
 								info.info = converter.GetInfo();
 								converter_module_number++;
 							} else if (info.moduleName.ToLower() == "parachute") {
-								var parachute = PartStats.GetModluleParachute(part.partPrefab);
+								var parachute = PartStats.GetModuleParachute(part.partPrefab);
 								if (parachute) info.info = parachute.GetInfo();
 							} else if (info.moduleName.ToLower() == "resource harvester") {
 								var harvester = PartStats.GetModuleResourceHarvester(part.partPrefab);
@@ -435,7 +435,7 @@ namespace KRnD.Source
 
 		public static int UpdateDataStorage(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
 		{
-			var science_lab = PartStats.GetModluleScienceLab(part);
+			var science_lab = PartStats.GetModuleScienceLab(part);
 			if (science_lab) {
 				science_lab.dataStorage = u_constants.CalculateImprovementValue(original_stats.dataStorage, upgrades_to_apply);
 			}
@@ -446,7 +446,7 @@ namespace KRnD.Source
 		public static int UpdateParachuteStrength(UpgradeConstants u_constants, Part part, PartStats original_stats, int upgrades_to_apply)
 		{
 			// Parachute Strength:
-			var parachute = PartStats.GetModluleParachute(part);
+			var parachute = PartStats.GetModuleParachute(part);
 			if (parachute) {
 				// The safe deployment-speed is derived from the temperature
 				parachute.chuteMaxTemp = original_stats.chuteMaxTemp * u_constants.CalculateImprovementFactor(upgrades_to_apply);

@@ -110,7 +110,7 @@ namespace KRnD.Source
 			var harvester = GetModuleResourceHarvester(part);
 			if (harvester) resourceHarvester = harvester.Efficiency;
 
-			var parachute = GetModluleParachute(part);
+			var parachute = GetModuleParachute(part);
 			if (parachute) chuteMaxTemp = parachute.chuteMaxTemp;
 
 			var fairing = GetModuleProceduralFairing(part);
@@ -134,7 +134,7 @@ namespace KRnD.Source
 			}
 
 			// Fetch science lab stats
-			var lab = GetModluleScienceLab(part);
+			var lab = GetModuleScienceLab(part);
 			if (lab != null) {
 				dataStorage = lab.dataStorage;
 			}
@@ -266,7 +266,7 @@ namespace KRnD.Source
 		}
 
 
-		public static ModuleScienceLab GetModluleScienceLab(Part part)
+		public static ModuleScienceLab GetModuleScienceLab(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleScienceLab") {
@@ -333,7 +333,7 @@ namespace KRnD.Source
 			return null;
 		}
 
-		public static ModuleParachute GetModluleParachute(Part part)
+		public static ModuleParachute GetModuleParachute(Part part)
 		{
 			foreach (var part_module in part.Modules) {
 				if (part_module.moduleName == "ModuleParachute") {

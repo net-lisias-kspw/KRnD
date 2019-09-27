@@ -100,7 +100,7 @@ namespace KRnD.Source
 
 
 		// Returns the info-text of the given part with the given upgrades to be displayed in the GUI-comparison.
-		private string GetPartInfo(Part part, PartUpgrades upgrades_to_apply = null)
+		private string BuildPartInfoString(Part part, PartUpgrades upgrades_to_apply = null)
 		{
 			var info = "";
 			PartUpgrades original_upgrades = null;
@@ -119,11 +119,11 @@ namespace KRnD.Source
 				var generator_module = PartStats.GetModuleGenerator(part);
 				var fission_generator = PartStats.GetFissionGenerator(part);
 				var converter_modules = PartStats.GetModuleResourceConverterList(part);
-				var parachute_module = PartStats.GetModluleParachute(part);
+				var parachute_module = PartStats.GetModuleParachute(part);
 				var fairing_module = PartStats.GetModuleProceduralFairing(part);
 				var fuel_resources = PartStats.GetFuelResources(part);
 				var antenna_module = PartStats.GetModuleDataTransmitter(part);
-				var science_module = PartStats.GetModluleScienceLab(part);
+				var science_module = PartStats.GetModuleScienceLab(part);
 				var harvester_module = PartStats.GetModuleResourceHarvester(part);
 				var radiator_module = PartStats.GetModuleActiveRadiator(part);
 
@@ -245,7 +245,7 @@ namespace KRnD.Source
 
 					if (part) {
 						antenna_module = PartStats.GetModuleDataTransmitter(part);
-						science_lab = PartStats.GetModluleScienceLab(part);
+						science_lab = PartStats.GetModuleScienceLab(part);
 						rnd_module = PartStats.GetKRnDModule(part);
 						engine_modules = PartStats.GetModuleEnginesList(part);
 						rcs_module = PartStats.GetModuleRCS(part);
@@ -256,7 +256,7 @@ namespace KRnD.Source
 						generator_module = PartStats.GetModuleGenerator(part);
 						fission_generator = PartStats.GetFissionGenerator(part);
 						converter_modules = PartStats.GetModuleResourceConverterList(part);
-						parachute_module = PartStats.GetModluleParachute(part);
+						parachute_module = PartStats.GetModuleParachute(part);
 						fuel_resources = PartStats.GetFuelResources(part);
 						harvester_module = PartStats.GetModuleResourceHarvester(part);
 						radiator_module = PartStats.GetModuleActiveRadiator(part);
@@ -285,7 +285,7 @@ namespace KRnD.Source
 
 				// Get stats of the current version of the selected part:
 				if (!KRnD.upgrades.TryGetValue(part.name, out var current_upgrade)) current_upgrade = new PartUpgrades();
-				var current_info = GetPartInfo(part, current_upgrade);
+				var current_info = BuildPartInfoString(part, current_upgrade);
 
 				// Create a copy of the part-stats which we can use to mock an upgrade further below:
 				var next_upgrade = current_upgrade.Clone();
@@ -493,7 +493,7 @@ namespace KRnD.Source
 					throw new Exception("unexpected option '" + selected_upgrade_option + "'");
 				}
 
-				var new_info = GetPartInfo(part, next_upgrade); // Calculate part-info if the selected stat was upgraded.
+				var new_info = BuildPartInfoString(part, next_upgrade); // Calculate part-info if the selected stat was upgraded.
 				new_info = HighlightChanges(current_info, new_info);
 
 				// Current stats:
