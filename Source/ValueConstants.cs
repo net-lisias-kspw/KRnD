@@ -12,6 +12,8 @@ namespace KRnD.Source
 	[KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
 	public class ValueConstants : MonoBehaviour
 	{
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Dictionary that holds all the control values that are used to modify stat(s) of upgraded parts.</summary>
 		public static Dictionary<string, UpgradeConstants> upgradeDatabase = new Dictionary<string, UpgradeConstants>();
 
 
@@ -27,11 +29,22 @@ namespace KRnD.Source
 		/// 		  for example, would mean the cost doubles for each upgrade level.</summary>
 		public static float costRate = 2.0f;
 
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Stat modifications are limited to this minimum factor of the original stat.</summary>
 		public static float minFactor = 0.1f;
 
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Stat modifications are limited to this maximum factor of the original stat.</summary>
 		public static float maxFactor = 4.0f;
 
 
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Initializes this constants of the mod. These constants determine the power/balance of stat
+		/// 		  upgrades. The default values come from a config file in the mod directory.</summary>
+		///
+		/// <exception cref="InvalidOperationException"> Thrown when the requested operation is invalid.</exception>
 		public static void Initialize()
 		{
 			try {
@@ -71,7 +84,7 @@ namespace KRnD.Source
 
 				} else {
 
-					// Create initial config file since it doesn't exist. This shouldn't be needed.
+					// Create initial config file if it doesn't exist. This shouldn't be needed since the mod comes with a config file.
 					var node = new ConfigNode();
 					SaveConstants(node);
 					node.Save(filename);
@@ -81,6 +94,14 @@ namespace KRnD.Source
 			}
 		}
 
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Fetches the UpgradeConstants for the part attribute specified.</summary>
+		///
+		/// <param name="key"> The part attribute as a string and used as the key to look-up the UpgradeConstants
+		/// 				   class to return.</param>
+		///
+		/// <returns> The UpgradeConstants for the specified key.</returns>
 		public static UpgradeConstants GetData(string key)
 		{
 			try { 
@@ -92,6 +113,10 @@ namespace KRnD.Source
 		}
 
 
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Saves the constants to a ConfigNode.</summary>
+		///
+		/// <param name="node"> The saved node.</param>
 		static void SaveConstants(ConfigNode node)
 		{
 			node.SetValue(StringConstants.COST_RATE, costRate, true);
@@ -101,6 +126,11 @@ namespace KRnD.Source
 			}
 		}
 
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Loads the constants from a ConfigNode.</summary>
+		///
+		/// <param name="node"> The saved node.</param>
 		static void LoadConstants(ConfigNode node)
 		{
 			node.TryGetValue(StringConstants.COST_RATE, ref costRate);
@@ -128,7 +158,5 @@ namespace KRnD.Source
 		{
 			LoadConstants(node);
 		}
-
-
 	}
 }

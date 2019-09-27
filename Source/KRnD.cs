@@ -501,7 +501,13 @@ namespace KRnD.Source
 		}
 
 
-		// Updates the given part with all upgrades provided in "upgradesToApply".
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Updates the given part with all upgrades provided in "upgradesToApply".</summary>
+		///
+		/// <exception cref="Exception"> Thrown when an exception error condition occurs.</exception>
+		///
+		/// <param name="part">				 The part.</param>
+		/// <param name="upgrades_to_apply"> The upgrades to apply.</param>
 		public static void UpdatePart(Part part, PartUpgrades upgrades_to_apply)
 		{
 			try {
@@ -517,12 +523,6 @@ namespace KRnD.Source
 				// Get the original part-stats:
 				if (!originalStats.TryGetValue(part_name, out var original_stats)) throw new Exception("no original-stats for part '" + part_name + "'");
 
-				//PartUpgrades latest_model;
-				//if (!upgrades.TryGetValue(part_name, out latest_model)) latest_model = null;
-
-
-
-#if true
 				/*
 				 * Updates the part to match the upgrade levels specified in the upgrades_to_apply parameter. This provides the hard
 				 * link between the ValueConstants class, the upgrade level field in PartUpgrades class, and the algorithm to actually
@@ -547,300 +547,25 @@ namespace KRnD.Source
 				UpdateFuelCapacity(ValueConstants.GetData(StringConstants.FUEL_CAPACITY), part, original_stats, upgrades_to_apply.fuelCapacity);
 				UpdateActiveRadiator(ValueConstants.GetData(StringConstants.ENERGY_TRANSFER), part, original_stats, upgrades_to_apply.maxEnergyTransfer);
 
-#else
-				// Dry Mass:
-				rnd_module.dryMass_upgrades = upgrades_to_apply.dryMass;
-				//var dry_mass_factor = 1 + CalculateImprovementFactor(rnd_module.dryMass_improvement, rnd_module.dryMass_improvementScale, upgrades_to_apply.dryMass);
-				//part.mass = original_stats.dryMass * dry_mass_factor;
-				//part.prefabMass = part.mass; // New in ksp 1.1, if this is correct is just guesswork however...
-				UpgradeConstants u_constants = ValueConstants.GetData(StringConstants.DRY_MASS);
-				part.prefabMass = part.mass = u_constants.CalculateImprovementValue(original_stats.dryMass, upgrades_to_apply.dryMass);
-
-				// Dry Mass also improves fairing mass:
-				var fairing_module = PartStats.GetModuleProceduralFairing(part);
-				if (fairing_module) {
-					fairing_module.UnitAreaMass = u_constants.CalculateImprovementValue(original_stats.fairingAreaMass, upgrades_to_apply.dryMass);
-
-					//fairing_module.UnitAreaMass = original_stats.fairingAreaMass * dry_mass_factor;
-				}
-
-				// Max Int/Skin Temp:
-				rnd_module.maxTemperature_upgrades = upgrades_to_apply.maxTemperature;
-				part.skinMaxTemp = ValueConstants.GetData(StringConstants.MAX_TEMPERATURE).CalculateImprovementValue(original_stats.skinMaxTemp, upgrades_to_apply.maxTemperature);
-				part.maxTemp = ValueConstants.GetData(StringConstants.MAX_TEMPERATURE).CalculateImprovementValue(original_stats.intMaxTemp, upgrades_to_apply.maxTemperature);
-
-
-				// Fuel Flow:
-				u_constants = ValueConstants.GetData(StringConstants.FUEL_FLOW);
-				float upgrade_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.fuelFlow);
-				var engine_modules = PartStats.GetModuleEnginesList(part);
-				var rcs_module = PartStats.GetModuleRCS(part);
-				if (engine_modules != null || rcs_module) {
-					rnd_module.fuelFlow_upgrades = upgrades_to_apply.fuelFlow;
-					for (var i = 0; i < original_stats.maxFuelFlows.Count; i++) {
-						//var max_fuel_flow = original_stats.maxFuelFlows[i] * (1 + CalculateImprovementFactor(rnd_module.fuelFlow_improvement, rnd_module.fuelFlow_improvementScale, upgrades_to_apply.fuelFlow));
-						var max_fuel_flow = (float)(original_stats.maxFuelFlows[i] * upgrade_factor);
-						if (engine_modules != null) {
-							engine_modules[i].maxFuelFlow = max_fuel_flow;
-						} else if (rcs_module) {
-							rcs_module.thrusterPower = max_fuel_flow; // There is only one rcs-module
-						}
-					}
-				} else {
-					rnd_module.fuelFlow_upgrades = 0;
-				}
-
-
-				// ISP Vac & Atm:
-				if (engine_modules != null || rcs_module) {
-					rnd_module.ispVac_upgrades = upgrades_to_apply.ispVac;
-					rnd_module.ispAtm_upgrades = upgrades_to_apply.ispAtm;
-					var data_vac = ValueConstants.GetData(StringConstants.ISP_VAC);
-					var data_atm = ValueConstants.GetData(StringConstants.ISP_ATM);
-					var improvement_factor_vac = data_vac.CalculateImprovementFactor(upgrades_to_apply.ispVac);
-					var improvement_factor_atm = data_atm.CalculateImprovementFactor(upgrades_to_apply.ispAtm);
-					//var improvement_factor_vac = 1 + CalculateImprovementFactor(rnd_module.ispVac_improvement, rnd_module.ispVac_improvementScale, upgrades_to_apply.ispVac);
-					//var improvement_factor_atm = 1 + CalculateImprovementFactor(rnd_module.ispAtm_improvement, rnd_module.ispAtm_improvementScale, upgrades_to_apply.ispAtm);
-
-					for (var i = 0; i < original_stats.atmosphereCurves.Count; i++) {
-						var is_airbreather = false;
-						if (engine_modules != null) is_airbreather = engine_modules[i].engineType == EngineType.Turbine || engine_modules[i].engineType == EngineType.Piston || engine_modules[i].engineType == EngineType.ScramJet;
-						var fc = new FloatCurve();
-						for (var v = 0; v < original_stats.atmosphereCurves[i].Curve.length; v++) {
-							var frame = original_stats.atmosphereCurves[i].Curve[v];
-
-							var pressure = frame.time;
-							float factor_at_this_pressure = 1;
-							if (is_airbreather && original_stats.atmosphereCurves[i].Curve.length == 1) {
-								factor_at_this_pressure = improvement_factor_atm; // Air-breathing engines have a pressure curve starting at 0, but they should use Atm. as improvement factor.
-							} else if (pressure == 0) {
-								factor_at_this_pressure = improvement_factor_vac; // In complete vacuum
-							} else if (pressure >= 1) {
-								factor_at_this_pressure = improvement_factor_atm; // At lowest kerbal atmosphere
-							} else {
-								factor_at_this_pressure = (1 - pressure) * improvement_factor_vac + pressure * improvement_factor_atm; // Mix both
-							}
-
-							var new_value = frame.value * factor_at_this_pressure;
-							fc.Add(pressure, new_value);
-						}
-
-						if (engine_modules != null) {
-							engine_modules[i].atmosphereCurve = fc;
-						} else if (rcs_module) rcs_module.atmosphereCurve = fc; // There is only one rcs-module
-					}
-				} else {
-					rnd_module.ispVac_upgrades = 0;
-					rnd_module.ispAtm_upgrades = 0;
-				}
-
-
-				// Torque:
-				var reaction_wheel = PartStats.GetModuleReactionWheel(part);
-				if (reaction_wheel) {
-					rnd_module.torque_upgrades = upgrades_to_apply.torqueStrength;
-
-					u_constants = ValueConstants.GetData(StringConstants.TORQUE);
-					float torque =  u_constants.CalculateImprovementValue(original_stats.torqueStrength, upgrades_to_apply.torqueStrength);
-
-					//var torque = original_stats.torqueStrength * (1 + CalculateImprovementFactor(rnd_module.torque_improvement, rnd_module.torque_improvementScale, upgrades_to_apply.torque));
-					reaction_wheel.PitchTorque = torque;
-					reaction_wheel.YawTorque = torque;
-					reaction_wheel.RollTorque = torque;
-				} else {
-					rnd_module.torque_upgrades = 0;
-				}
-
-
-				// Charge Rate:
-				var solar_panel = PartStats.GetModuleDeployableSolarPanel(part);
-				if (solar_panel) {
-					rnd_module.chargeRate_upgrades = upgrades_to_apply.efficiencyMult;
-
-					u_constants = ValueConstants.GetData(StringConstants.CHARGE_RATE);
-					solar_panel.efficiencyMult = u_constants.CalculateImprovementValue(0, upgrades_to_apply.efficiencyMult);
-
-					//var charge_efficiency = 1 + CalculateImprovementFactor(rnd_module.chargeRate_improvement, rnd_module.chargeRate_improvementScale, upgrades_to_apply.chargeRate);
-					// Somehow changing the charge-rate stopped working in KSP 1.1, so we use the efficiency instead. This however does not
-					// show up in the module-info (probably a bug in KSP), which is why we have another workaround to update the info-texts.
-					// float chargeRate = originalStats.chargeRate * chargeEfficiency;
-					// solarPanel.chargeRate = chargeRate;
-					//solar_panel.efficiencyMult = charge_efficiency;
-				} else {
-					rnd_module.chargeRate_upgrades = 0;
-				}
-
-
-				// Crash Tolerance (only for landing legs):
-				var landing_leg = PartStats.GetModuleWheelBase(part);
-				if (landing_leg) {
-
-					rnd_module.crashTolerance_upgrades = upgrades_to_apply.crashTolerance;
-
-					u_constants = ValueConstants.GetData(StringConstants.CRASH_TOLERANCE);
-					part.crashTolerance = u_constants.CalculateImprovementValue(original_stats.crashTolerance, upgrades_to_apply.crashTolerance);
-					//var crash_tolerance = original_stats.crashTolerance * (1 + CalculateImprovementFactor(rnd_module.crashTolerance_improvement, rnd_module.crashTolerance_improvementScale, upgrades_to_apply.crashTolerance));
-					//part.crashTolerance = crash_tolerance;
-				} else {
-					rnd_module.crashTolerance_upgrades = 0;
-				}
-
-
-				// Battery Charge:
-				var electric_charge = PartStats.GetElectricCharge(part);
-				if (electric_charge != null) {
-					rnd_module.batteryCharge_upgrades = upgrades_to_apply.batteryCharge;
-
-					u_constants = ValueConstants.GetData(StringConstants.BATTERY_CHARGE);
-					var battery_charge = u_constants.CalculateImprovementValue(original_stats.batteryCharge, upgrades_to_apply.batteryCharge);
-					//var battery_charge = original_stats.batteryCharge * (1 + CalculateImprovementFactor(rnd_module.batteryCharge_improvement, rnd_module.batteryCharge_improvementScale, upgrades_to_apply.batteryCharge));
-					battery_charge = Math.Round(battery_charge); // We don't want half units of electric charge
-
-					bool battery_is_full = Math.Abs(electric_charge.amount - electric_charge.maxAmount) < float.Epsilon;
-
-					electric_charge.maxAmount = battery_charge;
-					if (battery_is_full) electric_charge.amount = electric_charge.maxAmount;
-				} else {
-					rnd_module.batteryCharge_upgrades = 0;
-				}
-
-				// Generator & Fission-Generator Efficiency:
-				var generator = PartStats.GetModuleGenerator(part);
-				var fission_generator = PartStats.GetFissionGenerator(part);
-				if (generator || fission_generator) {
-					rnd_module.generatorEfficiency_upgrades = upgrades_to_apply.generatorEfficiency;
-
-					u_constants = ValueConstants.GetData(StringConstants.GENERATOR_EFFICIENCY);
-
-					if (generator) {
-						foreach (var output_resource in generator.resHandler.outputResources) {
-							if (!original_stats.generatorEfficiency.TryGetValue(output_resource.name, out var original_rate)) continue;
-							output_resource.rate = u_constants.CalculateImprovementValue(original_rate, upgrades_to_apply.generatorEfficiency);
-							//output_resource.rate = (float) (original_rate * (1 + CalculateImprovementFactor(rnd_module.generatorEfficiency_improvement, rnd_module.generatorEfficiency_improvementScale, upgrades_to_apply.generatorEfficiency)));
-						}
-					}
-
-					if (fission_generator) {
-						var power_generation = u_constants.CalculateImprovementValue(original_stats.fissionPowerGeneration, upgrades_to_apply.generatorEfficiency);
-						//var power_generation = original_stats.fissionPowerGeneration * (1 + CalculateImprovementFactor(rnd_module.generatorEfficiency_improvement, rnd_module.generatorEfficiency_improvementScale, upgrades_to_apply.generatorEfficiency));
-						PartStats.SetGenericModuleValue(fission_generator, "PowerGeneration", power_generation);
-					}
-				} else {
-					rnd_module.generatorEfficiency_upgrades = 0;
-				}
-
-				// Converter Efficiency:
-				var converter_list = PartStats.GetModuleResourceConverterList(part);
-				if (converter_list != null) {
-					u_constants = ValueConstants.GetData(StringConstants.CONVERTER_EFFICIENCY);
-
-
-					foreach (var converter in converter_list) {
-						if (!original_stats.converterEfficiency.TryGetValue(converter.ConverterName, out var original_output_resources)) continue;
-
-						rnd_module.converterEfficiency_upgrades = upgrades_to_apply.converterEfficiency;
-						// Since KSP 1.2 this can't be done in a foreach anymore, we have to read and write back the entire ResourceRatio-Object:
-						for (var i = 0; i < converter.outputList.Count; i++) {
-							var resource_ratio = converter.outputList[i];
-							if (!original_output_resources.TryGetValue(resource_ratio.ResourceName, out var original_ratio)) continue;
-
-							resource_ratio.Ratio = u_constants.CalculateImprovementValue(original_ratio, upgrades_to_apply.converterEfficiency);
-//							resource_ratio.Ratio = (float) (original_ratio * (1 + CalculateImprovementFactor(rnd_module.converterEfficiency_improvement, rnd_module.converterEfficiency_improvementScale, upgrades_to_apply.converterEfficiency)));
-
-							converter.outputList[i] = resource_ratio;
-						}
-					}
-				} else {
-					rnd_module.converterEfficiency_upgrades = 0;
-				}
-
-				// Antenna
-				var antenna = PartStats.GetModuleDataTransmitter(part);
-				if (antenna) {
-					rnd_module.antennaPower_upgrades = upgrades_to_apply.antennaPower;
-					antenna.antennaPower = ValueConstants.GetData(StringConstants.ANTENNA_POWER).CalculateImprovementValue(original_stats.antennaPower, upgrades_to_apply.antennaPower);
-
-					rnd_module.packetSize_upgrades = upgrades_to_apply.packetSize;
-					antenna.packetSize = ValueConstants.GetData(StringConstants.PACKET_SIZE).CalculateImprovementValue(original_stats.packetSize, upgrades_to_apply.packetSize);
-				}
-
-				var science_lab = PartStats.GetModluleScienceLab(part);
-				if (science_lab) {
-					rnd_module.dataStorage_upgrades = upgrades_to_apply.dataStorage;
-					science_lab.dataStorage = ValueConstants.GetData(StringConstants.DATA_STORAGE).CalculateImprovementValue(original_stats.dataStorage, upgrades_to_apply.dataStorage);
-				}
-
-
-				// Parachute Strength:
-				var parachute = PartStats.GetModluleParachute(part);
-				if (parachute) {
-					rnd_module.parachuteStrength_upgrades = upgrades_to_apply.parachuteStrength;
-
-					u_constants = ValueConstants.GetData(StringConstants.PARACHUTE_STRENGTH);
-					var chute_max_temp = original_stats.chuteMaxTemp * u_constants.CalculateImprovementFactor(upgrades_to_apply.parachuteStrength);
-					//var chute_max_temp = original_stats.chuteMaxTemp * (1 + CalculateImprovementFactor(rnd_module.parachuteStrength_improvement, rnd_module.parachuteStrength_improvementScale, upgrades_to_apply.parachuteStrength));
-					parachute.chuteMaxTemp = chute_max_temp; // The safe deployment-speed is derived from the temperature
-				} else {
-					rnd_module.parachuteStrength_upgrades = 0;
-				}
-
-
-				// Resource Harvester
-				var harvester = PartStats.GetModuleResourceHarvester(part);
-				if (harvester) {
-					rnd_module.resourceHarvester_upgrades = upgrades_to_apply.resourceHarvester;
-
-					u_constants = ValueConstants.GetData(StringConstants.RESOURCE_HARVESTER);
-					harvester.Efficiency = u_constants.CalculateImprovementValue(original_stats.resourceHarvester, upgrades_to_apply.resourceHarvester);
-				} else {
-					rnd_module.resourceHarvester_upgrades = 0;
-				}
-
-
-				// Fuel Capacity:
-				var fuel_resources = PartStats.GetFuelResources(part);
-				if (fuel_resources != null && original_stats.fuelCapacities != null) {
-					rnd_module.fuelCapacity_upgrades = upgrades_to_apply.fuelCapacity;
-
-					u_constants = ValueConstants.GetData(StringConstants.FUEL_CAPACITY);
-
-
-					double improvement_factor = u_constants.CalculateImprovementFactor(upgrades_to_apply.fuelCapacity);
-					//double improvement_factor = 1 + CalculateImprovementFactor(rnd_module.fuelCapacity_improvement, rnd_module.fuelCapacity_improvementScale, upgrades_to_apply.fuelCapacity);
-
-					foreach (var fuel_resource in fuel_resources) {
-						if (!original_stats.fuelCapacities.ContainsKey(fuel_resource.resourceName)) continue;
-						var original_capacity = original_stats.fuelCapacities[fuel_resource.resourceName];
-						var new_capacity = original_capacity * improvement_factor;
-						new_capacity = Math.Round(new_capacity); // We don't want half units of fuel
-
-						bool tank_is_full = Math.Abs(fuel_resource.amount - fuel_resource.maxAmount) < float.Epsilon;
-
-						fuel_resource.maxAmount = new_capacity;
-						if (tank_is_full) fuel_resource.amount = fuel_resource.maxAmount;
-					}
-				} else {
-					rnd_module.fuelCapacity_upgrades = 0;
-				}
-#endif
-
-
-
 				/*
 				 * Update the RnD module to reflect the upgrades specified.
 				 */
 				rnd_module.ApplyUpgrades(upgrades_to_apply);
-
-
 
 			} catch (Exception e) {
 				Debug.LogError("[KRnD] updatePart(" + part.name + "): " + e);
 			}
 		}
 
-		// Updates all parts of the given vessel according to their RnD-Module settings (should be executed
-		// when the vessel is loaded to make sure, that the vessel uses its own, historic upgrades and not
-		// the global part-upgrades).
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Updates all parts of the given vessel according to their RnD-Module settings (should be executed
+		/// 		  when the vessel is loaded to make sure, that the vessel uses its own, historic upgrades and
+		/// 		  not the global part-upgrades).</summary>
+		///
+		/// <exception cref="Exception"> Thrown when an exception error condition occurs.</exception>
+		///
+		/// <param name="vessel"> The vessel.</param>
 		public static void UpdateVessel(Vessel vessel)
 		{
 			try {

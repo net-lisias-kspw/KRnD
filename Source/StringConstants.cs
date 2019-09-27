@@ -82,9 +82,26 @@ namespace KRnD.Source
 		/// <summary> The torque is the reaction-wheel strength.</summary>
 		public static string TORQUE = "torque";
 
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> The packet-size for an antenna that can transmit science. This affects the speed that data can be
+		/// 		  transferred.</summary>
 		public static string PACKET_SIZE = "packetSize";
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> The power-rating of the antenna. Larger means the antenna can connect over longer distances.</summary>
 		public static string ANTENNA_POWER = "antennaPower";
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Science lab data storage specifies how much experimental data can be stored inside to be
+		/// 		  processed over time.</summary>
 		public static string DATA_STORAGE = "dataStorage";
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> The resource harvesting rate stat control.</summary>
 		public static string RESOURCE_HARVESTER = "resourceHarvester";
 		#endregion
 
@@ -119,6 +136,11 @@ namespace KRnD.Source
 		/// 		  "improvementRate" constant is less than 1.</summary>
 		public static string IMPROVEMENT = "improvement";
 
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> Should the result of the part stat modification result in a number that is rounded to the nearest
+		/// 		  whole number? For stats like battery charge, this makes sense. Other stats require fractional
+		/// 		  precision.</summary>
 		public static string ROUNDED = "rounded";
 		#endregion
 
@@ -154,6 +176,9 @@ namespace KRnD.Source
 		/// <summary> Pathname of the directory that contains this mod's files relative to the main game directory.</summary>
 		public static string MOD_DIRECTORY = "KRnD/";
 
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> The close icon (x).</summary>
 		public static string CLOSE_ICON = "Icons/close";
 
 
