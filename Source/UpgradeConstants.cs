@@ -21,7 +21,7 @@ namespace KRnD.Source
 
 		public Func<PartUpgrades, int> upgradeFunction;
 
-		public Func<UpgradeConstants, Part, PartStats, int, int> applyUpgradeFunction;
+		public Func<UpgradeConstants, Part, PartStats, PartUpgrades, int> applyUpgradeFunction;
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ namespace KRnD.Source
 		/// <param name="round">		    True to round the upgrade stat value to nearest whole number.</param>
 		/// <param name="upgrade_function"> (Optional) The upgrade function.</param>
 		/// <param name="apply_upgrade">    (Optional) The apply upgrade.</param>
-		public UpgradeConstants(string name_str, float cost_divisor, float improve_value, int science_cost, bool round, Func<PartUpgrades, int> upgrade_function = null, Func<UpgradeConstants, Part, PartStats, int, int> apply_upgrade = null)
+		public UpgradeConstants(string name_str, float cost_divisor, float improve_value, int science_cost, bool round, Func<PartUpgrades, int> upgrade_function = null, Func<UpgradeConstants, Part, PartStats, PartUpgrades, int> apply_upgrade = null)
 		{
 			name = name_str;
 			costDivisor = cost_divisor;
