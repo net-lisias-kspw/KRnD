@@ -497,7 +497,27 @@ namespace KRnD.Source
 			}
 
 			return 0;
+		}
 
+
+		public static int UpdateElConverter(UpgradeConstants u_constants, Part part, PartStats original_stats, PartUpgrades upgrades_to_apply)
+		{
+			var converter_list = PartStats.GetModuleElConverterList(part);
+			if (converter_list == null) return 0;
+
+			foreach (var converter in converter_list) {
+				converter.Rate = u_constants.CalculateImprovementValue(original_stats.ELConverter, upgrades_to_apply.elConverter);
+			}
+
+
+#if false
+			var el_converter = PartStats.GetModuleElConverter(part);
+			if (el_converter) {
+				el_converter.Rate = u_constants.CalculateImprovementValue(original_stats.ELConverter, upgrades_to_apply.elConverter);
+			}
+#endif
+
+			return 0;
 		}
 
 
@@ -529,6 +549,17 @@ namespace KRnD.Source
 				 * update the part -- sometimes the algorithm is simple, but could be more complex such as with ISP efficiency
 				 * curves.
 				 */
+				foreach (var u in ValueConstants.upgradeDatabase) {
+					if (u.Value.applyUpgradeFunction != null) {
+						u.Value.applyUpgradeFunction(u.Value, part, original_stats, upgrades_to_apply);
+					} else {
+						if (u.Key == StringConstants.ISP_VAC) {
+							UpdateISPVacAtm(ValueConstants.GetData(StringConstants.ISP_VAC), ValueConstants.GetData(StringConstants.ISP_ATM), part, original_stats, upgrades_to_apply);
+						}
+					}
+				}
+
+#if false
 				UpdateDryMass(ValueConstants.GetData(StringConstants.DRY_MASS), part, original_stats, upgrades_to_apply);
 				UpdateMaxTemperature(ValueConstants.GetData(StringConstants.MAX_TEMPERATURE), part, original_stats, upgrades_to_apply);
 				UpdateFuelFlow(ValueConstants.GetData(StringConstants.FUEL_FLOW), part, original_stats, upgrades_to_apply);
@@ -546,6 +577,9 @@ namespace KRnD.Source
 				UpdateResourceHarvester(ValueConstants.GetData(StringConstants.RESOURCE_HARVESTER), part, original_stats, upgrades_to_apply);
 				UpdateFuelCapacity(ValueConstants.GetData(StringConstants.FUEL_CAPACITY), part, original_stats, upgrades_to_apply);
 				UpdateActiveRadiator(ValueConstants.GetData(StringConstants.ENERGY_TRANSFER), part, original_stats, upgrades_to_apply);
+				UpdateElConverter(ValueConstants.GetData(StringConstants.EL_CONVERTER), part, original_stats, upgrades_to_apply);
+#endif
+
 
 				/*
 				 * Update the RnD module to reflect the upgrades specified.
@@ -783,6 +817,12 @@ namespace KRnD.Source
 		{
 			return ++store.maxEnergyTransfer;
 		}
+
+		public static int ImproveELConverter(PartUpgrades store)
+		{
+			return ++store.elConverter;
+		}
+
 
 		public static int ImproveAntennaPower(PartUpgrades store)
 		{

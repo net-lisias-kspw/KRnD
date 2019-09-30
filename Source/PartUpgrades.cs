@@ -21,6 +21,7 @@
 		public int dataStorage;
 		public int resourceHarvester;
 		public int maxEnergyTransfer;
+		public int elConverter;
 
 		public ConfigNode CreateConfigNode(string name)
 		{
@@ -43,6 +44,7 @@
 			if (fuelCapacity > 0) node.AddValue(StringConstants.FUEL_CAPACITY, fuelCapacity.ToString());
 			if (resourceHarvester > 0) node.AddValue(StringConstants.RESOURCE_HARVESTER, resourceHarvester.ToString());
 			if (maxEnergyTransfer > 0) node.AddValue(StringConstants.ENERGY_TRANSFER, maxEnergyTransfer.ToString());
+			if (elConverter > 0) node.AddValue(StringConstants.EL_CONVERTER, elConverter.ToString());
 			return node;
 		}
 
@@ -67,6 +69,7 @@
 			if (node.HasValue(StringConstants.FUEL_CAPACITY)) upgrade.fuelCapacity = int.Parse(node.GetValue(StringConstants.FUEL_CAPACITY));
 			if (node.HasValue(StringConstants.RESOURCE_HARVESTER)) upgrade.resourceHarvester = int.Parse(node.GetValue(StringConstants.RESOURCE_HARVESTER));
 			if (node.HasValue(StringConstants.ENERGY_TRANSFER)) upgrade.maxEnergyTransfer = int.Parse(node.GetValue(StringConstants.ENERGY_TRANSFER));
+			if (node.HasValue(StringConstants.EL_CONVERTER)) upgrade.elConverter = int.Parse(node.GetValue(StringConstants.EL_CONVERTER));
 			return upgrade;
 		}
 

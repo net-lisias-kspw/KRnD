@@ -57,7 +57,7 @@ namespace KRnD.Source
 					[StringConstants.CONVERTER_EFFICIENCY] = new UpgradeConstants(StringConstants.CONVERTER_EFFICIENCY, 0, 0.1f, 15, false, KRnD.ImproveConverterEfficiency, KRnD.UpdateConverterEfficiency),
 					[StringConstants.CRASH_TOLERANCE] = new UpgradeConstants(StringConstants.CRASH_TOLERANCE, 0, 0.15f, 10, false, KRnD.ImproveCrashTolerance, KRnD.UpdateCrashTolerance),
 					[StringConstants.DRY_MASS] = new UpgradeConstants(StringConstants.DRY_MASS, 1, -0.1f, 10, false, KRnD.ImproveDryMass, KRnD.UpdateDryMass),
-					[StringConstants.FUEL_CAPACITY] = new UpgradeConstants(StringConstants.FUEL_CAPACITY, 1000, 0.05f, 5, false, KRnD.ImproveFuelCapacity, KRnD.UpdateFuelCapacity),
+					//[StringConstants.FUEL_CAPACITY] = new UpgradeConstants(StringConstants.FUEL_CAPACITY, 1000, 0.05f, 5, false, KRnD.ImproveFuelCapacity, KRnD.UpdateFuelCapacity),
 					[StringConstants.FUEL_FLOW] = new UpgradeConstants(StringConstants.FUEL_FLOW, 0, 0.1f, 10, false, KRnD.ImproveFuelFlow, KRnD.UpdateFuelFlow),
 					[StringConstants.GENERATOR_EFFICIENCY] = new UpgradeConstants(StringConstants.GENERATOR_EFFICIENCY, 0, 0.1f, 15, false, KRnD.ImproveGeneratorEfficiency, KRnD.UpdateGeneratorEfficiency),
 					[StringConstants.ISP_ATM] = new UpgradeConstants(StringConstants.ISP_ATM, 0, 0.05f, 15, true, KRnD.ImproveIspAtm),
@@ -70,6 +70,7 @@ namespace KRnD.Source
 					[StringConstants.DATA_STORAGE] = new UpgradeConstants(StringConstants.DATA_STORAGE,  0, 0.40f, 10, true, KRnD.ImproveDataStorage, KRnD.UpdateDataStorage),
 					[StringConstants.RESOURCE_HARVESTER] = new UpgradeConstants(StringConstants.RESOURCE_HARVESTER,  0, 0.10f, 10, false, KRnD.ImproveResourceHarvester, KRnD.UpdateResourceHarvester),
 					[StringConstants.ENERGY_TRANSFER] = new UpgradeConstants(StringConstants.ENERGY_TRANSFER,  0, 0.10f, 10, true, KRnD.ImproveActiveRadiator, KRnD.UpdateActiveRadiator),
+					[StringConstants.EL_CONVERTER] = new UpgradeConstants(StringConstants.EL_CONVERTER,  0, 0.20f, 10, false, KRnD.ImproveELConverter, KRnD.UpdateElConverter),
 				};
 
 

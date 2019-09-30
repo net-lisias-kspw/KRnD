@@ -21,6 +21,7 @@
 		[KSPField(isPersistant = true)] public int dataStorage_upgrades = 0;
 		[KSPField(isPersistant = true)] public int resourceHarvester_upgrades = 0;
 		[KSPField(isPersistant = true)] public int maxEnergyTransfer_upgrades = 0;
+		[KSPField(isPersistant = true)] public int ELConverter_upgrades = 0;
 
 		// Flag, which can be set by other mods to apply latest upgrades on load:
 		[KSPField(isPersistant = true)] public int upgradeToLatest = 0;
@@ -67,6 +68,7 @@
 				maxTemperature_upgrades +
 				resourceHarvester_upgrades +
 				maxEnergyTransfer_upgrades +
+				ELConverter_upgrades +
 				fuelCapacity_upgrades;
 			if (upgrades == 0) return "";
 			return "Mk " + ToRoman(upgrades + 1); // Mk I is the part without upgrades, Mk II the first upgraded version.
@@ -102,6 +104,7 @@
 			fuelCapacity_upgrades = upgrades_to_apply.fuelCapacity;
 			resourceHarvester_upgrades = upgrades_to_apply.resourceHarvester;
 			maxEnergyTransfer_upgrades = upgrades_to_apply.maxEnergyTransfer;
+			ELConverter_upgrades = upgrades_to_apply.elConverter;
 		}
 
 		// Returns the upgrade-stats which this module represents.
@@ -126,7 +129,8 @@
 				maxTemperature = maxTemperature_upgrades,
 				fuelCapacity = fuelCapacity_upgrades,
 				resourceHarvester = resourceHarvester_upgrades,
-				maxEnergyTransfer = maxEnergyTransfer_upgrades
+				maxEnergyTransfer = maxEnergyTransfer_upgrades,
+				elConverter = ELConverter_upgrades
 			};
 		}
 	}

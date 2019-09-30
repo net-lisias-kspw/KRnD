@@ -103,6 +103,11 @@ namespace KRnD.Source
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/// <summary> The resource harvesting rate stat control.</summary>
 		public static string RESOURCE_HARVESTER = "resourceHarvester";
+
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/// <summary> The Extra-planetary Workshop converter from metal to rocket parts.</summary>
+		public static string EL_CONVERTER = "ELConverter";
 		#endregion
 
 

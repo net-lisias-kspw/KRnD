@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExtraplanetaryLaunchpads;
 
 namespace KRnD.Source
 {
@@ -31,6 +32,7 @@ namespace KRnD.Source
 		public float dataStorage;
 		public float resourceHarvester;
 		public double maxEnergyTransfer;
+		public double ELConverter;
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -142,6 +144,11 @@ namespace KRnD.Source
 			var radiator = GetModuleActiveRadiator(part);
 			if (radiator != null) {
 				maxEnergyTransfer = radiator.maxEnergyTransfer;
+			}
+
+			var el_converter = GetModuleElConverter(part);
+			if (el_converter) {
+				ELConverter = el_converter.Rate;
 			}
 
 		}
@@ -287,6 +294,17 @@ namespace KRnD.Source
 		}
 
 
+		public static ELConverter GetModuleElConverter(Part part)
+		{
+			foreach (var part_module in part.Modules) {
+				if (part_module.moduleName == "ELConverter") {
+					return (ELConverter)part_module;
+				}
+			}
+			return null;
+		}
+
+
 		public static ModuleGenerator GetModuleGenerator(Part part)
 		{
 			foreach (var part_module in part.Modules) {
@@ -321,6 +339,21 @@ namespace KRnD.Source
 			if (converters.Count == 0) return null;
 			return converters;
 		}
+
+
+		public static List<ELConverter> GetModuleElConverterList(Part part)
+		{
+			var converters = new List<ELConverter>();
+			foreach (var part_module in part.Modules) {
+				if (part_module.moduleName == "ELConverter") {
+					converters.Add((ELConverter)part_module);
+				}
+			}
+
+			if (converters.Count == 0) return null;
+			return converters;
+		}
+
 
 
 		public static ModuleResourceHarvester GetModuleResourceHarvester(Part part)

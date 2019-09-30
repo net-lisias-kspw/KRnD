@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using ExtraplanetaryLaunchpads;
 using JetBrains.Annotations;
 using KSP.UI.Screens;
 using UnityEngine;
@@ -126,6 +127,7 @@ namespace KRnD.Source
 				var science_module = PartStats.GetModuleScienceLab(part);
 				var harvester_module = PartStats.GetModuleResourceHarvester(part);
 				var radiator_module = PartStats.GetModuleActiveRadiator(part);
+				var el_converter = PartStats.GetModuleElConverter(part);
 
 				// Basic stats:
 				info = "<color=#FFFFFF><b>Dry Mass:</b> " + part.mass.ToString("0.#### t") + "\n";
@@ -169,6 +171,7 @@ namespace KRnD.Source
 				if (science_module) info += "<color=#99FF00><b>Science Lab:</b></color>\n" + science_module.GetInfo();
 				if (harvester_module) info += "<color=#99FF00><b>Harvester:</b></color>\n" + harvester_module.GetInfo();
 				if (radiator_module) info += "<color=#99FF00><b>Radiator:</b></color>\n" + radiator_module.GetInfo();
+				if (el_converter) info += "<color=#99FF00><b>EL Converter:</b></color>\n" + el_converter.GetInfo();
 
 
 				info += "</color>";
@@ -233,6 +236,7 @@ namespace KRnD.Source
 				List<PartResource> fuel_resources = null;
 				ModuleResourceHarvester harvester_module = null;
 				ModuleActiveRadiator radiator_module = null;
+				ELConverter el_converter = null;
 
 
 				if (selectedPart != null) {
@@ -260,6 +264,7 @@ namespace KRnD.Source
 						fuel_resources = PartStats.GetFuelResources(part);
 						harvester_module = PartStats.GetModuleResourceHarvester(part);
 						radiator_module = PartStats.GetModuleActiveRadiator(part);
+						el_converter = PartStats.GetModuleElConverter(part);
 					}
 				}
 
@@ -320,12 +325,13 @@ namespace KRnD.Source
 				if (solar_panel_module != null) options.Add("Charge Rate");
 				if (landing_leg_module != null) options.Add("Crash Tolerance");
 				if (electric_charge_resource != null) options.Add("Battery");
-				if (fuel_resources != null) options.Add("Fuel Pressure");
+				//if (fuel_resources != null) options.Add("Fuel Pressure");
 				if (generator_module || fission_generator) options.Add("Generator");
 				if (converter_modules != null) options.Add("Converter");
 				if (parachute_module) options.Add("Parachute");
 				if (harvester_module) options.Add("Harvester");
 				if (radiator_module) options.Add("Radiator");
+				if (el_converter) options.Add("EL Converter");
 
 				if (_selectedUpgradeOption >= options.Count) _selectedUpgradeOption = 0;
 				_selectedUpgradeOption = GUILayout.SelectionGrid(_selectedUpgradeOption, options.ToArray(), 1, _buttonStyle);
@@ -489,6 +495,14 @@ namespace KRnD.Source
 					current_improvement_factor = u_constants.CalculateImprovementFactor(current_upgrade.maxTemperature);
 					next_improvement_factor = u_constants.CalculateImprovementFactor(next_upgrade.maxTemperature);
 					science_cost = u_constants.CalculateScienceCost((float)original_stats.intMaxTemp, next_upgrade.maxTemperature);
+				} else if (selected_upgrade_option == "EL Converter") {
+					//improve_function = KRnD.ImproveMaxTemperature;
+					current_upgrade_level = current_upgrade.elConverter;
+					next_upgrade_level = ++next_upgrade.elConverter;
+					u_constants = ValueConstants.GetData(StringConstants.EL_CONVERTER);
+					current_improvement_factor = u_constants.CalculateImprovementFactor(current_upgrade.elConverter);
+					next_improvement_factor = u_constants.CalculateImprovementFactor(next_upgrade.elConverter);
+					science_cost = u_constants.CalculateScienceCost((float)original_stats.ELConverter, next_upgrade.elConverter);
 				} else {
 					throw new Exception("unexpected option '" + selected_upgrade_option + "'");
 				}
