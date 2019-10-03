@@ -3,6 +3,9 @@
 	[KSPModule("R&D")]
 	public class KRnDModule : PartModule
 	{
+		[KSPField(guiActive = true, guiName = "R&D", guiUnits = "", guiFormat = "", isPersistant = false)]
+		public string moduleVersion;
+
 		[KSPField(isPersistant = true)] public int batteryCharge_upgrades = 0;
 		[KSPField(isPersistant = true)] public int chargeRate_upgrades = 0;
 		[KSPField(isPersistant = true)] public int converterEfficiency_upgrades = 0;
@@ -26,8 +29,6 @@
 		// Flag, which can be set by other mods to apply latest upgrades on load:
 		[KSPField(isPersistant = true)] public int upgradeToLatest = 0;
 
-		[KSPField(guiActive = true, guiName = "R&D", guiUnits = "", guiFormat = "", isPersistant = false)]
-		public string moduleVersion;
 
 		public static string ToRoman(int number)
 		{
