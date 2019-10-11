@@ -440,6 +440,11 @@ namespace KRnD.Source
 				science_lab.dataStorage = u_constants.CalculateImprovementValue(original_stats.dataStorage, upgrades_to_apply.dataStorage);
 			}
 
+			var science_converter = PartStats.GetModuleScienceConverter(part);
+			if (science_converter) {
+				science_converter.scienceCap = u_constants.CalculateImprovementValue(original_stats.scienceCap, upgrades_to_apply.dataStorage);
+			}
+
 			return 0;
 		}
 

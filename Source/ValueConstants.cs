@@ -62,7 +62,7 @@ namespace KRnD.Source
 					[StringConstants.GENERATOR_EFFICIENCY] = new UpgradeConstants(StringConstants.GENERATOR_EFFICIENCY, 0, 0.1f, 15, false, KRnD.ImproveGeneratorEfficiency, KRnD.UpdateGeneratorEfficiency),
 					[StringConstants.ISP_ATM] = new UpgradeConstants(StringConstants.ISP_ATM, 0, 0.05f, 15, true, KRnD.ImproveIspAtm),
 					[StringConstants.ISP_VAC] = new UpgradeConstants(StringConstants.ISP_VAC, 0, 0.05f, 15, true, KRnD.ImproveIspVac),
-					[StringConstants.MAX_TEMPERATURE] = new UpgradeConstants(StringConstants.MAX_TEMPERATURE, 1200, 0.2f, 5, true, KRnD.ImproveMaxTemperature, KRnD.UpdateMaxTemperature),
+					[StringConstants.MAX_TEMPERATURE] = new UpgradeConstants(StringConstants.MAX_TEMPERATURE, 1200, 0.1f, 5, true, KRnD.ImproveMaxTemperature, KRnD.UpdateMaxTemperature),
 					[StringConstants.PARACHUTE_STRENGTH] = new UpgradeConstants(StringConstants.PARACHUTE_STRENGTH, 250, 0.3f, 10, false, KRnD.ImproveParachuteStrength, KRnD.UpdateParachuteStrength),
 					[StringConstants.TORQUE] = new UpgradeConstants(StringConstants.TORQUE,  0, 0.25f, 5, false, KRnD.ImproveTorque, KRnD.UpdateTorque),
 					[StringConstants.PACKET_SIZE] = new UpgradeConstants(StringConstants.PACKET_SIZE, 0, 0.10f, 10, false, KRnD.ImprovePacketSize, KRnD.UpdatePacketSize),

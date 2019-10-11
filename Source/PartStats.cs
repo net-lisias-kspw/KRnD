@@ -30,6 +30,7 @@ namespace KRnD.Source
 		public float packetSize;
 		public double antennaPower;
 		public float dataStorage;
+		public int scienceCap;
 		public float resourceHarvester;
 		public double maxEnergyTransfer;
 		public double ELConverter;
@@ -139,6 +140,11 @@ namespace KRnD.Source
 			var lab = GetModuleScienceLab(part);
 			if (lab != null) {
 				dataStorage = lab.dataStorage;
+			}
+
+			var science_converter = GetModuleScienceConverter(part);
+			if (science_converter != null) {
+				scienceCap = science_converter.scienceCap;
 			}
 
 			var radiator = GetModuleActiveRadiator(part);
@@ -282,6 +288,18 @@ namespace KRnD.Source
 			}
 			return null;
 		}
+
+
+		public static ModuleScienceConverter GetModuleScienceConverter(Part part)
+		{
+			foreach (var part_module in part.Modules) {
+				if (part_module.moduleName == "ModuleScienceConverter") {
+					return (ModuleScienceConverter)part_module;
+				}
+			}
+			return null;
+		}
+
 
 		public static ModuleActiveRadiator GetModuleActiveRadiator(Part part)
 		{
