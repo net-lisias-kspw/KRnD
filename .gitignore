@@ -148,6 +148,7 @@ csx/
 AppPackages/
 
 # Others
+.vs/
 sql/
 *.Cache
 ClientBin/
@@ -229,3 +230,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+*.dll

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KRnD", "Source\KRnD.csproj", "{7EBEF595-A861-4938-96A8-ED37A207716A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KRnD", "KRnD.csproj", "{7EBEF595-A861-4938-96A8-ED37A207716A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
