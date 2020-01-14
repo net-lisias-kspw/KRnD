@@ -519,8 +519,10 @@ namespace KRnD
                     for (int i = 0; i < originalStats.maxFuelFlows.Count; i++)
                     {
                         float maxFuelFlow = originalStats.maxFuelFlows[i] * (1 + KRnD.calculateImprovementFactor(rndModule.fuelFlow_improvement, rndModule.fuelFlow_improvementScale, upgradesToApply.fuelFlow));
-                        if (engineModules != null) engineModules[i].maxFuelFlow = maxFuelFlow;
-                        else if (rcsModule) rcsModule.thrusterPower = maxFuelFlow; // There is only one rcs-module
+                        if (engineModules != null) 
+                            engineModules[i].maxFuelFlow = maxFuelFlow;
+                        else if (rcsModule) 
+                            rcsModule.thrusterPower = maxFuelFlow; // There is only one rcs-module
                     }
                 }
                 else
@@ -680,7 +682,7 @@ namespace KRnD
                             double originalRatio;
                             if (!origiginalOutputResources.TryGetValue(resourceRatio.ResourceName, out originalRatio)) continue;
                             resourceRatio.Ratio = (float)(originalRatio * (1 + KRnD.calculateImprovementFactor(rndModule.converterEfficiency_improvement, rndModule.converterEfficiency_improvementScale, upgradesToApply.converterEfficiency)));
-                            converter.outputList[i] = resourceRatio;
+                            converter.outputList[i1] = resourceRatio;
                         }
                     }
                 }

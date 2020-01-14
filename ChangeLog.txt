@@ -1,5 +1,8 @@
 Changelog
 
+1.16.0.1
+	Fixed index out of range 
+
 1.16
 	Adoption by LinuxGuruGamer
 	Added support for ClickThroughBlocker
