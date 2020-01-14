@@ -252,5 +252,101 @@ namespace KRnD
             upgrades.fuelCapacity = this.fuelCapacity_upgrades;
             return upgrades;
         }
+
+
+        public override string GetModuleDisplayName()
+        {
+            return "R & D  Upgrades";
+        }
+#if true
+        public static string GetInfo(Part part)
+        {
+            float currentImprovement;
+
+            KRnDUpgrade upgrade;
+            if (!KRnD.upgrades.TryGetValue(part.name, out upgrade))
+                return "none";
+
+            var rndModule = KRnD.getKRnDModule(part);
+            KRnDUpgrade currentUpgrade;
+            if (!KRnD.upgrades.TryGetValue(part.name, out currentUpgrade)) currentUpgrade = new KRnDUpgrade();
+
+            List<string> u = new List<string>();
+            if (upgrade.ispVac > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.ispVac_improvement, rndModule.ispVac_improvementScale, currentUpgrade.ispVac);
+                u.Add("Vacuum ISP: Level: " + upgrade.ispVac.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.ispAtm > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.ispAtm_improvement, rndModule.ispAtm_improvementScale, currentUpgrade.ispAtm);
+                u.Add("ASL ISP: Level: " + upgrade.ispAtm.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.dryMass > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.dryMass_improvement, rndModule.dryMass_improvementScale, currentUpgrade.dryMass);
+                u.Add("Dry Mass: Level: " + upgrade.dryMass.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.fuelFlow > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.fuelFlow_improvement, rndModule.fuelFlow_improvementScale, currentUpgrade.fuelFlow);
+                u.Add("Fuel Flow: Level: " + upgrade.fuelFlow.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.torque > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.torque_improvement, rndModule.torque_improvementScale, currentUpgrade.torque);
+                u.Add("Torque: Level: " + upgrade.torque.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.chargeRate > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.chargeRate_improvement, rndModule.chargeRate_improvementScale, currentUpgrade.chargeRate);
+                u.Add("Charge Rate: Level: " + upgrade.chargeRate.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.crashTolerance > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.crashTolerance_improvement, rndModule.crashTolerance_improvementScale, currentUpgrade.crashTolerance);
+                u.Add("Crash Tolerance: Level: " + upgrade.crashTolerance.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.batteryCharge > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.batteryCharge_improvement, rndModule.batteryCharge_improvementScale, currentUpgrade.batteryCharge);
+                u.Add("Battery Chrg: Level: " + upgrade.batteryCharge.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.generatorEfficiency > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.generatorEfficiency_improvement, rndModule.generatorEfficiency_improvementScale, currentUpgrade.generatorEfficiency);
+                u.Add("Generator Eff.: Level: " + upgrade.generatorEfficiency.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.converterEfficiency > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.converterEfficiency_improvement, rndModule.converterEfficiency_improvementScale, currentUpgrade.converterEfficiency);
+                u.Add("Converter Efficiency: Level: " + upgrade.converterEfficiency.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.parachuteStrength > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.parachuteStrength_improvement, rndModule.parachuteStrength_improvementScale, currentUpgrade.parachuteStrength);
+                u.Add("Chute Strh: Level: " + upgrade.parachuteStrength.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.maxTemperature > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.maxTemperature_improvement, rndModule.maxTemperature_improvementScale, currentUpgrade.maxTemperature);
+                u.Add("Max Temp: Level: " + upgrade.maxTemperature.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.ispVac > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.fuelCapacity_improvement, rndModule.fuelCapacity_improvementScale, currentUpgrade.fuelCapacity);
+                u.Add("Fuel Capacity: Level: " + upgrade.fuelCapacity.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (u.Count == 0)
+                return "No upgrades applied";
+
+
+            return String.Join("\n", u);
+        }
+        public override string GetInfo()
+        {
+            return GetInfo(this.part);
+        }
+#endif
     }
 }

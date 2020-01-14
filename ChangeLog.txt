@@ -1,0 +1,65 @@
+Changelog
+
+1.16
+	Adoption by LinuxGuruGamer
+	Added support for ClickThroughBlocker
+	Added support for ToolbarController
+	Moved PartStats class into separate file
+	Moved KRnDUpgrade class into separate file
+	Converted foreach statements into (for int i=...) for speed
+	Fixed nullref caused by kerbals
+	Added new kerbals to the blacklisted parts
+	Replaced multiple If's with case in KRnDGUI.cs
+	Replaced multiple If's with case in KRnD.cs
+	Commented out all lines in parts.cfg since it was duplicated in code. Left them there so they can be customized 
+	Added new section to the Right-click of parts in the editor to show current upgrades
+
+1.15
+	Rebuild for KSP 1.4.2
+
+1.14
+	Rebuild for KSP 1.3
+
+1.13
+	Added Fission Generators
+	Added support for Fission Generators
+	Compiled for 1.22
+
+1.12
+	KSP 1.2.2 update
+
+1.11
+	KSP 1.2 update
+
+1.10	
+	Made KRnD compatible with KSTS.
+
+1.9
+	Added a blacklist for incompatible parts of conflicting mods.
+
+1.8
+	fixed issues with other mod's modules
+
+1.7
+	Added fuel capacity improvements.
+
+1.6
+	KSP 1.1
+
+1.5
+	fixed dry-mass issues
+
+1.4
+	KSP 1.1
+
+1.3
+	KSP 1.0.5
+
+1.2
+	added crash tolerance for landing legs
+
+1.1
+	added charge-rate for solar panels
+
+1.0
+	Initial release
