@@ -17,14 +17,12 @@ namespace KRnD
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class KRnDGUI : UnityEngine.MonoBehaviour
     {
-        // TODO: The Application-Button shows up during the flight scene ...
-        //private static ApplicationLauncherButton button = null;
         public static Rect windowPosition = new Rect(300, 60, 450, 400);
-        private static GUIStyle windowStyle = new GUIStyle(HighLogic.Skin.window) { fixedWidth = 500f, fixedHeight = 300f };
-        private static GUIStyle labelStyle = new GUIStyle(HighLogic.Skin.label);
-        private static GUIStyle labelStyleSmall = new GUIStyle(HighLogic.Skin.label) { fontSize = 10 };
-        private static GUIStyle buttonStyle = new GUIStyle(HighLogic.Skin.button);
-        private static GUIStyle scrollStyle = new GUIStyle(HighLogic.Skin.scrollView);
+        private static GUIStyle windowStyle;
+        private static GUIStyle labelStyle;
+        private static GUIStyle labelStyleSmall;
+        private static GUIStyle buttonStyle;
+        private static GUIStyle scrollStyle;
         private static Vector2 scrollPos = Vector2.zero;
         // private static Texture2D texture = null;
         private static bool showGui = false;
@@ -40,13 +38,18 @@ namespace KRnD
 
         void Awake()
         {
-
+            windowPosition = new Rect(300, 60, 450, 400);
+            windowStyle = new GUIStyle(HighLogic.Skin.window) { fixedWidth = 500f, fixedHeight = 370 };
+            labelStyle = new GUIStyle(HighLogic.Skin.label);
+            labelStyleSmall = new GUIStyle(HighLogic.Skin.label) { fontSize = 10 };
+            buttonStyle = new GUIStyle(HighLogic.Skin.button);
+            scrollStyle = new GUIStyle(HighLogic.Skin.scrollView);
+            scrollPos = Vector2.zero;
 
             ReadyEvent();
 
         }
 
-        // Fires when a scene is ready so we can install our button.
         public void ReadyEvent()
         {
             if (toolbarControl != null)
@@ -407,7 +410,7 @@ namespace KRnD
                     for (int i = 0; i < fuelResources.Count; i++)
                     {
                         PartResource fuelResource = fuelResources[i];
-                    
+
                         // Reformat resource-names like "ElectricCharge" to "Electric Charge":
                         String fuelName = fuelResource.resourceName.ToString();
                         fuelName = Regex.Replace(fuelName, @"([a-z])([A-Z])", "$1 $2");
@@ -422,7 +425,7 @@ namespace KRnD
                     for (int i = 0; i < engineModules.Count; i++)
                     {
                         ModuleEngines engineModule = engineModules[i];
-                    
+
                         info += "<color=#99FF00><b>Engine";
                         if (engineModules.Count > 1) info += " (" + engineModule.engineID.ToString() + ")";
                         info += ":</b></color>\n" + engineModule.GetInfo();
@@ -439,7 +442,7 @@ namespace KRnD
                     for (int i = 0; i < converterModules.Count; i++)
                     {
                         ModuleResourceConverter converterModule = converterModules[i];
-                    
+
                         info += "<color=#99FF00><b>Converter " + converterModule.ConverterName + ":</b></color>\n" + converterModule.GetInfo() + "\n";
                     }
                 }
@@ -855,7 +858,7 @@ namespace KRnD
                                         if (m.moduleName == "R&D")
                                         {
                                             AvailablePart.ModuleInfo info = m;
-                                            m.info = KRnDModule.GetInfo(part) ;
+                                            m.info = KRnDModule.GetInfo(part);
                                             break;
                                         }
                                     }
