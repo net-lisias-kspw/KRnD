@@ -78,6 +78,45 @@ namespace KRnD
             return null;
         }
 
+        // Parts can have multiple variants which we return as a list, needed
+        // because some variants change the part mass
+        public static Dictionary<string, KRnDVariant> getVariants(Part part)
+        {
+            if (part == null) return null;
+            if (part.partInfo.partPrefab == null) return null;
+
+            if (part.partInfo.Variants == null) return null;
+
+            Dictionary<string, KRnDVariant> variants = new Dictionary<string, KRnDVariant>();
+
+            for (int i = 0; i < part.partInfo.Variants.Count; i++)
+            {
+                var partVariant = part.partInfo.Variants[i];
+                KRnDVariant v = new KRnDVariant(partVariant.Name, partVariant.Mass);
+                variants.Add(partVariant.Name, v);
+            }
+            return variants;
+        }
+
+        static void UpdatePartVariantMasses(Part part, PartStats originalStats, float dryMassFactor)
+        {
+            if (part.partInfo.partPrefab == null || part.partInfo.Variants == null)
+                return;
+
+            if (originalStats.kRnDVariants == null)
+                originalStats.kRnDVariants = new Dictionary<string, KRnDVariant>();
+
+            for (int i = 0; i < part.partInfo.Variants.Count; i++)
+            {
+                var partVariant = part.partInfo.Variants[i];
+                if (originalStats.kRnDVariants.TryGetValue(partVariant.Name, out KRnDVariant v) == false)
+                    v = new KRnDVariant(partVariant.Name, partVariant.Mass);
+                v.UpdateMass(dryMassFactor);
+                originalStats.kRnDVariants[partVariant.Name] = v;
+                partVariant.Mass = v.mass;
+            }
+        }
+
         // Multi-Mode engines have multiple Engine-Modules which we return as a list.
         public static List<ModuleEngines> getEngineModules(Part part)
         {
@@ -497,6 +536,11 @@ namespace KRnD
                 part.mass = originalStats.mass * dryMassFactor;
                 part.prefabMass = part.mass; // New in ksp 1.1, if this is correct is just guesswork however...
 
+                part.partInfo.variant.Mass = originalStats.currentVariantMass * dryMassFactor;
+                UpdatePartVariantMasses(part, originalStats, dryMassFactor);
+                part.baseVariant.Mass = originalStats.variantBaseMass * dryMassFactor;
+                
+
                 // Dry Mass also improves fairing mass:
                 ModuleProceduralFairing fairngModule = KRnD.getFairingModule(part);
                 if (fairngModule)
@@ -519,9 +563,9 @@ namespace KRnD
                     for (int i = 0; i < originalStats.maxFuelFlows.Count; i++)
                     {
                         float maxFuelFlow = originalStats.maxFuelFlows[i] * (1 + KRnD.calculateImprovementFactor(rndModule.fuelFlow_improvement, rndModule.fuelFlow_improvementScale, upgradesToApply.fuelFlow));
-                        if (engineModules != null) 
+                        if (engineModules != null)
                             engineModules[i].maxFuelFlow = maxFuelFlow;
-                        else if (rcsModule) 
+                        else if (rcsModule)
                             rcsModule.thrusterPower = maxFuelFlow; // There is only one rcs-module
                     }
                 }
@@ -645,7 +689,7 @@ namespace KRnD
                         for (int i = 0; i < generator.resHandler.outputResources.Count; i++)
                         {
                             ModuleResource outputResource = generator.resHandler.outputResources[i];
-                        
+
                             double originalRate;
                             if (!originalStats.generatorEfficiency.TryGetValue(outputResource.name, out originalRate)) continue;
                             outputResource.rate = (float)(originalRate * (1 + KRnD.calculateImprovementFactor(rndModule.generatorEfficiency_improvement, rndModule.generatorEfficiency_improvementScale, upgradesToApply.generatorEfficiency)));
@@ -670,7 +714,7 @@ namespace KRnD
                     for (int i = 0; i < converterList.Count; i++)
                     {
                         ModuleResourceConverter converter = converterList[i];
-                    
+
                         Dictionary<String, double> origiginalOutputResources;
                         if (!originalStats.converterEfficiency.TryGetValue(converter.ConverterName, out origiginalOutputResources)) continue;
 
@@ -711,10 +755,10 @@ namespace KRnD
                     rndModule.fuelCapacity_upgrades = upgradesToApply.fuelCapacity;
                     double improvementFactor = (1 + KRnD.calculateImprovementFactor(rndModule.fuelCapacity_improvement, rndModule.fuelCapacity_improvementScale, upgradesToApply.fuelCapacity));
 
-                    for (int i = 0;  i < fuelResources.Count; i++)
+                    for (int i = 0; i < fuelResources.Count; i++)
                     {
                         PartResource fuelResource = fuelResources[i];
-                    
+
                         if (!originalStats.fuelCapacities.ContainsKey(fuelResource.resourceName)) continue;
                         double originalCapacity = originalStats.fuelCapacities[fuelResource.resourceName];
                         double newCapacity = originalCapacity * improvementFactor;
@@ -748,13 +792,14 @@ namespace KRnD
             {
                 if (!vessel.isActiveVessel) return; // Only the currently active vessel matters, the others are not simulated anyway.
                 if (KRnD.upgrades == null) throw new Exception("upgrades-dictionary missing");
+
                 Debug.Log("[KRnD] updating vessel '" + vessel.vesselName.ToString() + "'");
 
                 // Iterate through all parts:
                 for (int i = 0; i < vessel.parts.Count; i++)
                 {
                     Part part = vessel.parts[i];
-                
+
                     // We only have to update parts which have the RnD-Module:
                     KRnDModule rndModule = KRnD.getKRnDModule(part);
                     if (rndModule == null) continue;
@@ -811,6 +856,22 @@ namespace KRnD
             }
         }
 
+        private void OnVariantApplied(Part part, PartVariant pv)
+        {
+            if (part == null || part != KRnDGUI.selectedPart) return;
+            foreach (var v in part.partInfo.Variants)
+            {
+                if (v.Name == pv.Name)
+                {
+                    //partStats.currentVariant = p.partInfo.variant.Name;
+                    //partStats.currentVariantMass = kv.mass;
+
+                    //v.Mass
+                    break;
+                }
+
+            }
+        }
         public List<string> getBlacklistedModules()
         {
             List<string> blacklistedModules = new List<string>();
@@ -864,19 +925,19 @@ namespace KRnD
                     for (int i = 0; i < PartLoader.LoadedPartsList.Count; i++)
                     {
                         AvailablePart aPart = PartLoader.LoadedPartsList[i];
-                    
+
                         Part part = aPart.partPrefab;
                         List<ModuleEngines> engineModules = KRnD.getEngineModules(part);
                         if (engineModules == null) continue;
                         for (int i1 = 0; i1 < engineModules.Count; i1++)
                         {
                             ModuleEngines engineModule = engineModules[i1];
-                        
+
                             if (engineModule.propellants == null) continue;
                             for (int i2 = 0; i2 < engineModule.propellants.Count; i2++)
                             {
                                 Propellant propellant = engineModule.propellants[i2];
-                            
+
                                 if (propellant.name == "ElectricCharge") continue; // Electric Charge is improved by batteries.
                                 if (propellant.name == "IntakeAir") continue; // This is no real fuel-type.
                                 if (!fuelResources.Contains(propellant.name)) fuelResources.Add(propellant.name);
@@ -888,7 +949,7 @@ namespace KRnD
                     for (int i = 0; i < KRnD.fuelResources.Count; i++)
                     {
                         String fuelName = KRnD.fuelResources[i];
-                    
+
                         if (listString != "") listString += ", ";
                         listString += fuelName;
                     }
@@ -904,7 +965,7 @@ namespace KRnD
                     for (int i = 0; i < PartLoader.LoadedPartsList.Count; i++)
                     {
                         AvailablePart aPart = PartLoader.LoadedPartsList[i];
-                    
+
                         Part part = aPart.partPrefab;
                         Boolean skip = false;
                         string blacklistedModule = "N/A";
@@ -912,7 +973,7 @@ namespace KRnD
                         for (int i1 = 0; i1 < part.Modules.Count; i1++)
                         {
                             PartModule partModule = part.Modules[i1];
-                        
+
                             if (blacklistedModules.Contains(partModule.moduleName))
                             {
                                 blacklistedModule = partModule.moduleName;
@@ -965,6 +1026,7 @@ namespace KRnD
                 // Register event-handlers:
                 GameEvents.onVesselChange.Add(this.OnVesselChange);
                 GameEvents.onEditorPartEvent.Add(this.EditorPartEvent);
+                GameEvents.onVariantApplied.Add(this.OnVariantApplied);
 
                 KRnD.initialized = true;
             }

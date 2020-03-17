@@ -233,6 +233,10 @@ namespace KRnD
             }
         }
 
+        public void Start()
+        {
+            GameEvents.onVariantApplied.Add(this.OnVariantApplied);
+        }
         // Returns the upgrade-stats which this module represents.
         public KRnDUpgrade getCurrentUpgrades()
         {
@@ -347,6 +351,25 @@ namespace KRnD
         {
             return GetInfo(this.part);
         }
+
+        private void OnVariantApplied(Part p, PartVariant pv)
+        {
+            if (p == null || p.partInfo.partPrefab == null || p != this.part) return;
+
+            String partName = KRnD.sanatizePartName(p.name);
+
+            if (KRnD.originalStats.TryGetValue(partName, out PartStats partStats))
+            {
+                if (partStats.kRnDVariants != null && partStats.kRnDVariants.TryGetValue(pv.Name, out KRnDVariant kv))
+                {
+                    partStats.currentVariant = pv.Name;
+                    partStats.currentVariantMass = kv.mass;
+                    this.part.partInfo.variant = pv; // ??? why doesn't KSP do this
+                }
+            }
+            else throw new Exception("no original-stats for part '" + partName + "'");
+        }
+
 #endif
     }
 }

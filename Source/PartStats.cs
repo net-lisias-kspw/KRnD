@@ -13,11 +13,35 @@ using System.Text.RegularExpressions;
 
 namespace KRnD
 {
+    public class KRnDVariant
+    {
+        public string name;
+        public float mass;
+        public float origMass;
+
+        public KRnDVariant(string name, float mass)
+        {
+            this.name = name;
+            this.mass = mass;
+            origMass = mass;
+        }
+        public void UpdateMass(float adjust)
+        {
+            this.mass = origMass * adjust;
+        }
+    }
+
     // This class is used to store all relevant base-stats of a part used to calculate all other stats with
     // incrementel upgrades as well as a backup for resoting the original stats (eg after loading a savegame).
     public class PartStats
     {
+
         public float mass = 0;
+        public Dictionary<string, KRnDVariant> kRnDVariants;
+        public string currentVariant;
+        public float currentVariantMass = 0;
+        public float variantBaseMass = 0;
+
         public List<float> maxFuelFlows = null;
         public List<FloatCurve> atmosphereCurves = null;
         public float torque = 0;
@@ -37,7 +61,20 @@ namespace KRnD
 
         public PartStats(Part part)
         {
+            if (part == null || part.partInfo.partPrefab == null)
+                return;
+
             this.mass = part.mass;
+
+            kRnDVariants = KRnD.getVariants(part);
+            if (part.partInfo.variant != null)
+            {
+                currentVariant = part.partInfo.variant.Name;
+                currentVariantMass = part.partInfo.variant.Mass;
+                variantBaseMass = part.baseVariant.Mass;
+            }
+            else
+                currentVariantMass = 0;
             this.skinMaxTemp = part.skinMaxTemp;
             this.intMaxTemp = part.maxTemp;
 

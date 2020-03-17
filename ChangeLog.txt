@@ -1,5 +1,8 @@
 Changelog
 
+1.16.0.3
+	Fixed issue with part variants where it wasn't changing the mass of the part variant, resulting in negative numbers on occasion
+
 1.16.0.2
 	Moved initialization of GUIStyles into Start
 	Made window 70 pixels higher, thanks to @leatherneck6017 for the change

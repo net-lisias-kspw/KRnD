@@ -398,8 +398,11 @@ namespace KRnD
                 ModuleProceduralFairing fairingModule = KRnD.getFairingModule(part);
                 List<PartResource> fuelResources = KRnD.getFuelResources(part);
 
+                float partMass = part.mass + part.partInfo.variant.Mass;
+
                 // Basic stats:
-                info = "<color=#FFFFFF><b>Dry Mass:</b> " + part.mass.ToString("0.#### t") + "\n";
+                //info = "<color=#FFFFFF><b>Dry Mass:</b> " + part.mass.ToString("0.#### t") + "\n";
+                info = "<color=#FFFFFF><b>Dry Mass:</b> " + partMass.ToString("0.#### t") + "\n";
                 info += "<b>Max Temp.:</b> " + part.maxTemp.ToString("0.#") + "/" + part.skinMaxTemp.ToString("0.#") + " °K\n";
                 if (landingLegModule != null) info += "<b>Crash Tolerance:</b> " + part.crashTolerance.ToString("0.#### m/s") + "\n";
                 if (electricChargeResource != null) info += "<b>Electric Charge:</b> " + electricChargeResource.maxAmount.ToString() + "\n";
@@ -801,15 +804,15 @@ namespace KRnD
                         new Exception("unexpected option '" + selectedUpgradeOption + "'");
                         break;
                 }
-
-                String newInfo = getPartInfo(part, nextUpgrade); // Calculate part-info if the selected stat was upgraded.
+#if true
+                string newInfo = getPartInfo(part, currentUpgrade);
+                //String newInfo = getPartInfo(part, nextUpgrade); // Calculate part-info if the selected stat was upgraded.
                 newInfo = highlightChanges(currentInfo, newInfo);
 
                 // Current stats:
                 GUILayout.BeginArea(new Rect(10 + optionsWidth + 10, 30, windowStyle.fixedWidth, 20));
                 GUILayout.Label("<color=#FFFFFF><b>Current:</b> " + currentUpgradeCount.ToString() + " (" + currentImprovement.ToString("+0.##%;-0.##%;-") + ")</color>", labelStyle);
                 GUILayout.EndArea();
-
                 float areaWidth = (windowStyle.fixedWidth - 20 - optionsWidth) / 2;
                 float areaHeight = optionsHeight;
                 GUILayout.BeginArea(new Rect(10 + optionsWidth, 30 + 20, areaWidth, areaHeight));
@@ -852,7 +855,6 @@ namespace KRnD
                                 AvailablePart ap = PartLoader.LoadedPartsList[i];
                                 if (ap.name == part.partInfo.name)
                                 {
-                                    Debug.Log("Part found");
                                     foreach (var m in ap.moduleInfos)
                                     {
                                         if (m.moduleName == "R&D")
@@ -869,6 +871,7 @@ namespace KRnD
                         GUILayout.EndArea();
                     }
                 }
+#endif
 
                 GUILayout.EndVertical();
                 GUI.DragWindow();
