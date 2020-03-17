@@ -1,5 +1,8 @@
 Changelog
 
+1.16.0.4
+	Removed some debugging statements
+
 1.16.0.3
 	Fixed issue with part variants where it wasn't changing the mass of the part variant, resulting in negative numbers on occasion
 

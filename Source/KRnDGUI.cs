@@ -804,9 +804,8 @@ namespace KRnD
                         new Exception("unexpected option '" + selectedUpgradeOption + "'");
                         break;
                 }
-#if true
-                string newInfo = getPartInfo(part, currentUpgrade);
-                //String newInfo = getPartInfo(part, nextUpgrade); // Calculate part-info if the selected stat was upgraded.
+
+                String newInfo = getPartInfo(part, nextUpgrade); // Calculate part-info if the selected stat was upgraded.
                 newInfo = highlightChanges(currentInfo, newInfo);
 
                 // Current stats:
@@ -871,7 +870,6 @@ namespace KRnD
                         GUILayout.EndArea();
                     }
                 }
-#endif
 
                 GUILayout.EndVertical();
                 GUI.DragWindow();
