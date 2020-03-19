@@ -356,6 +356,7 @@ namespace KRnD
         {
             if (p == null || p.partInfo.partPrefab == null || p != this.part) return;
 
+            Log.Info("KRnDModule.OnVariantApplied, part: " + p.partInfo.title + ", " + p.name);
             String partName = KRnD.sanatizePartName(p.name);
 
             if (KRnD.originalStats.TryGetValue(partName, out PartStats partStats))

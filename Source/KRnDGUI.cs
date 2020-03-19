@@ -398,7 +398,9 @@ namespace KRnD
                 ModuleProceduralFairing fairingModule = KRnD.getFairingModule(part);
                 List<PartResource> fuelResources = KRnD.getFuelResources(part);
 
-                float partMass = part.mass + part.partInfo.variant.Mass;
+                float partMass = part.mass;
+                    if (part.partInfo.Variants.Count > 0)
+                    partMass += part.partInfo.variant.Mass;
 
                 // Basic stats:
                 //info = "<color=#FFFFFF><b>Dry Mass:</b> " + part.mass.ToString("0.#### t") + "\n";

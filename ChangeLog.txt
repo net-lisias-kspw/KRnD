@@ -1,5 +1,11 @@
 Changelog
 
+1.16.0.5 
+	Added Log.cs, now writes data to seperate log file as well as standard
+	Replaced all Debug.Log lines with Log.Debug
+	Added some checks to only do variant code if variants are available for the part
+	Fixed kerbal on eva exploding immediately from overheating
+
 1.16.0.4
 	Removed some debugging statements
 

@@ -58,6 +58,8 @@
     <Compile Include="KRnDModule.cs" />
     <Compile Include="KRnDGUI.cs" />
     <Compile Include="KRnDUpgrade.cs" />
+    <Compile Include="KRnDVariant.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="PartStats.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ToolbarRegistration.cs" />
