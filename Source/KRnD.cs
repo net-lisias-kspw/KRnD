@@ -105,9 +105,6 @@ namespace KRnD
 
         static void UpdatePartVariantMasses(Part part, PartStats originalStats, float dryMassFactor)
         {
-            if (part.partInfo.partPrefab == null || part.partInfo.Variants == null)
-                return;
-
             if (originalStats.kRnDVariants == null)
                 originalStats.kRnDVariants = new Dictionary<string, KRnDVariant>();
 
@@ -115,8 +112,12 @@ namespace KRnD
             {
                 var partVariant = part.partInfo.Variants[i];
                 if (originalStats.kRnDVariants.TryGetValue(partVariant.Name, out KRnDVariant v) == false)
+                {
                     v = new KRnDVariant(partVariant.Name, partVariant.Mass);
+                    originalStats.kRnDVariants.Add(partVariant.Name, v);
+                }
                 v.UpdateMass(dryMassFactor);
+                
                 originalStats.kRnDVariants[partVariant.Name] = v;
                 partVariant.Mass = v.mass;
             }

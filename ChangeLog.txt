@@ -1,5 +1,8 @@
 Changelog
 
+1.16.0.6
+	Fixed non-variant parts not showing up in the upgrades window
+
 1.16.0.5 
 	Added Log.cs, now writes data to seperate log file as well as standard
 	Replaced all Debug.Log lines with Log.Debug

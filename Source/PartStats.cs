@@ -20,7 +20,7 @@ namespace KRnD
     {
 
         public float mass = 0;
-        public Dictionary<string, KRnDVariant> kRnDVariants;
+        public Dictionary<string, KRnDVariant> kRnDVariants = null;
         public bool hasVariants = false;
         public string currentVariant;
         public float currentVariantMass = 0;
@@ -47,14 +47,15 @@ namespace KRnD
         {
             this.mass = part.mass;
 
-            kRnDVariants = KRnD.getVariants(part);
             if (part.partInfo.variant != null)
             {
+                kRnDVariants = KRnD.getVariants(part);
                 currentVariant = part.partInfo.variant.Name;
                 currentVariantMass = part.partInfo.variant.Mass;
                 variantBaseMass = part.baseVariant.Mass;
-                hasVariants = true;
             }
+            if (kRnDVariants != null)
+                hasVariants = true;            
             else
             {
                 currentVariantMass = 0;
@@ -75,7 +76,7 @@ namespace KRnD
                 for (int i = 0; i < engineModules.Count; i++)
                 {
                     ModuleEngines engineModule = engineModules[i];
-                
+
                     this.maxFuelFlows.Add(engineModule.maxFuelFlow);
 
                     FloatCurve atmosphereCurve = new FloatCurve();
@@ -133,7 +134,7 @@ namespace KRnD
                 for (int i = 0; i < generator.resHandler.outputResources.Count; i++)
                 {
                     ModuleResource outputResource = generator.resHandler.outputResources[i];
-                
+
                     generatorEfficiency.Add(outputResource.name, outputResource.rate);
                 }
             }
@@ -157,7 +158,7 @@ namespace KRnD
                     for (int i2 = 0; i2 < converter.outputList.Count; i2++)
                     {
                         ResourceRatio resourceRatio = converter.outputList[i2];
-                    
+
                         thisConverterEfficiency.Add(resourceRatio.ResourceName, resourceRatio.Ratio);
                     }
                     converterEfficiency.Add(converter.ConverterName, thisConverterEfficiency);
@@ -184,7 +185,7 @@ namespace KRnD
                 for (int i = 0; i < fuelResources.Count; i++)
                 {
                     PartResource fuelResource = fuelResources[i];
-                
+
                     fuelCapacities.Add(fuelResource.resourceName, fuelResource.maxAmount);
                     fuelCapacitiesSum += fuelResource.maxAmount;
                 }

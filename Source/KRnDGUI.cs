@@ -399,7 +399,8 @@ namespace KRnD
                 List<PartResource> fuelResources = KRnD.getFuelResources(part);
 
                 float partMass = part.mass;
-                    if (part.partInfo.Variants.Count > 0)
+                //if (part.partInfo.partPrefab != null && part.partInfo.Variants != null && part.partInfo.Variants.Count > 0)
+                if (part.partInfo.variant != null)
                     partMass += part.partInfo.variant.Mass;
 
                 // Basic stats:
@@ -451,6 +452,7 @@ namespace KRnD
                         info += "<color=#99FF00><b>Converter " + converterModule.ConverterName + ":</b></color>\n" + converterModule.GetInfo() + "\n";
                     }
                 }
+
                 if (parachuteModule) info += "<color=#99FF00><b>Parachute:</b></color>\n" + parachuteModule.GetInfo();
                 if (fairingModule) info += "<color=#99FF00><b>Fairing:</b></color>\n" + fairingModule.GetInfo();
                 info += "</color>";
