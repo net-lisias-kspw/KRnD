@@ -1,5 +1,9 @@
 Changelog
 
+1.16.0.7
+	Added new line to blacklist, thanks to @OhioBob
+		BLACKLISTED_MODULE = ModuleTweakMaxResource
+
 1.16.0.6
 	Fixed non-variant parts not showing up in the upgrades window
 
