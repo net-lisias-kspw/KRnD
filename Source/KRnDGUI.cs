@@ -205,6 +205,70 @@ namespace KRnD
             return 0;
         }
 
+        // WIP
+        //public static int UpgradeAntennaPower(Part part)
+        //{
+        //    try
+        //    {
+        //        KRnDUpgrade store = null;
+        //        if (!KRnD.upgrades.TryGetValue(part.name, out store))
+        //        {
+        //            store = new KRnDUpgrade();
+        //            KRnD.upgrades.Add(part.name, store);
+        //        }
+        //        store.antPower++;
+        //        KRnD.updateGlobalParts();
+        //        KRnD.updateEditorVessel();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Debug.LogError("[KRnD] UpgradeAntennaPower(): " + e.ToString());
+        //    }
+        //    return 0;
+        //}
+
+        public static int UpgradeDrillPower(Part part)
+        {
+            try
+            {
+                KRnDUpgrade store = null;
+                if (!KRnD.upgrades.TryGetValue(part.name, out store))
+                {
+                    store = new KRnDUpgrade();
+                    KRnD.upgrades.Add(part.name, store);
+                }
+                store.harvester++;
+                KRnD.updateGlobalParts();
+                KRnD.updateEditorVessel();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[KRnD] UpgradeDrillPower(): " + e.ToString());
+            }
+            return 0;
+        }
+
+        public static int UpgradeRadiatorEfficiency(Part part)
+        {
+            try
+            {
+                KRnDUpgrade store = null;
+                if (!KRnD.upgrades.TryGetValue(part.name, out store))
+                {
+                    store = new KRnDUpgrade();
+                    KRnD.upgrades.Add(part.name, store);
+                }
+                store.radiatorEfficiency++;
+                KRnD.updateGlobalParts();
+                KRnD.updateEditorVessel();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("[KRnD] UpgradeRadiatorEfficiency(): " + e.ToString());
+            }
+            return 0;
+        }
+
         public static int UpgradeChargeRate(Part part)
         {
             try
@@ -397,6 +461,9 @@ namespace KRnD
                 ModuleParachute parachuteModule = KRnD.getParachuteModule(part);
                 ModuleProceduralFairing fairingModule = KRnD.getFairingModule(part);
                 List<PartResource> fuelResources = KRnD.getFuelResources(part);
+                //ModuleDataTransmitter dataTransmitter = KRnD.getDataTransmitterModule(part); //WIP
+                ModuleResourceHarvester resourceHarvester = KRnD.getResourceHarvesterModule(part);
+                ModuleActiveRadiator activeRadiator = KRnD.getActiveRadiatorModule(part);
 
                 float partMass = part.mass;
                 //if (part.partInfo.partPrefab != null && part.partInfo.Variants != null && part.partInfo.Variants.Count > 0)
@@ -455,6 +522,9 @@ namespace KRnD
 
                 if (parachuteModule) info += "<color=#99FF00><b>Parachute:</b></color>\n" + parachuteModule.GetInfo();
                 if (fairingModule) info += "<color=#99FF00><b>Fairing:</b></color>\n" + fairingModule.GetInfo();
+                //if (dataTransmitter) info += "<color=#99FF00><b>Antenna:</b></color>\n" + dataTransmitter.GetInfo(); // WIP
+                if (resourceHarvester) info += "<color=#99FF00><b>Drill:</b></color>\n" + resourceHarvester.GetInfo();
+                if (activeRadiator) info += "<color=#99FF00><b>Radiator:</b></color>\n" + activeRadiator.GetInfo();
                 info += "</color>";
             }
             catch (Exception e)
@@ -526,6 +596,9 @@ namespace KRnD
                 List<ModuleResourceConverter> converterModules = null;
                 ModuleParachute parachuteModule = null;
                 List<PartResource> fuelResources = null;
+                //ModuleDataTransmitter dataTransmitter = null; // WIP
+                ModuleResourceHarvester resourceHarvester = null;
+                ModuleActiveRadiator activeRadiator = null;
                 if (selectedPart != null)
                 {
                     for (int i = 0; i < PartLoader.LoadedPartsList.Count; i++)
@@ -553,6 +626,9 @@ namespace KRnD
                         converterModules = KRnD.getConverterModules(part);
                         parachuteModule = KRnD.getParachuteModule(part);
                         fuelResources = KRnD.getFuelResources(part);
+                        //dataTransmitter = KRnD.getDataTransmitterModule(part); // WIP
+                        resourceHarvester = KRnD.getResourceHarvesterModule(part);
+                        activeRadiator = KRnD.getActiveRadiatorModule(part);
                     }
                 }
                 if (!part)
@@ -637,6 +713,19 @@ namespace KRnD
                 {
                     options.Add("Parachute");
                 }
+                // WIP                
+                //if (dataTransmitter)
+                //{
+                //    options.Add("Antenna");
+                //}
+                if (resourceHarvester)
+                {
+                    options.Add("Drill");
+                }
+                if (activeRadiator)
+                {
+                    options.Add("Radiator");
+                }
                 if (this.selectedUpgradeOption >= options.Count) this.selectedUpgradeOption = 0;
                 this.selectedUpgradeOption = GUILayout.SelectionGrid(this.selectedUpgradeOption, options.ToArray(), 1, buttonStyle);
                 GUILayout.EndArea();
@@ -706,6 +795,37 @@ namespace KRnD
                             currentImprovement = KRnD.calculateImprovementFactor(rndModule.torque_improvement, rndModule.torque_improvementScale, currentUpgrade.torque);
                             nextImprovement = KRnD.calculateImprovementFactor(rndModule.torque_improvement, rndModule.torque_improvementScale, nextUpgrade.torque);
                             scienceCost = KRnD.calculateScienceCost(rndModule.torque_scienceCost, rndModule.torque_costScale, nextUpgrade.torque);
+                        }
+                        break;
+                    // WIP
+                    //case "Antenna":
+                    //    {
+                    //        upgradeFunction = KRnDGUI.UpgradeAntennaPower;
+                    //        currentUpgradeCount = currentUpgrade.antPower;
+                    //        nextUpgradeCount = ++nextUpgrade.antPower;
+                    //        currentImprovement = KRnD.calculateImprovementFactor(rndModule.antPower_improvement, rndModule.antPower_improvementScale, currentUpgrade.antPower);
+                    //        nextImprovement = KRnD.calculateImprovementFactor(rndModule.antPower_improvement, rndModule.antPower_improvementScale, nextUpgrade.antPower);
+                    //        scienceCost = KRnD.calculateScienceCost(rndModule.antPower_scienceCost, rndModule.antPower_costScale, nextUpgrade.antPower);
+                    //    }
+                    //    break;
+                    case "Drill":
+                        {
+                            upgradeFunction = KRnDGUI.UpgradeDrillPower;
+                            currentUpgradeCount = currentUpgrade.harvester;
+                            nextUpgradeCount = ++nextUpgrade.harvester;
+                            currentImprovement = KRnD.calculateImprovementFactor(rndModule.harvester_improvement, rndModule.harvester_improvementScale, currentUpgrade.harvester);
+                            nextImprovement = KRnD.calculateImprovementFactor(rndModule.harvester_improvement, rndModule.harvester_improvementScale, nextUpgrade.harvester);
+                            scienceCost = KRnD.calculateScienceCost(rndModule.harvester_scienceCost, rndModule.harvester_costScale, nextUpgrade.harvester);
+                        }
+                        break;
+                    case "Radiator":
+                        {
+                            upgradeFunction = KRnDGUI.UpgradeRadiatorEfficiency;
+                            currentUpgradeCount = currentUpgrade.radiatorEfficiency;
+                            nextUpgradeCount = ++nextUpgrade.radiatorEfficiency;
+                            currentImprovement = KRnD.calculateImprovementFactor(rndModule.radiatorEfficiency_improvement, rndModule.radiatorEfficiency_improvementScale, currentUpgrade.radiatorEfficiency);
+                            nextImprovement = KRnD.calculateImprovementFactor(rndModule.radiatorEfficiency_improvement, rndModule.radiatorEfficiency_improvementScale, nextUpgrade.radiatorEfficiency);
+                            scienceCost = KRnD.calculateScienceCost(rndModule.radiatorEfficiency_scienceCost, rndModule.radiatorEfficiency_costScale, nextUpgrade.radiatorEfficiency);
                         }
                         break;
                     case "Charge Rate":
