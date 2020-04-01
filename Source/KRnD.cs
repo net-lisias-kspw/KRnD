@@ -162,6 +162,40 @@ namespace KRnD
             return null;
         }
 
+        // WIP for upgrading antenna range. Need to figure out how to get Antenna Rating to display properly in GUI
+        //public static ModuleDataTransmitter getDataTransmitterModule(Part part)
+        //{
+        //    for (int i = 0; i < part.Modules.Count; i++)
+        //    {
+        //        PartModule partModule = part.Modules[i];
+
+        //        if (partModule.moduleName == "ModuleDataTransmitter") return (ModuleDataTransmitter)partModule;
+        //    }
+        //    return null;
+        //}
+
+        public static ModuleResourceHarvester getResourceHarvesterModule(Part part)
+        {
+            for (int i = 0; i < part.Modules.Count; i++)
+            {
+                PartModule partModule = part.Modules[i];
+
+                if (partModule.moduleName == "ModuleResourceHarvester") return (ModuleResourceHarvester)partModule;
+            }
+            return null;
+        }
+
+        public static ModuleActiveRadiator getActiveRadiatorModule(Part part)
+        {
+            for (int i = 0; i < part.Modules.Count; i++)
+            {
+                PartModule partModule = part.Modules[i];
+
+                if (partModule.moduleName == "ModuleActiveRadiator") return (ModuleActiveRadiator)partModule;
+            }
+            return null;
+        }
+
         public static ModuleDeployableSolarPanel getSolarPanelModule(Part part)
         {
             for (int i = 0; i < part.Modules.Count; i++)
@@ -361,6 +395,25 @@ namespace KRnD
                                     {
                                         ModuleReactionWheel reactionWheel = KRnD.getReactionWheelModule(part.partPrefab);
                                         if (reactionWheel) info.info = reactionWheel.GetInfo();
+                                    }
+                                    break;
+                                // WIP
+                                //case "antenna power":
+                                //    {
+                                //        ModuleDataTransmitter dataTransmitter = KRnD.getDataTransmitterModule(part.partPrefab);
+                                //        if (dataTransmitter) info.info = dataTransmitter.GetInfo();
+                                //    }
+                                //    break;
+                                case "drill effeciency":
+                                    {
+                                        ModuleResourceHarvester resourceHarvester = KRnD.getResourceHarvesterModule(part.partPrefab);
+                                        if (resourceHarvester) info.info = resourceHarvester.GetInfo();
+                                    }
+                                    break;
+                                case "radiator effeciency":
+                                    {
+                                        ModuleActiveRadiator activeRadiator = KRnD.getActiveRadiatorModule(part.partPrefab);
+                                        if (activeRadiator) info.info = activeRadiator.GetInfo();
                                     }
                                     break;
                                 case "deployable solar panel":
@@ -636,6 +689,46 @@ namespace KRnD
                     rndModule.torque_upgrades = 0;
                 }
 
+                // Antenna Range: WIP
+                //ModuleDataTransmitter dataTransmitter = KRnD.getDataTransmitterModule(part);
+                //if (dataTransmitter)
+                //{
+                //    rndModule.antPower_upgrades = upgradesToApply.antPower;
+                //    double antPower = originalStats.antPower * (1 + KRnD.calculateImprovementFactor(rndModule.antPower_improvement, rndModule.antPower_improvementScale, upgradesToApply.antPower));
+                //    dataTransmitter.antennaPower = antPower;
+                //}
+                //else
+                //{
+                //    rndModule.antPower_upgrades = 0;
+                //}
+
+                // Drill Efficiency:
+                ModuleResourceHarvester resourceHarvester = KRnD.getResourceHarvesterModule(part);
+                if (resourceHarvester)
+                {
+                    rndModule.harvester_upgrades = upgradesToApply.harvester;
+                    float harvester = originalStats.harvester * (1 + KRnD.calculateImprovementFactor(rndModule.harvester_improvement, rndModule.harvester_improvementScale, upgradesToApply.harvester));
+                    resourceHarvester.Efficiency = harvester;
+                }
+                else
+                {
+                    rndModule.harvester_upgrades = 0;
+                }
+
+                // Radiator Efficiency:
+                ModuleActiveRadiator activeRadiator = KRnD.getActiveRadiatorModule(part);
+                if (activeRadiator)
+                {
+                    rndModule.radiatorEfficiency_upgrades = upgradesToApply.radiatorEfficiency;
+                    double radiatorEfficiency = originalStats.radiatorEfficiency * (1 + KRnD.calculateImprovementFactor(rndModule.radiatorEfficiency_improvement, rndModule.radiatorEfficiency_improvementScale, upgradesToApply.radiatorEfficiency));
+                    radiatorEfficiency = Math.Round(radiatorEfficiency);// Don't want decimals
+                    activeRadiator.maxEnergyTransfer = radiatorEfficiency;
+                }
+                else
+                {
+                    rndModule.radiatorEfficiency_upgrades = 0;
+                }
+
                 // Charge Rate:
                 ModuleDeployableSolarPanel solarPanel = KRnD.getSolarPanelModule(part);
                 if (solarPanel)
@@ -783,7 +876,6 @@ namespace KRnD
                 {
                     rndModule.fuelCapacity_upgrades = 0;
                 }
-
             }
             catch (Exception e)
             {

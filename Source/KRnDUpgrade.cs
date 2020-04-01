@@ -29,6 +29,9 @@ namespace KRnD
         public int parachuteStrength = 0;
         public int maxTemperature = 0;
         public int fuelCapacity = 0;
+        //public int antPower = 0; // WIP
+        public int harvester = 0;
+        public int radiatorEfficiency = 0;
 
         public const String ISP_VAC = "ispVac";
         public const String ISP_ATM = "ispAtm";
@@ -43,6 +46,9 @@ namespace KRnD
         public const String PARACHUTE_STRENGTH = "parachuteStrength";
         public const String MAX_TEMPERATURE = "maxTemperature";
         public const String FUEL_CAPACITY = "fuelCapacity";
+        //public const String ANTENNA_POWER = "antPower"; // WIP
+        public const String DRILL_EFFICIENCY = "harvester";
+        public const String RADIATOR_EFFICIENCY = "radiatorEfficiency";
 
         public override string ToString()
         {
@@ -59,7 +65,10 @@ namespace KRnD
                 CONVERTER_EFFICIENCY + ":" + this.converterEfficiency.ToString() + "," +
                 PARACHUTE_STRENGTH + ":" + this.parachuteStrength.ToString() + "," +
                 MAX_TEMPERATURE + ":" + this.maxTemperature.ToString() + "," +
-                FUEL_CAPACITY + ":" + this.fuelCapacity +
+                FUEL_CAPACITY + ":" + this.fuelCapacity.ToString() + "," +
+                //ANTENNA_POWER + ":" + this.antPower.ToString() + "," + // WIP
+                DRILL_EFFICIENCY + ":" + this.harvester.ToString() + "," +
+                RADIATOR_EFFICIENCY + ":" + this.radiatorEfficiency +
                 ")";
         }
 
@@ -79,6 +88,9 @@ namespace KRnD
             if (this.parachuteStrength > 0) node.AddValue(PARACHUTE_STRENGTH, this.parachuteStrength.ToString());
             if (this.maxTemperature > 0) node.AddValue(MAX_TEMPERATURE, this.maxTemperature.ToString());
             if (this.fuelCapacity > 0) node.AddValue(FUEL_CAPACITY, this.fuelCapacity.ToString());
+            //if (this.antPower > 0) node.AddValue(ANTENNA_POWER, this.antPower.ToString()); // WIP
+            if (this.harvester > 0) node.AddValue(DRILL_EFFICIENCY, this.harvester.ToString());
+            if (this.radiatorEfficiency > 0) node.AddValue(RADIATOR_EFFICIENCY, this.radiatorEfficiency.ToString());
             return node;
         }
 
@@ -98,6 +110,9 @@ namespace KRnD
             if (node.HasValue(PARACHUTE_STRENGTH)) upgrade.parachuteStrength = Int32.Parse(node.GetValue(PARACHUTE_STRENGTH));
             if (node.HasValue(MAX_TEMPERATURE)) upgrade.maxTemperature = Int32.Parse(node.GetValue(MAX_TEMPERATURE));
             if (node.HasValue(FUEL_CAPACITY)) upgrade.fuelCapacity = Int32.Parse(node.GetValue(FUEL_CAPACITY));
+            //if (node.HasValue(ANTENNA_POWER)) upgrade.antPower = Int32.Parse(node.GetValue(ANTENNA_POWER)); //WIP
+            if (node.HasValue(DRILL_EFFICIENCY)) upgrade.harvester = Int32.Parse(node.GetValue(DRILL_EFFICIENCY));
+            if (node.HasValue(RADIATOR_EFFICIENCY)) upgrade.radiatorEfficiency = Int32.Parse(node.GetValue(RADIATOR_EFFICIENCY));
             return upgrade;
         }
 
@@ -117,6 +132,9 @@ namespace KRnD
             copy.parachuteStrength = this.parachuteStrength;
             copy.maxTemperature = this.maxTemperature;
             copy.fuelCapacity = this.fuelCapacity;
+            //copy.antPower = this.antPower; // WIP
+            copy.harvester = this.harvester;
+            copy.radiatorEfficiency = this.radiatorEfficiency;
             return copy;
         }
     }

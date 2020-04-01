@@ -41,6 +41,9 @@ namespace KRnD
         public Dictionary<String, double> fuelCapacities = null; // Resource-Name, capacity
         public double fuelCapacitiesSum = 0; // Sum of all fuel capacities
         public double fissionPowerGeneration = 0; // From FissionGenerator
+        //public double antPower = 0; // WIP
+        public float harvester = 0;
+        public double radiatorEfficiency = 0;
 
 
         public PartStats(Part part)
@@ -107,6 +110,25 @@ namespace KRnD
             if (reactionWheel)
             {
                 this.torque = reactionWheel.RollTorque; // There is also pitch- and yaw-torque, but they should all be the same
+            }
+
+            // WIP
+            //ModuleDataTransmitter dataTransmitter = KRnD.getDataTransmitterModule(part);
+            //if (dataTransmitter)
+            //{
+            //    this.antPower = dataTransmitter.antennaPower;
+            //}
+
+            ModuleResourceHarvester resourceHarvester = KRnD.getResourceHarvesterModule(part);
+            if (resourceHarvester)
+            {
+                this.harvester = resourceHarvester.Efficiency;
+            }
+
+            ModuleActiveRadiator activeRadiator = KRnD.getActiveRadiatorModule(part);
+            if (activeRadiator)
+            {
+                this.radiatorEfficiency = activeRadiator.maxEnergyTransfer;
             }
 
             ModuleDeployableSolarPanel solarPanel = KRnD.getSolarPanelModule(part);

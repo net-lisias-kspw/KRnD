@@ -81,6 +81,42 @@ namespace KRnD
         [KSPField(isPersistant = false)]
         public float torque_improvementScale = 1f;
 
+        //Antenna Power [WIP]
+        //[KSPField(isPersistant = true)]
+        //public int antPower_upgrades = 0;
+        //[KSPField(isPersistant = false)]
+        //public int antPower_scienceCost = 50;
+        //[KSPField(isPersistant = false)]
+        //public float antPower_costScale = 2f;
+        //[KSPField(isPersistant = false)]
+        //public float antPower_improvement = 0.1f;
+        //[KSPField(isPersistant = false)]
+        //public float antPower_improvementScale = 1f;
+
+        //Drill Efficiency
+        [KSPField(isPersistant = true)]
+        public int harvester_upgrades = 0;
+        [KSPField(isPersistant = false)]
+        public int harvester_scienceCost = 100;
+        [KSPField(isPersistant = false)]
+        public float harvester_costScale = 1.75f;
+        [KSPField(isPersistant = false)]
+        public float harvester_improvement = 0.1f;
+        [KSPField(isPersistant = false)]
+        public float harvester_improvementScale = 1f;
+
+        //Radiator Efficiency
+        [KSPField(isPersistant = true)]
+        public int radiatorEfficiency_upgrades = 0;
+        [KSPField(isPersistant = false)]
+        public int radiatorEfficiency_scienceCost = 100;
+        [KSPField(isPersistant = false)]
+        public float radiatorEfficiency_costScale = 1.75f;
+        [KSPField(isPersistant = false)]
+        public float radiatorEfficiency_improvement = 0.1f;
+        [KSPField(isPersistant = false)]
+        public float radiatorEfficiency_improvementScale = 1f;
+
         // Charge Rate
         [KSPField(isPersistant = true)]
         public int chargeRate_upgrades = 0;
@@ -215,7 +251,10 @@ namespace KRnD
                 this.converterEfficiency_upgrades +
                 this.parachuteStrength_upgrades +
                 this.maxTemperature_upgrades +
-                this.fuelCapacity_upgrades;
+                this.fuelCapacity_upgrades +
+                //this.antPower_upgrades + // WIP
+                this.harvester_upgrades +
+                this.radiatorEfficiency_upgrades;
             if (upgrades == 0) return "";
             return "Mk " + ToRoman(upgrades + 1); // Mk I is the part without upgrades, Mk II the first upgraded version.
         }
@@ -254,6 +293,9 @@ namespace KRnD
             upgrades.parachuteStrength = this.parachuteStrength_upgrades;
             upgrades.maxTemperature = this.maxTemperature_upgrades;
             upgrades.fuelCapacity = this.fuelCapacity_upgrades;
+            //upgrades.antPower = this.antPower_upgrades; // WIP
+            upgrades.harvester = this.harvester_upgrades;
+            upgrades.radiatorEfficiency = this.radiatorEfficiency_upgrades;
             return upgrades;
         }
 
@@ -300,6 +342,22 @@ namespace KRnD
             {
                 currentImprovement = KRnD.calculateImprovementFactor(rndModule.torque_improvement, rndModule.torque_improvementScale, currentUpgrade.torque);
                 u.Add("Torque: Level: " + upgrade.torque.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            // WIP
+            //if (upgrade.antPower > 0)
+            //{
+            //    currentImprovement = KRnD.calculateImprovementFactor(rndModule.antPower_improvement, rndModule.antPower_improvementScale, currentUpgrade.antPower);
+            //    u.Add("Antenna Power: Level: " + upgrade.antPower.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            //}
+            if (upgrade.harvester > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.harvester_improvement, rndModule.harvester_improvementScale, currentUpgrade.harvester);
+                u.Add("Drill Efficiency: Level: " + upgrade.harvester.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
+            }
+            if (upgrade.radiatorEfficiency > 0)
+            {
+                currentImprovement = KRnD.calculateImprovementFactor(rndModule.radiatorEfficiency_improvement, rndModule.radiatorEfficiency_improvementScale, currentUpgrade.radiatorEfficiency);
+                u.Add("Radiator Efficiency: Level: " + upgrade.radiatorEfficiency.ToString() + ", " + currentImprovement.ToString("+0.##%;-0.##%;-"));
             }
             if (upgrade.chargeRate > 0)
             {
