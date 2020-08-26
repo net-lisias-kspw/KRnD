@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using KSP.IO;
-using KSP;
 
 namespace KRnD
 {
@@ -402,8 +397,7 @@ namespace KRnD
             if (u.Count == 0)
                 return "No upgrades applied";
 
-
-            return String.Join("\n", u);
+            return String.Join("\n", u.ToArray());
         }
         public override string GetInfo()
         {
@@ -414,7 +408,7 @@ namespace KRnD
         {
             if (p == null || p.partInfo.partPrefab == null || p != this.part) return;
 
-            Log.Info("KRnDModule.OnVariantApplied, part: " + p.partInfo.title + ", " + p.name);
+            Log.info("KRnDModule.OnVariantApplied, part: {0}, {1}", p.partInfo.title, p.name);
             String partName = KRnD.sanatizePartName(p.name);
 
             if (KRnD.originalStats.TryGetValue(partName, out PartStats partStats))

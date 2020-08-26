@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using KSP.IO;
-using KSP;
 using System.IO;
 
 using System.Reflection;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+
+using UnityEngine;
 
 namespace KRnD
 {
@@ -87,10 +83,10 @@ namespace KRnD
 
             if (part.partInfo.Variants == null)
             {
-                Log.Info("Part: " + part.partInfo.title + ", " + part.partInfo.name +" has no variants");
+                Log.info("Part: {0}, {1} has no variants", part.partInfo.title, part.partInfo.name);
                 return null;
             }
-            Log.Info("Part: " + part.partInfo.title + ", " + part.partInfo.name + " has " + part.partInfo.Variants.Count + " variants");
+            Log.info("Part: {0}, {1} has {2} variants", part.partInfo.title, part.partInfo.name, part.partInfo.Variants.Count);
 
             Dictionary<string, KRnDVariant> variants = new Dictionary<string, KRnDVariant>();
 
@@ -498,13 +494,13 @@ namespace KRnD
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("[KRnD] updateGlobalParts(" + part.title.ToString() + "): " + e.ToString());
+                        Log.error(e, "updateGlobalParts({0}): {1}", part.title, e);
                     }
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] updateGlobalParts(): " + e.ToString());
+                Log.error(e, "updateGlobalParts(): {0}", e);
             }
             return upgradesApplied;
         }
@@ -879,7 +875,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] updatePart(" + part.name.ToString() + "): " + e.ToString());
+                Log.error(e, "updatePart({0}): ", part.name, e);
             }
         }
 
@@ -893,7 +889,7 @@ namespace KRnD
                 if (!vessel.isActiveVessel) return; // Only the currently active vessel matters, the others are not simulated anyway.
                 if (KRnD.upgrades == null) throw new Exception("upgrades-dictionary missing");
 
-                Log.Error("updating vessel '" + vessel.vesselName.ToString() + "'");
+                Log.error("updating vessel '{0}'", vessel.vesselName);
 
                 // Iterate through all parts:
                 for (int i = 0; i < vessel.parts.Count; i++)
@@ -912,7 +908,7 @@ namespace KRnD
                     else if (rndModule.upgradeToLatest > 0)
                     {
                         // Flagged by another mod (eg KSTS) to get updated to the latest model (once):
-                       Log.Error("part '" + KRnD.sanatizePartName(part.name) + "' of '" + vessel.vesselName + "' was flagged to be updated to the latest model");
+                        Log.error("part '{0}' of '{1}' was flagged to be updated to the latest model", KRnD.sanatizePartName(part.name), vessel.vesselName);
                         rndModule.upgradeToLatest = 0;
                         KRnD.updatePart(part, true);
                     }
@@ -925,7 +921,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] updateVesselActive(): " + e.ToString());
+                Log.error(e, "updateVesselActive(): {0}", e);
             }
         }
 
@@ -938,7 +934,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] OnVesselChange(): " + e.ToString());
+                Log.error(e, "OnVesselChange(): {0}", e);
             }
         }
 
@@ -952,14 +948,14 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] EditorPartEvent(): " + e.ToString());
+                Log.error(e, "EditorPartEvent(): {0}", e);
             }
         }
 
         private void OnVariantApplied(Part p, PartVariant pv)
         {
             if (p == null || p != KRnDGUI.selectedPart) return;
-            Log.Info("KRnD.OnVariantApplied, part: " + p.partInfo.title + ", " + p.name);
+            Log.info("KRnD.OnVariantApplied, part: {0}, {1}" + p.partInfo.title, p.name);
 
             foreach (var v in p.partInfo.Variants)
             {
@@ -988,7 +984,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] getBlacklistedModules(): " + e.ToString());
+                Log.error(e, "getBlacklistedModules(): {0}", e);
             }
             return blacklistedModules;
         }
@@ -1007,7 +1003,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] getBlacklistedParts(): " + e.ToString());
+                Log.error(e, "getBlacklistedParts(): {0}", e);
             }
             return blacklistedParts;
         }
@@ -1055,7 +1051,7 @@ namespace KRnD
                         if (listString != "") listString += ", ";
                         listString += fuelName;
                     }
-                   Log.Error("found " + KRnD.fuelResources.Count.ToString() + " propellants: " + listString);
+                    Log.info("found {0} propellants: {1}", KRnD.fuelResources.Count, listString);
                 }
 
                 // Create a list of blacklisted parts (parts with known incompatible modules of other mods):
@@ -1085,13 +1081,13 @@ namespace KRnD
                         }
                         if (skip)
                         {
-                           Log.Error("blacklisting part '" + part.name.ToString() + "' (has blacklisted module '" + blacklistedModule.ToString() + "')");
+                            Log.info("blacklisting part '{0}' (has blacklisted module {1}')", part.name, blacklistedModule);
                             if (!KRnD.blacklistedParts.Contains(part.name)) KRnD.blacklistedParts.Add(part.name);
                             continue;
                         }
                     }
 
-                   Log.Error("blacklisted " + KRnD.blacklistedParts.Count.ToString() + " parts, which contained one of " + blacklistedModules.Count.ToString() + " blacklisted modules");
+                    Log.info("blacklisted {0} parts, which contained one of {1} blacklisted modules", KRnD.blacklistedParts.Count, blacklistedModules.Count);
                 }
 
                 // Create a backup of all unmodified parts before we update them. We will later use these backup-parts
@@ -1111,7 +1107,7 @@ namespace KRnD
                             PartStats duplicate;
                             if (originalStats.TryGetValue(part.name, out duplicate))
                             {
-                                Debug.LogError("[KRnD] Awake(): duplicate part-name: " + part.name.ToString());
+                                Log.error("Awake(): duplicate part-name: {0}", part.name);
                             }
                             else
                             {
@@ -1134,7 +1130,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] Awake(): " + e.ToString());
+                Log.error(e, "Awake(): {0}", e);
             }
         }
     }
@@ -1154,12 +1150,12 @@ namespace KRnD
                     KRnDUpgrade upgrade;
                     if (!KRnD.upgrades.TryGetValue(upgradeName, out upgrade)) continue;
                     upgradeNodes.AddNode(upgrade.createConfigNode(upgradeName));
-                   Log.Error("saved: " + upgradeName + " " + upgrade.ToString());
+                    Log.info("saved: {0} {1}",upgradeName, upgrade);
                 }
                 node.AddNode(upgradeNodes);
 
                 time = (DateTime.Now.Ticks - time) / TimeSpan.TicksPerSecond;
-               Log.Error("saved " + upgradeNodes.CountNodes.ToString() + " upgrades in " + time.ToString("0.000s"));
+                Log.info("saved {0} upgrades in {1:F3}s", upgradeNodes.CountNodes, time);
 
                 ConfigNode guiSettings = new ConfigNode("gui");
                 guiSettings.AddValue("left", KRnDGUI.windowPosition.xMin);
@@ -1168,7 +1164,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] OnSave(): " + e.ToString());
+                Log.error(e, "OnSave(): {0}", e);
             }
         }
 
@@ -1201,7 +1197,7 @@ namespace KRnD
                     }
 
                     time = (DateTime.Now.Ticks - time) / TimeSpan.TicksPerSecond;
-                   Log.Error("retrieved and applied " + upgradesApplied.ToString() + " upgrades in " + time.ToString("0.000s"));
+                    Log.info("retrieved and applied {0} upgrades in {1:F3}s", upgradesApplied, time);
                 }
 
                 ConfigNode guiSettings = node.GetNode("gui");
@@ -1213,9 +1209,8 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] OnLoad(): " + e.ToString());
+                Log.error(e, "OnLoad(): {0}", e);
             }
         }
     }
-
 }

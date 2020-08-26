@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Data.SqlTypes;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using UnityEngine;
 using System.Text.RegularExpressions;
+
+using UnityEngine;
+
 using KSP.UI.Screens; // For "ApplicationLauncherButton"
 
-using ClickThroughFix;
+using GUILayout = KSPe.UI.GUILayout;
 using ToolbarControl_NS;
 
 namespace KRnD
@@ -96,7 +93,7 @@ namespace KRnD
         {
             if (showGui)
             {
-                windowPosition = ClickThruBlocker.GUILayoutWindow(100, windowPosition, OnWindow, "", windowStyle);
+                windowPosition = GUILayout.Window(100, windowPosition, OnWindow, "", windowStyle);
             }
         }
 
@@ -116,7 +113,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeIspVac(): " + e.ToString());
+                Log.error(e, "UpgradeIspVac(): {0}", e);
             }
             return 0;
         }
@@ -137,7 +134,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeIspAtm(): " + e.ToString());
+                Log.error(e, "UpgradeIspAtm(): {0}", e);
             }
             return 0;
         }
@@ -158,7 +155,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeDryMass(): " + e.ToString());
+                Log.error(e, "UpgradeDryMass(): {0}", e);
             }
             return 0;
         }
@@ -179,7 +176,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeFuelFlow(): " + e.ToString());
+                Log.error(e, "UpgradeFuelFlow(): {0}", e);
             }
             return 0;
         }
@@ -200,7 +197,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeTorque(): " + e.ToString());
+                Log.error(e, "UpgradeTorque(): {0}", e);
             }
             return 0;
         }
@@ -222,7 +219,7 @@ namespace KRnD
         //    }
         //    catch (Exception e)
         //    {
-        //        Debug.LogError("[KRnD] UpgradeAntennaPower(): " + e.ToString());
+        //        Log.error(e, "UpgradeAntennaPower(): {0}", e);
         //    }
         //    return 0;
         //}
@@ -243,7 +240,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeDrillPower(): " + e.ToString());
+                Log.error(e, "UpgradeDrillPower(): {0}", e);
             }
             return 0;
         }
@@ -264,7 +261,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeRadiatorEfficiency(): " + e.ToString());
+                Log.error(e, "UpgradeRadiatorEfficiency(): {0}", e);
             }
             return 0;
         }
@@ -285,7 +282,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeChargeRate(): " + e.ToString());
+                Log.error(e, "UpgradeChargeRate(): {0}", e);
             }
             return 0;
         }
@@ -306,7 +303,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeCrashTolerance(): " + e.ToString());
+                Log.error(e, "UpgradeCrashTolerance(): {0}", e);
             }
             return 0;
         }
@@ -327,7 +324,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeBatteryCharge(): " + e.ToString());
+                Log.error(e, "UpgradeBatteryCharge(): {0}", e);
             }
             return 0;
         }
@@ -348,7 +345,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeGeneratorEfficiency(): " + e.ToString());
+                Log.error(e, "UpgradeGeneratorEfficiency(): {0}", e);
             }
             return 0;
         }
@@ -369,7 +366,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeConverterEfficiency(): " + e.ToString());
+                Log.error(e, "UpgradeConverterEfficiency(): {0}", e);
             }
             return 0;
         }
@@ -390,7 +387,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeParachuteStrength(): " + e.ToString());
+                Log.error(e, "UpgradeParachuteStrength(): {0}", e);
             }
             return 0;
         }
@@ -411,7 +408,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeMaxTemperature(): " + e.ToString());
+                Log.error(e, "UpgradeMaxTemperature(): {0}", e);
             }
             return 0;
         }
@@ -432,7 +429,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] UpgradeFuelCapacity(): " + e.ToString());
+                Log.error(e, "UpgradeFuelCapacity(): {0}", e);
             }
             return 0;
         }
@@ -529,7 +526,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnDGUI] getPartInfo(): " + e.ToString());
+                Log.error(e, "getPartInfo(): {0}", e);
             }
             finally
             {
@@ -542,7 +539,7 @@ namespace KRnD
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("[KRnDGUI] getPartInfo() restore of part failed: " + e.ToString());
+                    Log.error(e, "getPartInfo() restore of part failed: {0}", e);
                 }
             }
             return info;
@@ -569,7 +566,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnDGUI] highlightChanges(): " + e.ToString());
+                Log.error(e, "highlightChanges(): {0}", e);
             }
             if (highlightedText == "") return newText;
             return highlightedText;
@@ -1000,7 +997,7 @@ namespace KRnD
             }
             catch (Exception e)
             {
-                Debug.LogError("[KRnD] GenerateWindow(): " + e.ToString());
+                Log.error(e, "GenerateWindow(): {0}", e);
             }
         }
     }

@@ -9,6 +9,6 @@ GameData/**/CHANGE_LOG.md
 GameData/**/CHANGES.md
 GameData/INSTALL.md
 GameData/**/*.version
-Source/*/Properties/Version.cs
-Source/*/Properties/Configuration.cs
+Source/**/Properties/Version.cs
+Source/**/Properties/Configuration.cs
 Source/*/*.user
