@@ -1090,8 +1090,32 @@ namespace KRnD
                     Log.info("blacklisted {0} parts, which contained one of {1} blacklisted modules", KRnD.blacklistedParts.Count, blacklistedModules.Count);
                 }
 
+                // Create a backup of all unmodified parts before we update them. We will later use these backup-parts
+                // for all calculations of upgraded stats.
                 if (KRnD.originalStats == null)
-                    this.RefreshOriginalStats();
+                {
+                    KRnD.originalStats = new Dictionary<string, PartStats>();
+                    for (int i = 0; i < PartLoader.LoadedPartsList.Count; i++)
+                    {
+                        AvailablePart aPart = PartLoader.LoadedPartsList[i];
+
+                        Part part = aPart.partPrefab;
+
+                        // Backup this part, if it has the RnD-Module:
+                        if (KRnD.getKRnDModule(part) != null)
+                        {
+                            PartStats duplicate;
+                            if (originalStats.TryGetValue(part.name, out duplicate))
+                            {
+                                Log.error("Awake(): duplicate part-name: {0}", part.name);
+                            }
+                            else
+                            {
+                                originalStats.Add(part.name, new PartStats(part));
+                            }
+                        }
+                    }
+                }
 
                 // Execute the following code only once:
                 if (KRnD.initialized) return;
@@ -1108,42 +1132,6 @@ namespace KRnD
             {
                 Log.error(e, "Awake(): {0}", e);
             }
-        }
-
-        // Create a backup of all unmodified parts before we update them. We will later use these backup-parts
-        // for all calculations of upgraded stats.
-        private void RefreshOriginalStats()
-        {
-            KRnD.originalStats = new Dictionary<string, PartStats>();
-            for (int i = 0; i < PartLoader.LoadedPartsList.Count; i++)
-            {
-                AvailablePart aPart = PartLoader.LoadedPartsList[i];
-
-                Part part = aPart.partPrefab;
-
-                // Backup this part, if it has the RnD-Module:
-                if (KRnD.getKRnDModule(part) != null)
-                {
-                    PartStats duplicate;
-                    if (originalStats.TryGetValue(part.name, out duplicate))
-                    {
-                        Log.error("RefreshOriginalStats(): duplicate part-name: {0}", part.name);
-                    }
-                    else
-                    {
-                        originalStats.Add(part.name, new PartStats(part));
-                    }
-                }
-            }
-        }
-
-        [KSPEvent(guiActive = false, active = true)]
-        private void OnPartScaleChanged(BaseEventDetails data)
-        {
-            float factorAbsolute = data.Get<float>("factorAbsolute");
-            float factorRelative = data.Get<float>("factorRelative");
-            Log.info("OnPartScaleChanged() by {0:F5} to {1:F5}", factorRelative, factorAbsolute);
-            this.RefreshOriginalStats();
         }
     }
 
